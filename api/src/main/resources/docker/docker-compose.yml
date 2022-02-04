@@ -1,0 +1,19 @@
+# A Docker Compose must always start with the version tag.
+# We use '3.9' because it's the last version.
+version: '3.9'
+
+services:
+
+  db:
+    # Official Postgres image from DockerHub (we use the last version)
+    image: 'postgres:latest'
+    container_name: boilerplate_postgres
+
+    ports:
+      - 5434:5432
+    volumes:
+      - "./.data/db:/var/lib/postgres"
+    environment:
+      POSTGRES_USER: user # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: pass # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: boilerplate # The PostgreSQL default database (automatically created at first launch)

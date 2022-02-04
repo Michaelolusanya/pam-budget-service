@@ -1,0 +1,19 @@
+version: "3.9"
+services:
+
+    boilerplate-java-springboot2:
+        build: ./api
+        container_name: boilerplate-java-springboot2
+        hostname: boilerplate-java-springboot2
+        privileged: true
+        depends_on:
+          - db
+        restart: always
+        ports:
+            - 8080:8080
+    db:
+        image: 'postgres:13.1-alpine'
+        container_name: db
+        environment:
+        - POSTGRES_USER=compose-postgres
+        - POSTGRES_PASSWORD=compose-postgres
