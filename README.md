@@ -1,4 +1,4 @@
-# Java-Backend-Boilerplate
+# pam-budget-service
 To be able to run the application properly you need to have all this installed
 - An IDE (Intellij recommended)
 - Java 
