@@ -7,13 +7,16 @@ services:
   db:
     # Official Postgres image from DockerHub (we use the last version)
     image: 'postgres:latest'
-    container_name: boilerplate_postgres
+    container_name: budget_service_postgres
 
     ports:
-      - 5434:5432
+      - 23155:5432
     volumes:
       - "./.data/db:/var/lib/postgres"
     environment:
       POSTGRES_USER: user # The PostgreSQL user (useful to connect to the database)
       POSTGRES_PASSWORD: pass # The PostgreSQL password (useful to connect to the database)
-      POSTGRES_DB: boilerplate # The PostgreSQL default database (automatically created at first launch)
+      POSTGRES_DB: budget-service # The PostgreSQL default database (automatically created at first launch)
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:23155" ]
+

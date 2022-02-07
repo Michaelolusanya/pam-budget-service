@@ -130,8 +130,8 @@
 				<artifactId>maven-compiler-plugin</artifactId>
 				<version>${maven-compiler.version}</version>
 				<configuration>
-					<source>11</source>
-					<target>11</target>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -158,6 +158,24 @@
 						</googleJavaFormat>
 					</java>
 				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>com.dkanejs.maven.plugins</groupId>
+				<artifactId>docker-compose-maven-plugin</artifactId>
+				<version>4.0.0</version>
+				<configuration>
+					<composeFile>${project.basedir}/src/main/resources/docker/postgres/docker-compose.yml</composeFile>
+					<detachedMode>true</detachedMode>
+				</configuration>
+				<!-- Start our containers if not already running -->
+				<executions>
+					<execution>
+						<phase>compile</phase>
+						<goals>
+							<goal>up</goal>
+						</goals>
+					</execution>
+				</executions>
 			</plugin>
 		</plugins>
 	</build>
