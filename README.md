@@ -18,7 +18,7 @@ When that is set up do the following steps.
 2. docker-compose build (builds the project inside a container)
 3. docker-compose up (Starts up the container that were built)
 4. docker-compose down (removes the containers)
-When the container is up the url are ` http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config `
+When the container is up the url are ` http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config `
 to use the swagger (open-api documentation) and test the different endpoints. Further info about swagger can be find below
 under the "Swagger" section.
 
@@ -104,5 +104,5 @@ The `Env.java` manages static variables that are used across the application, as
 Swagger includes automated documentation of the restful APIs expressed using json. It displays all the endpoints in a project and generates test-cases for those. To be able to test the endpoints, firstly an authorization is needed through OAuth2. After that all endpoints can be tested out. 
 <br> 
 The site displays which environment that the project are currently running on under the title "Environment:".
-When the application is running swagger can be find with this url `http://localhost:8080/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config`
+When the application is running swagger can be find with this url `http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config`
 The configuration file for swagger is in **apiconfiguration/OpenapiConfiguration.java**

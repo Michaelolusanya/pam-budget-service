@@ -79,7 +79,7 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             "/swagger-ui/swagger-ui.css.map",
             "/swagger-ui/swagger-ui-bundle.js.map",
             "/swagger-ui/swagger-ui-standalone-preset.js.map",
-            "http://localhost:8080/v3/api-docs",
+            "http://localhost:23154/v3/api-docs",
             "/swagger-ui/swagger-ui.css",
             "/swagger-ui/swagger-ui-bundle.js",
             "/swagger-ui/swagger-ui-standalone-preset.js"
