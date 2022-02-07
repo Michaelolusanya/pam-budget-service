@@ -9,7 +9,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
 import ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
-import ikea.imc.pam.budget.service.controller.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;

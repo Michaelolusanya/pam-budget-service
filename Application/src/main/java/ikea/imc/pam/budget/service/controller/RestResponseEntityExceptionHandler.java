@@ -1,7 +1,7 @@
 package ikea.imc.pam.budget.service.controller;
 
 import ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
-import ikea.imc.pam.budget.service.controller.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import ikea.imc.pam.budget.service.exception.RequestException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;

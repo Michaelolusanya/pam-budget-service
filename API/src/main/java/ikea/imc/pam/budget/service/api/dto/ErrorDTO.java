@@ -1,4 +1,4 @@
-package ikea.imc.pam.budget.service.controller.dto;
+package ikea.imc.pam.budget.service.api.dto;
 
 public class ErrorDTO {
 
