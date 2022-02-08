@@ -87,6 +87,7 @@
 					<composeFile>${project.basedir}/Application/src/main/resources/docker/postgres/docker-compose.yml</composeFile>
 					<detachedMode>true</detachedMode>
 				</configuration>
+				<inherited>false</inherited>
 				<!-- Start our containers if not already running -->
 				<executions>
 					<execution>
