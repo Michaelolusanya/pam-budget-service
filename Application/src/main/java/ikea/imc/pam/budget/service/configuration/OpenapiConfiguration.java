@@ -1,6 +1,11 @@
 package ikea.imc.pam.budget.service.configuration;
 
 import com.google.common.base.Joiner;
+import ikea.imc.pam.budget.service.configuration.properties.NetworkProperties;
+import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
+import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties.ClientScope;
+import ikea.imc.pam.budget.service.configuration.properties.OpenApiProperties;
+import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
 import io.swagger.v3.oas.models.info.Contact;
@@ -9,11 +14,6 @@ import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
 import io.swagger.v3.oas.models.security.*;
 import io.swagger.v3.oas.models.servers.Server;
-import ikea.imc.pam.budget.service.configuration.properties.NetworkProperties;
-import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
-import ikea.imc.pam.budget.service.configuration.properties.OpenApiProperties;
-import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties.ClientScope;
-import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
@@ -28,9 +28,7 @@ public class OpenapiConfiguration {
     private final OpenApiProperties openApiProperties;
 
     public OpenapiConfiguration(
-            NetworkProperties networkProperties,
-            OAuthProperties oauthProperties,
-            OpenApiProperties openApiProperties) {
+            NetworkProperties networkProperties, OAuthProperties oauthProperties, OpenApiProperties openApiProperties) {
         this.networkProperties = networkProperties;
         this.oauthProperties = oauthProperties;
         this.openApiProperties = openApiProperties;
@@ -50,7 +48,6 @@ public class OpenapiConfiguration {
     private Info getApplicationInformation() {
         Contact contact = new Contact();
         contact.name("the application owner");
-        contact.email(openApiProperties.getOwnerMail());
 
         Info info = new Info();
         info.title(title);
@@ -72,10 +69,11 @@ public class OpenapiConfiguration {
                 + "<br>";
     }
 
-    /***************************************************************************************
-     ******************************** Security Configuration ********************************
-     ***************************************************************************************/
-
+    /**
+     * *************************************************************************************
+     * ****************************** Security Configuration *******************************
+     * *************************************************************************************
+     */
     private Components getSecuritySchemesComponents() {
         Parameter parameter = new Parameter();
         parameter.in("header");
@@ -90,10 +88,11 @@ public class OpenapiConfiguration {
         return components;
     }
 
-    /***************************************************************************************
-     *********************** Security Configuration: Open ID Connnect ***********************
-     ***************************************************************************************/
-
+    /**
+     * *************************************************************************************
+     * ******************** Security Configuration: Open ID Connnect ***********************
+     * *************************************************************************************
+     */
     private SecurityScheme getOpenIdConnectSecurityScheme() {
         SecurityScheme secScheme = new SecurityScheme();
         secScheme.type(SecurityScheme.Type.OAUTH2);
@@ -105,10 +104,8 @@ public class OpenapiConfiguration {
     private OAuthFlows getAuthorizationCodeOAuthFlows() {
         ClientScope clientScopeProperties = oauthProperties.getClientScope();
         Scopes scopes = new Scopes();
-        scopes.addString(
-                clientScopeProperties.getReadScope(), clientScopeProperties.getReadScopeDesc());
-        scopes.addString(
-                clientScopeProperties.getWriteScope(), clientScopeProperties.getWriteScopeDesc());
+        scopes.addString(clientScopeProperties.getReadScope(), clientScopeProperties.getReadScopeDesc());
+        scopes.addString(clientScopeProperties.getWriteScope(), clientScopeProperties.getWriteScopeDesc());
 
         OAuthFlow oAuthFlow = new OAuthFlow();
         oAuthFlow.setAuthorizationUrl(oauthProperties.getMicrosoft().getAuthorizationUrl());
@@ -121,10 +118,11 @@ public class OpenapiConfiguration {
         return oauthFlows;
     }
 
-    /***************************************************************************************
-     ************************** Security Configuration: JWT - Token *************************
-     ***************************************************************************************/
-
+    /**
+     * *************************************************************************************
+     * ************************ Security Configuration: JWT - Token ************************
+     * *************************************************************************************
+     */
     private SecurityScheme getJwtTokenSecurityScheme() {
         SecurityScheme secScheme = new SecurityScheme();
         secScheme.type(SecurityScheme.Type.HTTP);
