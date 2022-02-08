@@ -6,6 +6,7 @@ public class RequestPartialBudgetDTO {
 
     @Size(min = 3, max = 200)
     private String name;
+
     private String status;
     private int salesStartAtYear;
     private byte salesStartAtMonth;

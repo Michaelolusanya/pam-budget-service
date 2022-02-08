@@ -6,15 +6,14 @@ import com.auth0.jwk.UrlJwkProvider;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
-import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
-import org.apache.logging.log4j.Logger;
 import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
-import org.json.JSONObject;
-
+import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
 import java.net.URL;
 import java.security.interfaces.RSAPublicKey;
 import java.util.Base64;
 import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+import org.json.JSONObject;
 
 public class JWTVerifier {
     private static final Logger logger = LogManager.getLogger(JWTVerifier.class);
@@ -42,8 +41,7 @@ public class JWTVerifier {
 
     public boolean isCorrectIssuer(DecodedJWT jwt) {
         OAuthProperties oAuthProperties = ApplicationContextUtil.getBean(OAuthProperties.class);
-        Object allowedIssuer =
-                "https://sts.windows.net/" + oAuthProperties.getMicrosoft().getTenantId() + "/";
+        Object allowedIssuer = "https://sts.windows.net/" + oAuthProperties.getMicrosoft().getTenantId() + "/";
         boolean correctIssuer = (jwt.getIssuer() != null && jwt.getIssuer().equals(allowedIssuer));
         if (correctIssuer == false) {
             logger.error("Incorrect Issuer: " + jwt.getIssuer());
@@ -55,8 +53,7 @@ public class JWTVerifier {
         OAuthProperties oAuthProperties = ApplicationContextUtil.getBean(OAuthProperties.class);
         JSONObject json = getJSONObjectFromJWT(jwt.getToken());
         String appid = ((json == null) ? null : json.getString("appid"));
-        boolean correctAppId =
-                (appid != null && appid.equals(oAuthProperties.getClientScope().getId()));
+        boolean correctAppId = (appid != null && appid.equals(oAuthProperties.getClientScope().getId()));
         if (correctAppId == false) {
             logger.warn("Incorrect appid (client id within the token): " + appid);
         }

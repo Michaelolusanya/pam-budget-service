@@ -4,10 +4,17 @@ import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import ikea.imc.pam.budget.service.api.dto.ErrorDTO;
 import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.configuration.properties.OpenApiProperties;
 import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
-import ikea.imc.pam.budget.service.configuration.properties.OpenApiProperties;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import javax.validation.ConstraintViolation;
+import javax.validation.ConstraintViolationException;
+import javax.validation.ElementKind;
+import javax.validation.Path;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -17,14 +24,6 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 
-import javax.validation.ConstraintViolation;
-import javax.validation.ConstraintViolationException;
-import javax.validation.ElementKind;
-import javax.validation.Path;
-import java.util.List;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 public class ResponseEntityFactory {
 
     private ResponseEntityFactory() {}
@@ -33,7 +32,8 @@ public class ResponseEntityFactory {
         return generateResponse(httpStatus, null, data);
     }
 
-    public static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponse(HttpStatus httpStatus, String message, T data) {
+    public static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponse(
+            HttpStatus httpStatus, String message, T data) {
 
         ResponseMessageDTO<T> dto = new ResponseMessageDTO<>();
         dto.setSuccess(isSuccess(httpStatus));
@@ -48,7 +48,8 @@ public class ResponseEntityFactory {
         return generateResponse(httpStatus, null, null);
     }
 
-    public static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponseMessage(HttpStatus httpStatus, String message) {
+    public static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponseMessage(
+            HttpStatus httpStatus, String message) {
         return generateResponse(httpStatus, message, null);
     }
 
@@ -68,13 +69,15 @@ public class ResponseEntityFactory {
         if (!isSuccess(httpStatus)) {
             OpenApiProperties properties = ApplicationContextUtil.getBean(OpenApiProperties.class);
             dto.setOpenApiDocumentation(properties != null ? properties.getDocumentation().getOpenApiDocs() : null);
-            dto.setOpenApiJSONDocumentation(properties != null ? properties.getDocumentation().getOpenApiJsonDoc() : null);
+            dto.setOpenApiJSONDocumentation(
+                    properties != null ? properties.getDocumentation().getOpenApiJsonDoc() : null);
         }
 
         return generateResponseEntity(httpStatus, dto);
     }
 
-    private static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponseEntity(HttpStatus httpStatus, ResponseMessageDTO<T> dto) {
+    private static <T> ResponseEntity<ResponseMessageDTO<T>> generateResponseEntity(
+            HttpStatus httpStatus, ResponseMessageDTO<T> dto) {
         return new ResponseEntity<>(dto, httpStatus);
     }
 
@@ -92,10 +95,10 @@ public class ResponseEntityFactory {
             Throwable rootCause = httpException.getRootCause();
             if (rootCause instanceof JsonParseException) {
                 JsonParseException ex = (JsonParseException) rootCause;
-                message = String.format("Line: %d, column: %d, exception: %s",
-                        ex.getLocation().getLineNr(),
-                        ex.getLocation().getColumnNr(),
-                        ex.getOriginalMessage());
+                message =
+                        String.format(
+                                "Line: %d, column: %d, exception: %s",
+                                ex.getLocation().getLineNr(), ex.getLocation().getColumnNr(), ex.getOriginalMessage());
             }
         }
 
@@ -143,17 +146,19 @@ public class ResponseEntityFactory {
 
         ErrorDTO dto = new ErrorDTO();
         dto.setMessage(exception.getOriginalMessage());
-        String pointer = exception.getPath().stream()
-                .map(reference -> {
-                    if (reference.getFrom() instanceof List) {
-                        return "[" + reference.getIndex() + "]";
-                    }
-                    if (reference.getFrom() instanceof Map) {
-                        return "[" + reference.getFieldName() + "]";
-                    }
-                    return "." + reference.getFieldName();
-                })
-                .collect(Collectors.joining());
+        String pointer =
+                exception.getPath().stream()
+                        .map(
+                                reference -> {
+                                    if (reference.getFrom() instanceof List) {
+                                        return "[" + reference.getIndex() + "]";
+                                    }
+                                    if (reference.getFrom() instanceof Map) {
+                                        return "[" + reference.getFieldName() + "]";
+                                    }
+                                    return "." + reference.getFieldName();
+                                })
+                        .collect(Collectors.joining());
         if (pointer.startsWith(".")) {
             pointer = pointer.substring(1);
         }
@@ -166,7 +171,7 @@ public class ResponseEntityFactory {
         ErrorDTO dto = new ErrorDTO();
         dto.setMessage(error.getDefaultMessage());
         if (error instanceof FieldError) {
-            dto.setPointer(((FieldError)error).getField());
+            dto.setPointer(((FieldError) error).getField());
         } else {
             dto.setPointer(error.getObjectName());
         }

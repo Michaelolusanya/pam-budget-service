@@ -2,21 +2,23 @@ package ikea.imc.pam.budget.service.api.dto;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
 
 public class ResponseMessageDTO<T> {
     private boolean success;
     private int statusCode;
     private String message;
+
     @JsonInclude(JsonInclude.Include.NON_EMPTY)
     private List<ErrorDTO> errors;
+
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private T data;
 
     @JsonProperty("OpenApi-Documentation")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String openApiDocumentation;
+
     @JsonProperty("OpenApi-JSON-Documentation")
     @JsonInclude(JsonInclude.Include.NON_NULL)
     private String openApiJSONDocumentation;

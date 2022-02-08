@@ -9,7 +9,7 @@ public class Paths {
 
     private Paths() {}
 
-    public static String buildUrl(String url, String ...parameters) {
+    public static String buildUrl(String url, String... parameters) {
         if (parameters == null || parameters.length == 0) {
             return url;
         }
@@ -32,9 +32,6 @@ public class Paths {
             return "";
         }
 
-        return parameterValues
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining(",", parameterName + "=", ""));
+        return parameterValues.stream().map(Object::toString).collect(Collectors.joining(",", parameterName + "=", ""));
     }
 }

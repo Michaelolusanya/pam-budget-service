@@ -1,17 +1,16 @@
 package ikea.imc.pam.budget.service.controller.dto;
 
+import static org.junit.jupiter.api.Assertions.*;
+
 import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.exception.RequestException;
+import java.util.ArrayList;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 class ResponseEntityFactoryTest {
 
@@ -20,7 +19,8 @@ class ResponseEntityFactoryTest {
         String data = "Any class type data";
         HttpStatus httpStatus = HttpStatus.OK;
 
-        ResponseEntity<ResponseMessageDTO<String>> responseEntity = ResponseEntityFactory.generateResponse(httpStatus, data);
+        ResponseEntity<ResponseMessageDTO<String>> responseEntity =
+                ResponseEntityFactory.generateResponse(httpStatus, data);
 
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
@@ -37,7 +37,8 @@ class ResponseEntityFactoryTest {
         data.add(2);
         HttpStatus httpStatus = HttpStatus.ACCEPTED;
 
-        ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity = ResponseEntityFactory.generateResponse(httpStatus, data);
+        ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity =
+                ResponseEntityFactory.generateResponse(httpStatus, data);
 
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
@@ -55,7 +56,8 @@ class ResponseEntityFactoryTest {
         String message = "message1";
         HttpStatus httpStatus = HttpStatus.OK;
 
-        ResponseEntity<ResponseMessageDTO<String>> responseEntity = ResponseEntityFactory.generateResponse(httpStatus, message, data);
+        ResponseEntity<ResponseMessageDTO<String>> responseEntity =
+                ResponseEntityFactory.generateResponse(httpStatus, message, data);
 
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
@@ -73,7 +75,8 @@ class ResponseEntityFactoryTest {
         String message = "message1";
         HttpStatus httpStatus = HttpStatus.ACCEPTED;
 
-        ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity = ResponseEntityFactory.generateResponse(httpStatus, message, data);
+        ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity =
+                ResponseEntityFactory.generateResponse(httpStatus, message, data);
 
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
@@ -90,7 +93,8 @@ class ResponseEntityFactoryTest {
         String message = "not found";
         RequestException exception = new NotFoundException(message);
 
-        ResponseEntity<ResponseMessageDTO<Object>> responseEntity = ResponseEntityFactory.generateResponse(exception, message);
+        ResponseEntity<ResponseMessageDTO<Object>> responseEntity =
+                ResponseEntityFactory.generateResponse(exception, message);
 
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());

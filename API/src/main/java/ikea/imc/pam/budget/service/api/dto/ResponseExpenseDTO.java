@@ -12,7 +12,6 @@ public class ResponseExpenseDTO {
     private String comment;
     private String priceModel;
 
-
     public Long getId() {
         return id;
     }

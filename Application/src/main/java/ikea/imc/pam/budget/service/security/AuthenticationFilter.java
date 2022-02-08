@@ -1,15 +1,14 @@
 package ikea.imc.pam.budget.service.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
+import ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
 import java.io.IOException;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
-import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
-import ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
-import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -28,13 +27,12 @@ public class AuthenticationFilter extends OncePerRequestFilter {
     }
 
     @Override
-    protected void doFilterInternal(
-            HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
+    protected void doFilterInternal(HttpServletRequest req, HttpServletResponse res, FilterChain filterChain)
             throws ServletException, IOException {
         JWTVerifier jv = new JWTVerifier();
         String auth = req.getHeader("Authorization");
 
-        if(!oAuthProperties.getEnabled()) {
+        if (!oAuthProperties.getEnabled()) {
             filterChain.doFilter(req, res);
         } else if (isCurrentPathOpen(req.getRequestURI(), req.getMethod())) {
             filterChain.doFilter(req, res);
@@ -49,7 +47,8 @@ public class AuthenticationFilter extends OncePerRequestFilter {
         response.resetBuffer();
         response.setStatus(401);
         response.setHeader(HttpHeaders.CONTENT_TYPE, "application/json");
-        ResponseEntity<ResponseMessageDTO<Object>> responseEntity = ResponseEntityFactory.generateResponse(HttpStatus.UNAUTHORIZED);
+        ResponseEntity<ResponseMessageDTO<Object>> responseEntity =
+                ResponseEntityFactory.generateResponse(HttpStatus.UNAUTHORIZED);
         response.getOutputStream().print(new ObjectMapper().writeValueAsString(responseEntity.getBody()));
         response.flushBuffer();
     }

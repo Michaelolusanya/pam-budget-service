@@ -9,9 +9,12 @@ public class RequestPartialExpenseDTO {
     @Min(0)
     @Max(1)
     private double comdevFraction;
+
     @Min(0)
     private int comdevCost;
+
     private int unitCost;
+
     @Size(min = 0)
     private String comment;
 

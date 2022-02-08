@@ -9,28 +9,30 @@ public class RequestBudgetDTO {
     private String name;
 
     private String status;
-    @NotNull
-    private boolean runningRange;
+    @NotNull private boolean runningRange;
 
     private int salesStartAtYear;
     private byte salesStartAtMonth;
-    @NotNull
-    private Long hfbId;
-    @NotBlank
-    private String fiscalYear;
+    @NotNull private Long hfbId;
+    @NotBlank private String fiscalYear;
+
     @Min(0)
     private Integer estimatedCost;
 
     @AssertTrue(message = "salesStartAtYear must be between 1970 and 3000 if runningRange is false")
     private boolean isSalesStartAtYear() {
-        return (runningRange && salesStartAtYear == 0) || (!runningRange && salesStartAtYear > 1970 && salesStartAtYear < 3000);
+        return (runningRange && salesStartAtYear == 0)
+                || (!runningRange && salesStartAtYear > 1970 && salesStartAtYear < 3000);
     }
 
     @AssertTrue(message = "salesStartAtMonth must be one of 1, 3, 6, or 9 if runningRange is false")
     private boolean isSalesStartAtMonth() {
         return (runningRange && salesStartAtMonth == 0)
                 || (!runningRange
-                && (salesStartAtMonth == 1 || salesStartAtMonth == 3 || salesStartAtMonth == 6 || salesStartAtMonth == 9));
+                        && (salesStartAtMonth == 1
+                                || salesStartAtMonth == 3
+                                || salesStartAtMonth == 6
+                                || salesStartAtMonth == 9));
     }
 
     public String getName() {

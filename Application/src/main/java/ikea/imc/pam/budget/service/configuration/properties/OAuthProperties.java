@@ -1,8 +1,6 @@
 package ikea.imc.pam.budget.service.configuration.properties;
 
 import javax.validation.constraints.NotEmpty;
-
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
@@ -10,9 +8,7 @@ import org.springframework.validation.annotation.Validated;
 /**
  * For OAUTH-variables defined in spring, see the
  *
- * @see org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties
- *      OAUTH
- *      for Swagger
+ * @see org.springframework.boot.autoconfigure.security.oauth2.client.OAuth2ClientProperties OAUTH for Swagger
  * @see org.springdoc.core.SwaggerUiOAuthProperties
  */
 @Validated
@@ -24,9 +20,7 @@ public class OAuthProperties {
     private final ClientScope clientScope;
     private final boolean enabled;
 
-    public OAuthProperties(Microsoft microsoft,
-                           ClientScope clientScope,
-                           Boolean enabled) {
+    public OAuthProperties(Microsoft microsoft, ClientScope clientScope, Boolean enabled) {
 
         this.microsoft = microsoft;
         this.clientScope = clientScope;
@@ -86,12 +80,9 @@ public class OAuthProperties {
     }
 
     public static class Microsoft {
-        @NotEmpty
-        private final String tenantId;
-        @NotEmpty
-        private final String authorizationUrl;
-        @NotEmpty
-        private final String tokenUrl;
+        @NotEmpty private final String tenantId;
+        @NotEmpty private final String authorizationUrl;
+        @NotEmpty private final String tokenUrl;
 
         public Microsoft(String tenantId, String authorizationUrl, String tokenUrl) {
             this.tenantId = tenantId;
