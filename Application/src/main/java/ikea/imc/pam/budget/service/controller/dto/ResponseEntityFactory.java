@@ -67,8 +67,8 @@ public class ResponseEntityFactory {
 
         if (!isSuccess(httpStatus)) {
             OpenApiProperties properties = ApplicationContextUtil.getBean(OpenApiProperties.class);
-            dto.setOpenApiDocumentation(properties.getDocumentation().getOpenApiDocs());
-            dto.setOpenApiJSONDocumentation(properties.getDocumentation().getOpenApiJsonDoc());
+            dto.setOpenApiDocumentation(properties != null ? properties.getDocumentation().getOpenApiDocs() : null);
+            dto.setOpenApiJSONDocumentation(properties != null ? properties.getDocumentation().getOpenApiJsonDoc() : null);
         }
 
         return generateResponseEntity(httpStatus, dto);
