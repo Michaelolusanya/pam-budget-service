@@ -1,19 +1,37 @@
 version: "3.9"
 services:
-
-    pam-budget-service:
-        build: ./api
-        container_name: pam-budget-service
+    budget-service-application:
+        build:
+            context: .
+            dockerfile: Dockerfile
+            args:
+                - SUSPENDED_BOOT=n
+                - DEBUG_PORT=5006
+        container_name: budget_service_application
         hostname: pam-budget-service
         privileged: true
+        restart: unless-stopped
         depends_on:
-          - db
-        restart: always
+            budget-service-postgres:
+                condition: service_healthy
         ports:
-            - 23154:8080
-    db:
-        image: 'postgres:13.1-alpine'
-        container_name: db
+            - "23154:8080" # Default application port
+            - "5006:5006" # Debug port
         environment:
-        - POSTGRES_USER=compose-postgres
-        - POSTGRES_PASSWORD=compose-postgres
+            - "SPRING_PROFILES_ACTIVE=local"
+    budget-service-postgres:
+        image: 'postgres:latest'
+        container_name: budget_service_postgres
+        ports:
+            - "23155:5432"
+        volumes:
+            - "./.data/db:/var/lib/postgres"
+        environment:
+            POSTGRES_USER: user
+            POSTGRES_PASSWORD: pass
+            POSTGRES_DB: budget-service
+        healthcheck:
+            test: [ "CMD-SHELL", "pg_isready" ]
+            interval: 10s
+            timeout: 5s
+            retries: 5

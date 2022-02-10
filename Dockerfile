@@ -1,26 +1,17 @@
-FROM maven:3.8.3-jdk-11
+FROM maven:3.8.3-jdk-11-slim
 RUN apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Check-Date=false --allow-releaseinfo-change \
      update -y && apt-get install -y git vim systemd
 
-RUN apt-get install -y python3 
-RUN apt-get install -y python3-pip
-RUN pip3 install requests
+ARG SUSPENDED_BOOT
+ARG DEBUG_PORT
+RUN echo "Suspended boot: $SUSPENDED_BOOT"
+RUN echo "Debug port: $DEBUG_PORT"
+ENV SUSPENDED_BOOT_ENV=$SUSPENDED_BOOT
+ENV DEBUG_PORT_ENV=$DEBUG_PORT
 
-RUN mkdir -p /boilerplate/api
+RUN mkdir /budget-service
+WORKDIR /budget-service
 
-RUN mkdir /boilerplate/jar-file
+COPY /Application/target /budget-service
 
-WORKDIR /boilerplate/api
-
-COPY . /boilerplate/api
-
-#RUN chmod 777 -R
-
-RUN mkdir -p /boilerplate/storage/files/
-
-RUN mvn clean install
-
-EXPOSE 8080
-
-ENTRYPOINT ["java", "-jar","/boilerplate/api/target/boilerplate-0.0.1-SNAPSHOT.jar"]
-
+ENTRYPOINT java -jar -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=$SUSPENDED_BOOT_ENV,address=*:$DEBUG_PORT_ENV /budget-service/pam-budget-service-application-0.0.1-SNAPSHOT-exec.jar

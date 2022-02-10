@@ -28,7 +28,6 @@
 		<modelmapper.version>2.4.2</modelmapper.version>
 		<maven-compiler.version>3.8.1</maven-compiler.version>
 		<spotless.version>2.20.0</spotless.version>
-		<suspended.startup>n</suspended.startup>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
 		<maven.compiler.target>${java.version}</maven.compiler.target>
 	</properties>
@@ -40,19 +39,8 @@
 				<artifactId>spring-boot-maven-plugin</artifactId>
 				<version>2.6.2</version>
 				<configuration>
-					<jvmArguments>
-						-Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=${suspended.startup},address=5006
-					</jvmArguments>
 					<classifier>exec</classifier>
 					<mainClass>ikea.imc.pam.budget.service.StartSpringbootApi</mainClass>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<version>3.3.1</version>
-				<configuration>
-					<attachClasses>true</attachClasses>
 				</configuration>
 			</plugin>
 			<plugin>
@@ -79,29 +67,7 @@
 					</execution>
 				</executions>
 			</plugin>
-			<plugin>
-				<groupId>com.dkanejs.maven.plugins</groupId>
-				<artifactId>docker-compose-maven-plugin</artifactId>
-				<version>4.0.0</version>
-				<configuration>
-					<composeFile>${project.basedir}/Application/src/main/resources/docker/postgres/docker-compose.yml</composeFile>
-					<detachedMode>true</detachedMode>
-				</configuration>
-				<inherited>false</inherited>
-				<!-- Start our containers if not already running -->
-				<executions>
-					<execution>
-						<phase>compile</phase>
-						<goals>
-							<goal>up</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
 		</plugins>
-		<finalName>
-			content-planning-projects
-		</finalName>
 	</build>
 
 	<!-- DEFINE COMMON DEPENDENCIES BETWEEN MODULES -->
