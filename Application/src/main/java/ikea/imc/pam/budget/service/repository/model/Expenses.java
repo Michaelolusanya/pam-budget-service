@@ -22,7 +22,7 @@ public class Expenses {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long expensesId;
 
     private long assignmentId;
 

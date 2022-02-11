@@ -20,7 +20,7 @@ public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long budgetId;
 
     private long projectId;
 
@@ -29,7 +29,7 @@ public class Budget {
     private BigDecimal costCOMDEV;
 
     @ManyToOne
-    @JoinColumn(name = "id")
+    @JoinColumn(name = "budgetVersionId")
     private BudgetVersion budgetVersion;
 
 }

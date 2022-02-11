@@ -17,7 +17,7 @@ public class BudgetVersion {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long budgetVersionId;
 
     private String budgetVersionName;
 
