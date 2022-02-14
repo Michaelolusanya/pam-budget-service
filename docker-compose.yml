@@ -11,9 +11,6 @@ services:
         hostname: pam-budget-service
         privileged: true
         restart: unless-stopped
-        depends_on:
-            budget-service-postgres:
-                condition: service_healthy
         ports:
             - "23154:8080" # Default application port
             - "5006:5006" # Debug port
@@ -25,19 +22,3 @@ services:
             timeout: 5s
             retries: 5
             start_period: 40s
-    budget-service-postgres:
-        image: 'postgres:latest'
-        container_name: budget_service_postgres
-        ports:
-            - "23155:5432"
-        volumes:
-            - "./.data/db:/var/lib/postgres"
-        environment:
-            POSTGRES_USER: user
-            POSTGRES_PASSWORD: pass
-            POSTGRES_DB: budget-service
-        healthcheck:
-            test: [ "CMD-SHELL", "pg_isready" ]
-            interval: 10s
-            timeout: 5s
-            retries: 5

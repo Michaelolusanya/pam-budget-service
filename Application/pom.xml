@@ -44,10 +44,14 @@
                 </configuration>
                 <dependencies>
                     <dependency>
+                        <groupId>com.h2database</groupId>
+                        <artifactId>h2</artifactId>
+                        <version>1.4.200</version>
+                    </dependency>
+                    <dependency>
                         <groupId>org.postgresql</groupId>
                         <artifactId>postgresql</artifactId>
                         <version>42.2.24</version>
-                        <scope>runtime</scope>
                     </dependency>
                 </dependencies>
             </plugin>
@@ -132,7 +136,6 @@
         <dependency>
             <groupId>com.h2database</groupId>
             <artifactId>h2</artifactId>
-            <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.modelmapper</groupId>

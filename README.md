@@ -20,13 +20,21 @@ To debug connect a *Remote JVM Debug* configuration on port **5006**
 3. Select the root pom
 
 ## Database
-pam-budget-service uses Postgres as it's RDBMS, the database is created as a Docker container and is handled by Maven.
+### Local
+pam-budget-service uses the H2 engine to run an embedded Postgres db in local and its pipelines.
+
+To view the database:
+1. Start application
+2. localhost:23154/h2-console
+* User name: sa
+* JDBC URL: jdbc:h2:mem:budget-version
+
+### Azure
+pam-budget-service uses Postgres as it's RDBMS
 
 To view the database it's recommended to use pgAdmin:
 1. Install and start up the program
-2. Add username and password to match -env datasource_username and datasource_password.
-3. Add a new database the match the database-name set in the end of the datasource_url.
-4. Run the springboot and all the tables should be added to the specified db inside pgAdmin.
+2. Username and password exists as secrets in Azure
 
 ## Environmental variables
 Important environment variables and how to set them up to get everything running.
