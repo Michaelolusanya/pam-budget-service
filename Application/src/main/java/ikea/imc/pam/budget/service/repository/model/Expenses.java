@@ -1,38 +1,39 @@
 package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
-import java.math.BigDecimal;
 import javax.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class Expenses {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long expensesId;
+    private Long expensesId;
 
-    private long assignmentId;
+    private Long assignmentId;
 
-    private long assetTypeId;
+    private Long assetTypeId;
 
     private String comment;
 
-    private int cost;
+    private Integer cost;
 
-    private double costCOMDEV;
+    private Double costCOMDEV;
 
-    private int costPerUnit;
+    private Integer costPerUnit;
 
-    private byte percentCOMDEV;
+    private Byte percentCOMDEV;
 
-    private short units;
+    private Short units;
 
-    private byte weeks;
+    private Byte weeks;
 
     @Enumerated(EnumType.STRING)
     private InvoicingTypeOption invoicingTypeOption;

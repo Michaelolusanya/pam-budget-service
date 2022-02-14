@@ -1,20 +1,21 @@
 package ikea.imc.pam.budget.service.repository.model;
 
-import java.math.BigDecimal;
 import java.util.List;
 import javax.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+
+import lombok.*;
+
 @Entity
 @Getter
 @Setter
 @NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+@Builder
 public class Budget {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long budgetId;
+    private Long budgetId;
 
     private Long projectId;
 

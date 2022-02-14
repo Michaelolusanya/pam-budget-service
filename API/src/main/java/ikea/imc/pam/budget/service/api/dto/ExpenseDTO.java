@@ -2,9 +2,11 @@ package ikea.imc.pam.budget.service.api.dto;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class ExpenseDTO {
     private Long id;
     private Long budgetId;

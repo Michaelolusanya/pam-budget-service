@@ -2,11 +2,9 @@ package ikea.imc.pam.budget.service.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import ikea.imc.pam.budget.service.api.dto.*;
-import ikea.imc.pam.budget.service.configuration.ModelMapperConfiguration;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
@@ -17,10 +15,15 @@ import java.util.List;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
+@ExtendWith(MockitoExtension.class)
 public class BudgetControllerTest {
 
     private static final Long BUDGET_ID = 1L;
@@ -49,9 +52,11 @@ public class BudgetControllerTest {
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_COST = 100_000L;
 
-    private final BudgetService budgetService = mock(BudgetService.class);
-    private final BudgetController controller =
-            new BudgetController(budgetService, new ModelMapperConfiguration().modelMapper());
+    @Mock
+    private BudgetService budgetService;
+
+    @InjectMocks
+    private BudgetController controller;
 
     @Nested
     class GetBudgetTest {
@@ -495,50 +500,54 @@ public class BudgetControllerTest {
     }
 
     private static BudgetDTO generateRequestBudget() {
-        BudgetDTO dto = new BudgetDTO();
-        dto.setEstimatedCost(ESTIMATED_COST);
-        dto.setFiscalYear(REQUEST_FISCAL_YEAR);
-        dto.setComdevCost(COMDEV_COST);
-        return dto;
+        return BudgetDTO
+                .builder()
+                .estimatedCost(ESTIMATED_COST)
+                .fiscalYear(REQUEST_FISCAL_YEAR)
+                .comdevCost(COMDEV_COST)
+                .build();
     }
 
     private static ExpenseDTO generateExpenseDTO() {
-        ExpenseDTO dto = new ExpenseDTO();
-        dto.setComdevFraction(EXPENSE_FRACTION_COMDEV);
-        dto.setUnitCost(EXPENSE_COST_PER_UNIT);
-        dto.setComdevCost(EXPENSE_COST_COMDEV);
-        dto.setWeekCount(EXPENSE_WEEKS);
-        dto.setComment(EXPENSE_COMMENT);
-        dto.setUnitCount(EXPENSE_UNITS);
-        return dto;
+        return ExpenseDTO
+                .builder()
+                .comdevFraction(EXPENSE_FRACTION_COMDEV)
+                .unitCost(EXPENSE_COST_PER_UNIT)
+                .comdevCost(EXPENSE_COST_COMDEV)
+                .weekCount(EXPENSE_WEEKS)
+                .comment(EXPENSE_COMMENT)
+                .unitCount(EXPENSE_UNITS)
+                .build();
     }
 
     private static Expenses generateExpense(Budget budget, Long id) {
-        Expenses expenses = new Expenses();
-        expenses.setExpensesId(id);
-        expenses.setAssignmentId(ASSIGNMENT_ID);
-        expenses.setAssetTypeId(ASSET_TYPE_ID);
-        expenses.setComment(EXPENSE_COMMENT);
-        expenses.setCost(EXPENSE_COST);
-        expenses.setCostCOMDEV(EXPENSE_COST_COMDEV);
-        expenses.setCostPerUnit(EXPENSE_COST_PER_UNIT);
-        expenses.setPercentCOMDEV(EXPENSE_PERCENT_COMDEV);
-        expenses.setUnits(EXPENSE_UNITS);
-        expenses.setWeeks(EXPENSE_WEEKS);
-        expenses.setInvoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION);
-        expenses.setBudget(budget);
-        return expenses;
+        return Expenses
+                .builder()
+                .expensesId(id)
+                .assignmentId(ASSIGNMENT_ID)
+                .assetTypeId(ASSET_TYPE_ID)
+                .comment(EXPENSE_COMMENT)
+                .cost(EXPENSE_COST)
+                .costCOMDEV(EXPENSE_COST_COMDEV)
+                .costPerUnit(EXPENSE_COST_PER_UNIT)
+                .percentCOMDEV(EXPENSE_PERCENT_COMDEV)
+                .units(EXPENSE_UNITS)
+                .weeks(EXPENSE_WEEKS)
+                .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
+                .budget(budget)
+                .build();
     }
 
     private static Budget generateBudget(Long id) {
-        Budget budget = new Budget();
-        budget.setBudgetId(id);
-        budget.setEstimatedBudget(ESTIMATED_BUDGET);
-        budget.setCostCOMDEV(COMDEV_COST);
-        budget.setProjectId(PROJECT_ID);
-        budget.setBudgetVersion(generateBudgetVersion());
-        budget.setExpenses(List.of());
-        return budget;
+        return Budget
+                .builder()
+                .budgetId(id)
+                .estimatedBudget(ESTIMATED_BUDGET)
+                .costCOMDEV(COMDEV_COST)
+                .projectId(PROJECT_ID)
+                .budgetVersion(generateBudgetVersion())
+                .expenses(List.of())
+                .build();
     }
 
     private static BudgetVersion generateBudgetVersion() {

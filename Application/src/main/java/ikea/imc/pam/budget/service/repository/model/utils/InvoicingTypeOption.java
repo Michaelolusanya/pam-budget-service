@@ -11,6 +11,21 @@ public enum InvoicingTypeOption {
         setDescription(invoicingTypeOption);
     }
 
+    public static InvoicingTypeOption get(String description) {
+        if (FIXED_PRICE.getDescription().equals(description)) {
+            return FIXED_PRICE;
+        }
+
+        if (HOURLY_PRICE.getDescription().equals(description)) {
+            return HOURLY_PRICE;
+        }
+
+        if (QUOTATION_BASED.getDescription().equals(description)) {
+            return QUOTATION_BASED;
+        }
+        return null;
+    }
+
     public String getDescription() {
         return description;
     }

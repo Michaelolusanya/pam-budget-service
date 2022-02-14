@@ -5,7 +5,7 @@
             <PatternLayout pattern="%d{HH:mm:ss.SSS} [%t] %-5level %logger{36} - %msg%n"/>
         </Console>
 
-        <RollingRandomAccessFile name="LogToRollingRandomAccessFile" fileName="api/src/main/resources/logs/app.log"
+        <RollingRandomAccessFile name="LogToRollingRandomAccessFile" fileName="/src/main/resources/logs/app.log"
                                  filePattern="api/src/main/resources/logs/$${date:yyyy}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}.log">
             <PatternLayout>
                 <Pattern>%d [%-6p] %C{1}.%M(%F:%L) - %m%n</Pattern>
