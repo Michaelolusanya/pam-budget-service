@@ -12,7 +12,6 @@ ENV DEBUG_PORT_ENV=$DEBUG_PORT
 RUN mkdir /budget-service
 WORKDIR /budget-service
 
-COPY /Application/target
-COPY /budget-service
+COPY /Application/target /budget-service
 
 ENTRYPOINT java -jar -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=$SUSPENDED_BOOT_ENV,address=*:$DEBUG_PORT_ENV /budget-service/pam-budget-service-application-0.0.1-SNAPSHOT-exec.jar
