@@ -47,3 +47,4 @@ build/
 *.pyc
 api/src/main/resources/logs/app.log
 *.log
+*.orig

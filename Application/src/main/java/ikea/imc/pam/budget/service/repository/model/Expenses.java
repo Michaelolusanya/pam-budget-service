@@ -2,16 +2,10 @@ package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import java.math.BigDecimal;
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-
 @Entity
 @Getter
 @Setter
@@ -24,11 +18,13 @@ public class Expenses {
 
     private long assignmentId;
 
+    private long assetTypeId;
+
     private String comment;
 
     private int cost;
 
-    private BigDecimal costCOMDEV;
+    private double costCOMDEV;
 
     private int costPerUnit;
 
@@ -40,4 +36,12 @@ public class Expenses {
 
     @Enumerated(EnumType.STRING)
     private InvoicingTypeOption invoicingTypeOption;
+
+    @ManyToOne
+    @JoinColumn(name = "budgetId")
+    private Budget budget;
+
+    public String getInvoicingTypeName() {
+        return invoicingTypeOption != null ? invoicingTypeOption.getDescription() : null;
+    }
 }

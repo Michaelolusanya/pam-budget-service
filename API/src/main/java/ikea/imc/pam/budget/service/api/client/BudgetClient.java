@@ -6,15 +6,15 @@ import java.util.Optional;
 
 public interface BudgetClient {
 
-    Optional<ResponseBudgetDTO> getBudget(Long id);
+    Optional<BudgetDTO> getBudget(Long id);
 
-    List<ResponseBudgetDTO> findBudgets(List<Long> hfbIds, List<String> fiscalYears);
+    List<BudgetDTO> findBudgets(List<Long> hfbIds, List<String> fiscalYears);
 
-    ResponseBudgetDTO deleteBudget(Long id);
+    BudgetDTO deleteBudget(Long id);
 
-    ResponseBudgetDTO createBudget(RequestBudgetDTO requestBudgetDTO);
+    BudgetDTO createBudget(BudgetDTO requestBudgetDTO);
 
-    ResponseBudgetDTO updateBudget(Long id, RequestPartialBudgetDTO requestPartialBudgetDTO);
+    BudgetDTO updateBudget(Long id, BudgetDTO requestBudgetDTO);
 
-    ResponseExpenseDTO updateExpense(Long budgetId, Long expenseId, RequestPartialExpenseDTO requestPartialExpenseDTO);
+    ExpenseDTO updateExpense(Long budgetId, Long expenseId, ExpenseDTO expenseDTO);
 }
