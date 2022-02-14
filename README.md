@@ -1,104 +1,73 @@
 # pam-budget-service
 To be able to run the application properly you need to have all this installed
 - An IDE (Intellij recommended)
-- Java 
+- Java 11
 - Docker
 
 Download the project to your computer and follow the steps below on 
-how to set everything up in different environments. You can either choose to run the boilerplate locally with containers
-or through Intellij.
+how to set everything up.
 
-<br>
-<br>
+## How to run&debug application in local environment
+Navigate to the root of pam-budget-service **mvn clean install**, this will create everything that pam-budget-service
+need itself.
 
-## How to run application locally in container mode
-To run the project in container mode, first check that docker is installed on your computer.
-When that is set up do the following steps.
-1. Open a cmd on your computer and type in cd "path to the project folder".
-2. docker-compose build (builds the project inside a container)
-3. docker-compose up (Starts up the container that were built)
-4. docker-compose down (removes the containers)
-When the container is up the url are ` http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config `
-to use the swagger (open-api documentation) and test the different endpoints. Further info about swagger can be find below
-under the "Swagger" section.
-
-<br>
-<br>
-
-## How to run application in development mode
-Navigate to the path where your boilerplate-java-springboot2 code is located.
-Download the project and open it inside the IDE. Intellij is recommended due to it has worked the best
-together with the boilerplate. A database needs to be set up and running, either through container or through a program.
-Further info below.
+To debug connect a *Remote JVM Debug* configuration on port **5006**
 
 
-### Intellij (Recommended) :sparkles:
-Check if the IDE recognize Spring boot and Maven. If it does skip to point 3. Otherwise follow all steps below.
-1. Right click on the pom.xml file.
-2. Press generate maven project.
-3. Add the .env file, follow the section below about environment variables.
-4. Set up database run following command:
-
-    ```
-    docker run -p 21539:5432 --name boilerplate-postgres-dev-db -d -e POSTGRES_PASSWORD=<password> -e POSTGRES_USER=username -e POSTGRES_DB=boilerplate-postgres-dev-db postgres:13.1-alpine
-    ```
-    OR 
-
-    create a database by using an installed software. More information below under the section "Database".
-
-5. Start the project by running the main class (StartSpringbootApi). 
-
-<br>
-<br>
+### Add project to Intellij (Recommended)
+1. git clone git@github.com:icomdev/pam-budget-service.git
+2. IntelliJ -> New -> Project from Existing Sources...
+3. Select the root pom
 
 ## Database
-The database can either be running locally through the terminal using containers or through some installed program.
-In this project the program pgAdmin have been used and worked without any problems, so it's recommended to use. 
-<br>
-To run it through pgAdmin:
+pam-budget-service uses Postgres as it's RDBMS, the database is created as a Docker container and is handled by Maven.
+
+To view the database it's recommended to use pgAdmin:
 1. Install and start up the program
 2. Add username and password to match -env datasource_username and datasource_password.
 3. Add a new database the match the database-name set in the end of the datasource_url.
 4. Run the springboot and all the tables should be added to the specified db inside pgAdmin.
 
-<br>
-<br>
-
-## Environmental variables :closed_lock_with_key:
+## Environmental variables
 Important environment variables and how to set them up to get everything running.
 
 
-### .env file
-The env file declares default environment variables that are used for the docker compose environment. It should be created  
-inside the current working folder ("/api"). Important that the file is named .env.
-When the .env file is created, it should be containing the follow fields
-Mandatory fields<br>
+### application-local.properties file
+application-local.properties specifies system local properties needed for application to run.
+It should be created in **../Application/src/main/resources/**. Important that you name it 
+application-local.properties otherwise Spring won't be able to find it.
 
-```
-CLIENT_SCOPE_ID=
-CLIENT_ID=…
-TENANT_ID=…
-DATASOURCE_URL=jdbc:postgresql://localhost:21539/boilerplate-postgres-dev-db
-DATASOURCE_USERNAME=username
-DATASOURCE_PASSWORD=<password>
-```
-Fields that can be added<br>
-```
-APPLICATION_OWNER=owner-email
-BOILERPLATE_JAVA_MANAGER=https://boilerplate-java-manager.azurewebsites.net/apidocs
-VERSION=0.1
-ENVIRONMENT=DEVELOPMENT
-```
+#### File data
+<details>
+    <summary>application-local.properties</summary>
 
-The mandatory fields are credentials for both the client to connect for the auth, to be able to get access and use the endpoints. 
-The postgres fields are defined to match the credentials the were set during the creation of the database, so that the IDE can connect with the database.
-
-
-### Env-class
-The `Env.java` manages static variables that are used across the application, as environment details, versioning, etc. 
-
-<br>
-<br>
+    spring.main.allow-bean-definition-overriding=true
+    springdoc.swagger-ui.oauth.client-id=CLIENT_ID
+    
+    #Networking
+    ikea.imc.pam.network.domain=http://localhost:${ikea.imc.pam.network.port}
+    ikea.imc.pam.budget.service.url = ${ikea.imc.pam.network.domain}/
+    
+    #Addons local
+    ikea.imc.pam.oauth.microsoft.tenant-id=<Ask a colleague for this id>
+    ikea.imc.pam.oauth.microsoft.authorization-url=https://login.microsoftonline.com/${ikea.imc.pam.oauth.microsoft.tenant-id}/oauth2/v2.0/authorize
+    ikea.imc.pam.oauth.microsoft.token-url=https://login.microsoftonline.com/${ikea.imc.pam.oauth.microsoft.tenant-id}/oauth2/v2.0/token
+    ikea.imc.pam.oauth.client-scope.id=<Ask a colleague for this id>
+    
+    #OpenAPI
+    ikea.imc.pam.openapi.documentation.open-api-docs=${ikea.imc.pam.network.domain}/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/
+    ikea.imc.pam.openapi.documentation.open-api-json-doc=${ikea.imc.pam.network.domain}/v3/api-docs
+    
+    #ClientScope
+    ikea.imc.pam.oauth.client-scope.read-scope-desc=Read
+    ikea.imc.pam.oauth.client-scope.write-scope-desc=Write
+    
+    #SQL overwrite usr/pass in profile-specific file
+    ikea.imc.pam.budget.service.db.port=5432
+    spring.datasource.url=jdbc:postgresql://budget-service-postgres:${ikea.imc.pam.budget.service.db.port}/${ikea.imc.pam.budget.service.db.name}
+    spring.datasource.username=user
+    spring.datasource.password=pass
+</details>
 
 ## Swagger
 Swagger includes automated documentation of the restful APIs expressed using json. It displays all the endpoints in a project and generates test-cases for those. To be able to test the endpoints, firstly an authorization is needed through OAuth2. After that all endpoints can be tested out. 
