@@ -12,7 +12,7 @@ env
 api/src/main/resources/files/*
 api/src/main/resources/logs/*
 !application-default.properties
-application-*.properties
+
 
 
 ### STS ###
