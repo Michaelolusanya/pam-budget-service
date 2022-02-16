@@ -7,6 +7,7 @@ import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.repository.BudgetRepository;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
+import ikea.imc.pam.budget.service.repository.model.utils.Status;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -79,7 +80,7 @@ public class BudgetServiceV1Test {
         void nullInput() {
 
             // Given
-            when(repository.findAll()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+            when(repository.getAllActive()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
 
             // When
             List<Budget> budgets = service.listBudgets(null, null);
@@ -94,7 +95,7 @@ public class BudgetServiceV1Test {
         void emptyInput() {
 
             // Given
-            when(repository.findAll()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+            when(repository.getAllActive()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
 
             // When
             List<Budget> budgets = service.listBudgets(List.of(), List.of());
@@ -220,12 +221,61 @@ public class BudgetServiceV1Test {
         }
     }
 
+    @Nested
+    class DeleteBudgetTest {
+
+        @Test
+        void deleteNotFound() {
+
+            // Given
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.empty());
+
+            // When
+            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+
+            // Then
+            assertTrue(optionalBudget.isEmpty());
+        }
+
+        @Test
+        void deleteAlreadyDeleted() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setStatus(Status.ARCHIVED);
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(budget));
+
+            // When
+            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+
+            // Then
+            assertTrue(optionalBudget.isEmpty());
+        }
+
+        @Test
+        void deleteAsExpected() {
+
+            // Given
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+
+            // When
+            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+
+            // Then
+            assertTrue(optionalBudget.isPresent());
+            Budget budget = optionalBudget.get();
+            assertEquals(BUDGET_ID, budget.getBudgetId());
+            assertEquals(Status.ARCHIVED, budget.getStatus());
+        }
+    }
+
     private static Budget generateBudget(Long id) {
         return Budget.builder()
                 .budgetId(id)
                 .estimatedBudget(ESTIMATED_BUDGET)
                 .costCOMDEV(COMDEV_COST)
                 .projectId(PROJECT_ID)
+                .status(Status.ACTIVE)
                 .budgetVersion(generateBudgetVersion())
                 .expenses(List.of())
                 .build();

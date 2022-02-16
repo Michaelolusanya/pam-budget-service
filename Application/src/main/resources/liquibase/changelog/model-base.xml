@@ -48,4 +48,9 @@
                                  constraintName="FK_BUDGET_ON_BUDGETVERSIONID" referencedColumnNames="budget_version_id"
                                  referencedTableName="budget_version"/>
     </changeSet>
+    <changeSet id="1644908519822-1" author="carl-henrik-laulaja (generated)">
+        <addColumn tableName="budget">
+            <column name="status" type="VARCHAR(25)" defaultValue="ACTIVE" />
+        </addColumn>
+    </changeSet>
 </databaseChangeLog>

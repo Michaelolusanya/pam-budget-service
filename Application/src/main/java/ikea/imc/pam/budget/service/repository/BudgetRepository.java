@@ -13,4 +13,6 @@ public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
     List<Budget> getBudgetByProjectIdAndFiscalYear(
             @Param("projectIds") List<Long> projectIds, @Param("fiscalYears") List<Integer> fiscalYears);
+
+    List<Budget> getAllActive();
 }
