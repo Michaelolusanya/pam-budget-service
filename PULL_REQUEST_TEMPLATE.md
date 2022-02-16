@@ -11,7 +11,7 @@ Set the sprint and the sprint weeks the issue were implemented in
 ## Feature description
 <!-- 
 Short description of what has been implemented
---> 
+-->
 
 ## How to test
 <!-- 
