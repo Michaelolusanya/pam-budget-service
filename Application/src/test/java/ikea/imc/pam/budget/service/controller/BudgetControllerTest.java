@@ -52,11 +52,9 @@ public class BudgetControllerTest {
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_COST = 100_000L;
 
-    @Mock
-    private BudgetService budgetService;
+    @Mock private BudgetService budgetService;
 
-    @InjectMocks
-    private BudgetController controller;
+    @InjectMocks private BudgetController controller;
 
     @Nested
     class GetBudgetTest {
@@ -500,8 +498,7 @@ public class BudgetControllerTest {
     }
 
     private static BudgetDTO generateRequestBudget() {
-        return BudgetDTO
-                .builder()
+        return BudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
                 .fiscalYear(REQUEST_FISCAL_YEAR)
                 .comdevCost(COMDEV_COST)
@@ -509,8 +506,7 @@ public class BudgetControllerTest {
     }
 
     private static ExpenseDTO generateExpenseDTO() {
-        return ExpenseDTO
-                .builder()
+        return ExpenseDTO.builder()
                 .comdevFraction(EXPENSE_FRACTION_COMDEV)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .comdevCost(EXPENSE_COST_COMDEV)
@@ -521,8 +517,7 @@ public class BudgetControllerTest {
     }
 
     private static Expenses generateExpense(Budget budget, Long id) {
-        return Expenses
-                .builder()
+        return Expenses.builder()
                 .expensesId(id)
                 .assignmentId(ASSIGNMENT_ID)
                 .assetTypeId(ASSET_TYPE_ID)
@@ -539,8 +534,7 @@ public class BudgetControllerTest {
     }
 
     private static Budget generateBudget(Long id) {
-        return Budget
-                .builder()
+        return Budget.builder()
                 .budgetId(id)
                 .estimatedBudget(ESTIMATED_BUDGET)
                 .costCOMDEV(COMDEV_COST)

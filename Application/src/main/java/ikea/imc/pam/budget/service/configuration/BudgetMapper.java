@@ -6,7 +6,6 @@ import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
-
 import java.util.stream.Collectors;
 
 public class BudgetMapper {
@@ -14,8 +13,7 @@ public class BudgetMapper {
     private BudgetMapper() {}
 
     public static BudgetDTO buildBudgetDTO(Budget budget) {
-        return BudgetDTO
-                .builder()
+        return BudgetDTO.builder()
                 .id(budget.getBudgetId())
                 .projectId(budget.getProjectId())
                 .fiscalYear(toFiscalYear(budget.getBudgetVersion().getFiscalYear()))
@@ -26,8 +24,7 @@ public class BudgetMapper {
     }
 
     public static ExpenseDTO buildExpenseDTO(Expenses expenses) {
-        return ExpenseDTO
-                .builder()
+        return ExpenseDTO.builder()
                 .id(expenses.getExpensesId())
                 .budgetId(expenses.getBudget().getBudgetId())
                 .assignmentId(expenses.getAssignmentId())
@@ -43,16 +40,19 @@ public class BudgetMapper {
     }
 
     public static Budget buildBudget(BudgetDTO dto) {
-        Budget budget = Budget
-                .builder()
-                .budgetId(dto.getId())
-                .projectId(dto.getProjectId())
-                .estimatedBudget(dto.getEstimatedCost())
-                .costCOMDEV(dto.getComdevCost())
-                .build();
+        Budget budget =
+                Budget.builder()
+                        .budgetId(dto.getId())
+                        .projectId(dto.getProjectId())
+                        .estimatedBudget(dto.getEstimatedCost())
+                        .costCOMDEV(dto.getComdevCost())
+                        .build();
 
         if (dto.getExpenses() != null) {
-            budget.setExpenses(dto.getExpenses().stream().map(expenseDTO -> buildExpense(budget, expenseDTO)).collect(Collectors.toList()));
+            budget.setExpenses(
+                    dto.getExpenses().stream()
+                            .map(expenseDTO -> buildExpense(budget, expenseDTO))
+                            .collect(Collectors.toList()));
         }
 
         return budget;
@@ -65,8 +65,7 @@ public class BudgetMapper {
     }
 
     public static Expenses buildExpense(ExpenseDTO dto) {
-        return Expenses
-                .builder()
+        return Expenses.builder()
                 .expensesId(dto.getId())
                 .assignmentId(dto.getAssignmentId())
                 .assetTypeId(dto.getAssetTypeId())

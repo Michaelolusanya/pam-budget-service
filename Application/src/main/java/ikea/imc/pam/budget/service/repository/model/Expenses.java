@@ -2,7 +2,6 @@ package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import javax.persistence.*;
-
 import lombok.*;
 
 @Entity

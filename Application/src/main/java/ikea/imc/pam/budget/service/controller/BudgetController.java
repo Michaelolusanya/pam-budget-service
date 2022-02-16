@@ -36,7 +36,10 @@ public class BudgetController {
 
         return budgetService
                 .getById(id)
-                .map(budget -> ResponseEntityFactory.generateResponse(HttpStatus.OK, BudgetMapper.buildBudgetDTO(budget)))
+                .map(
+                        budget ->
+                                ResponseEntityFactory.generateResponse(
+                                        HttpStatus.OK, BudgetMapper.buildBudgetDTO(budget)))
                 .orElseGet(
                         () -> {
                             log.warn("Could not find budget with id {}", id);
@@ -62,17 +65,20 @@ public class BudgetController {
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> deleteBudget(@PathVariable Long id) {
         return budgetService
                 .deleteById(id)
-                .map(budget -> ResponseEntityFactory.generateResponse(HttpStatus.OK, BudgetMapper.buildBudgetDTO(budget)))
+                .map(
+                        budget ->
+                                ResponseEntityFactory.generateResponse(
+                                        HttpStatus.OK, BudgetMapper.buildBudgetDTO(budget)))
                 .orElseGet(() -> ResponseEntityFactory.generateResponse(HttpStatus.NO_CONTENT));
     }
 
     @Operation(summary = "Create a new budget")
     @PostMapping
-    public ResponseEntity<ResponseMessageDTO<BudgetDTO>> createBudget(
-            @Valid @RequestBody BudgetDTO dto) {
+    public ResponseEntity<ResponseMessageDTO<BudgetDTO>> createBudget(@Valid @RequestBody BudgetDTO dto) {
         Budget budget = BudgetMapper.buildBudget(dto);
         return ResponseEntityFactory.generateResponse(
-                HttpStatus.CREATED, BudgetMapper.buildBudgetDTO(budgetService.createBudget(dto.getFiscalYear(), budget)));
+                HttpStatus.CREATED,
+                BudgetMapper.buildBudgetDTO(budgetService.createBudget(dto.getFiscalYear(), budget)));
     }
 
     @Operation(summary = "Update budget by Id")
@@ -82,7 +88,10 @@ public class BudgetController {
         Budget budget = BudgetMapper.buildBudget(dto);
         return budgetService
                 .patchBudget(id, dto.getFiscalYear(), budget)
-                .map(updatedBudget -> ResponseEntityFactory.generateResponse(HttpStatus.OK, BudgetMapper.buildBudgetDTO(updatedBudget)))
+                .map(
+                        updatedBudget ->
+                                ResponseEntityFactory.generateResponse(
+                                        HttpStatus.OK, BudgetMapper.buildBudgetDTO(updatedBudget)))
                 .orElseGet(
                         () -> {
                             log.warn("Could not update budget with id {}", id);
