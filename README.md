@@ -26,7 +26,7 @@ To view the database:
 1. Start application
 2. localhost:23154/h2-console
 * User name: sa
-* JDBC URL: jdbc:h2:mem:budget-version
+* JDBC URL: jdbc:h2:mem:budget-service
 
 ### Azure
 pam-budget-service uses Postgres as it's RDBMS
