@@ -7,7 +7,6 @@ services:
             args:
                 - SUSPENDED_BOOT=n
                 - DEBUG_PORT=5006
-        container_name: budget_service_application
         hostname: pam-budget-service
         privileged: true
         restart: unless-stopped

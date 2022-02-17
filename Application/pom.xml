@@ -16,26 +16,6 @@
     <build>
         <plugins>
             <plugin>
-                <groupId>com.dkanejs.maven.plugins</groupId>
-                <artifactId>docker-compose-maven-plugin</artifactId>
-                <version>4.0.0</version>
-                <configuration>
-                    <composeFile>${project.basedir}/../docker-compose.yml</composeFile>
-                    <detachedMode>true</detachedMode>
-                </configuration>
-                <inherited>false</inherited>
-                <!-- Start our containers if not already running -->
-                <executions>
-                    <execution>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>build</goal>
-                            <goal>up</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
                 <version>3.9.0</version>

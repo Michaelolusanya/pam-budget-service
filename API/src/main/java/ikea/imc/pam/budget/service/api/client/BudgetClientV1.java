@@ -1,122 +1,88 @@
 package ikea.imc.pam.budget.service.api.client;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import ikea.imc.pam.budget.service.api.Paths;
-import ikea.imc.pam.budget.service.api.dto.*;
+import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
+import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
+import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.http.HttpStatus;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import reactor.core.publisher.Mono;
 
 @Component
 public class BudgetClientV1 implements BudgetClient {
-
-    private final String budgetServiceEndpoint;
+    private static final Logger log = LoggerFactory.getLogger(BudgetClientV1.class);
     private final WebClient webClient;
-    private final ObjectMapper objectMapper;
+    private final String budgetServiceEndpoint;
 
     public BudgetClientV1(
-            @Value("${ikea.imc.pam.budget.service.url}") String budgetServiceBaseUrl,
-            ObjectMapper objectMapper,
-            WebClient webClient) {
+            @Value("${ikea.imc.pam.budget.service.url:}") String budgetServiceBaseUrl, WebClient webClient) {
         this.budgetServiceEndpoint = budgetServiceBaseUrl + Paths.BUDGET_V1_ENDPOINT;
         this.webClient = webClient;
-        this.objectMapper = objectMapper;
     }
 
     @Override
     public Optional<BudgetDTO> getBudget(Long id) {
-        String url = budgetServiceEndpoint + id;
-        ResponseMessageDTO<?> dto =
-                webClient
-                        .get()
-                        .uri(url)
-                        .retrieve()
-                        .onStatus(status -> status == HttpStatus.NOT_FOUND, error -> Mono.empty())
-                        .bodyToMono(ResponseMessageDTO.class)
-                        .block();
-
-        if (dto != null && dto.getSuccess()) {
-            return Optional.of(objectMapper.convertValue(dto.getData(), BudgetDTO.class));
-        } else {
-            return Optional.empty();
-        }
+        return Optional.of(execute(HttpMethod.GET, "" + id));
     }
 
     @Override
     public List<BudgetDTO> findBudgets(List<Long> hfbIds, List<String> fiscalYears) {
-
-        String url =
-                Paths.buildUrl(
-                        budgetServiceEndpoint,
+        String contextUrl =
+                Paths.buildContextUrl(
                         Paths.buildRequestParameter("hfbIds", hfbIds),
                         Paths.buildRequestParameter("fiscalYears", fiscalYears));
 
-        ResponseMessageDTO<?> dto = webClient.get().uri(url).retrieve().bodyToMono(ResponseMessageDTO.class).block();
-
-        if (dto != null && dto.getData() instanceof List) {
-            List<?> list = (List<?>) dto.getData();
-            return list.stream()
-                    .map(current -> objectMapper.convertValue(current, BudgetDTO.class))
-                    .collect(Collectors.toList());
-        } else {
-            return List.of();
-        }
+        return execute(HttpMethod.GET, contextUrl);
     }
 
     @Override
     public BudgetDTO deleteBudget(Long id) {
-        String url = budgetServiceEndpoint + id;
-        ResponseMessageDTO<?> dto = webClient.delete().uri(url).retrieve().bodyToMono(ResponseMessageDTO.class).block();
-        return dto != null ? objectMapper.convertValue(dto.getData(), BudgetDTO.class) : null;
+        return execute(HttpMethod.DELETE, "" + id);
     }
 
     @Override
     public BudgetDTO createBudget(BudgetDTO requestBudgetDTO) {
-        ResponseMessageDTO<?> dto =
-                webClient
-                        .post()
-                        .uri(budgetServiceEndpoint)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(requestBudgetDTO)
-                        .retrieve()
-                        .bodyToMono(ResponseMessageDTO.class)
-                        .block();
-        return dto != null ? objectMapper.convertValue(dto.getData(), BudgetDTO.class) : null;
+        return execute(HttpMethod.POST, "", requestBudgetDTO);
     }
 
     @Override
     public BudgetDTO updateBudget(Long id, BudgetDTO requestBudgetDTO) {
-        String url = budgetServiceEndpoint + id;
-        ResponseMessageDTO<?> dto =
-                webClient
-                        .patch()
-                        .uri(url)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(requestBudgetDTO)
-                        .retrieve()
-                        .bodyToMono(ResponseMessageDTO.class)
-                        .block();
-        return dto != null ? objectMapper.convertValue(dto.getData(), BudgetDTO.class) : null;
+        return execute(HttpMethod.PATCH, "" + id, requestBudgetDTO);
     }
 
     @Override
     public ExpenseDTO updateExpense(Long budgetId, Long expenseId, ExpenseDTO requestPartialExpenseDTO) {
-        String url = budgetServiceEndpoint + budgetId + "expenses/" + expenseId;
-        ResponseMessageDTO<?> dto =
+        return execute(HttpMethod.PATCH, budgetId + "expenses/" + expenseId);
+    }
+
+    private <T> T execute(HttpMethod operation, String contextUrl) {
+        return execute(operation, contextUrl, "");
+    }
+
+    private <T> T execute(HttpMethod operation, String contextUrl, Object body) {
+        String url = budgetServiceEndpoint + contextUrl;
+
+        log.debug("Calling endpoint {}", url);
+        ResponseMessageDTO<T> wrapper =
                 webClient
-                        .patch()
+                        .method(operation)
                         .uri(url)
                         .contentType(MediaType.APPLICATION_JSON)
-                        .bodyValue(requestPartialExpenseDTO)
+                        .bodyValue(body)
                         .retrieve()
                         .bodyToMono(ResponseMessageDTO.class)
                         .block();
-        return dto != null ? objectMapper.convertValue(dto.getData(), ExpenseDTO.class) : null;
+
+        assert wrapper != null;
+        T result = wrapper.getData();
+        log.debug("Result from call {}", result);
+
+        return result;
     }
 }

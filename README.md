@@ -83,3 +83,7 @@ Swagger includes automated documentation of the restful APIs expressed using jso
 The site displays which environment that the project are currently running on under the title "Environment:".
 When the application is running swagger can be find with this url `http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config`
 The configuration file for swagger is in **apiconfiguration/OpenapiConfiguration.java**
+
+## Local Tips
+* For component-test set property *ikea.imc.pam.budget.service.docker.standalone* to true for faster tests. Keep in mind
+though that you, the user, is responsible for the application lifecycle.

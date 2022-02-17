@@ -1,0 +1,34 @@
+/***
+* WIREMOCK
+***/
+
+* What is Wiremock?
+http://wiremock.org/
+Wiremock simulates HTTP(S) responses from fake endpoints created by us. This allows us test any given scenario that can
+happen to the component in a structured and repeatable way.
+
+* Start service
+Our Wiremock instance uses Docker so we get consistent behaviour in all environments that we want to test in. To start
+the service all you need to do is run 'mvn install' from either root or ComponentTest module
+docker-compose-maven-plugin will take care of spinning up the container for us.
+
+NOTE: This only needs to be done once on local, after that you can run like you would normally do.
+
+* Add new integration
+For new integrations we need to modify the docker-compose.yml to allow for the integration's port to be mocked. To do
+this find the docker-compose.yml for Wiremock under resources for module ComponentTest and add it to the list of ports
+that is routed.
+
+* Mocking
+To mock an endpoint we only need to register a new stub
+
+Example:
+WireMock wiremock = new WireMockBuilder().host("localhost").build();
+wiremock.register(get("/myEndpoint").withPort(9000).willReturn(aResponse().withStatus(200)));
+
+This example will register the endpoint "localhost:9000/myEndpoint" to Wiremock and calling it will return a generic
+body with http code 200.
+
+* Resources
+http://localhost:8443/__admin/ - See mocks that currently exists
+http://localhost:8443/__admin/requests - See requests that Wiremock have received
