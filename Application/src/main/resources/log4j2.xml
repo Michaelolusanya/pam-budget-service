@@ -6,7 +6,7 @@
         </Console>
 
         <RollingRandomAccessFile name="LogToRollingRandomAccessFile" fileName="/src/main/resources/logs/app.log"
-                                 filePattern="api/src/main/resources/logs/$${date:yyyy}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}.log">
+                                 filePattern="target/src/main/resources/logs/$${date:yyyy}/$${date:yyyy-MM}/app-%d{MM-dd-yyyy}.log">
             <PatternLayout>
                 <Pattern>%d [%-6p] %C{1}.%M(%F:%L) - %m%n</Pattern>
             </PatternLayout>
