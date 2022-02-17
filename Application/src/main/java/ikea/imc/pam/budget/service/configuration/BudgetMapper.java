@@ -16,7 +16,7 @@ public class BudgetMapper {
         return BudgetDTO.builder()
                 .id(budget.getBudgetId())
                 .projectId(budget.getProjectId())
-                .fiscalYear(toFiscalYear(budget.getBudgetVersion().getFiscalYear()))
+                .fiscalYear(budget.getBudgetVersion().getFiscalYear())
                 .estimatedCost(budget.getEstimatedBudget())
                 .comdevCost(budget.getCostCOMDEV())
                 .expenses(budget.getExpenses().stream().map(BudgetMapper::buildExpenseDTO).collect(Collectors.toList()))

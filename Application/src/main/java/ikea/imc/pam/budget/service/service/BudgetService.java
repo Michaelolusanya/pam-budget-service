@@ -7,15 +7,15 @@ import java.util.Optional;
 
 public interface BudgetService {
 
-    Budget createBudget(String fiscalYear, Budget budget);
+    Budget createBudget(Integer fiscalYear, Budget budget);
 
     Optional<Budget> getById(Long budgetId);
 
-    List<Budget> listBudgets(List<Long> projectIds, List<String> fiscalYears);
+    List<Budget> listBudgets(List<Long> projectIds, List<Integer> fiscalYears);
 
-    Optional<Budget> patchBudget(Long budgetId, String fiscalYear, Budget updatedBudget);
+    Optional<Budget> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget);
 
-    Optional<Expenses> patchExpense(Budget budget, Long expenseId, Expenses updatedExpenses);
+    List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses);
 
     Optional<Budget> deleteById(Long budgetId);
 }

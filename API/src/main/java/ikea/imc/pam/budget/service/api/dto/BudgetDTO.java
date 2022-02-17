@@ -15,8 +15,9 @@ public class BudgetDTO {
     private Long projectId;
 
     @NotBlank
-    @Size(min = 4, max = 4)
-    private String fiscalYear;
+    @Min(1900)
+    @Max(9999)
+    private Integer fiscalYear;
 
     @Min(0)
     private Long estimatedCost;

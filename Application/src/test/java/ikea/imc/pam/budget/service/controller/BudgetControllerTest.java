@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import ikea.imc.pam.budget.service.api.dto.*;
+import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
@@ -47,8 +48,7 @@ public class BudgetControllerTest {
     private static final byte EXPENSE_WEEKS = 42;
     private static final InvoicingTypeOption EXPENSES_INVOICINGTYPEOPTION = InvoicingTypeOption.FIXED_PRICE;
 
-    private static final int FISCAL_YEAR = 20;
-    private static final String REQUEST_FISCAL_YEAR = "FY20";
+    private static final Integer FISCAL_YEAR = 2020;
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_COST = 100_000L;
 
@@ -98,7 +98,7 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, dto.getId());
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
-            assertEquals("FY" + FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(FISCAL_YEAR, dto.getFiscalYear());
             assertEquals(0, dto.getExpenses().size());
         }
 
@@ -148,10 +148,10 @@ public class BudgetControllerTest {
 
             // Given
             ArgumentCaptor<List<Long>> argumentCaptorProjectIds = ArgumentCaptor.forClass(List.class);
-            ArgumentCaptor<List<String>> argumentCaptorFiscalYears = ArgumentCaptor.forClass(List.class);
+            ArgumentCaptor<List<Integer>> argumentCaptorFiscalYears = ArgumentCaptor.forClass(List.class);
 
             List<Long> projectIds = List.of(1L, 5L);
-            List<String> fiscalYears = List.of("FY20", "FY21");
+            List<Integer> fiscalYears = List.of(2020, 2021);
             when(budgetService.listBudgets(argumentCaptorProjectIds.capture(), argumentCaptorFiscalYears.capture()))
                     .thenReturn(List.of());
 
@@ -161,8 +161,8 @@ public class BudgetControllerTest {
             // Then
             assertEquals(1L, argumentCaptorProjectIds.getValue().get(0));
             assertEquals(5L, argumentCaptorProjectIds.getValue().get(1));
-            assertEquals("FY20", argumentCaptorFiscalYears.getValue().get(0));
-            assertEquals("FY21", argumentCaptorFiscalYears.getValue().get(1));
+            assertEquals(2020, argumentCaptorFiscalYears.getValue().get(0));
+            assertEquals(2021, argumentCaptorFiscalYears.getValue().get(1));
         }
 
         @Test
@@ -170,7 +170,7 @@ public class BudgetControllerTest {
 
             // Given
             List<Long> projectIds = List.of();
-            List<String> fiscalYears = List.of();
+            List<Integer> fiscalYears = List.of();
             when(budgetService.listBudgets(projectIds, fiscalYears)).thenReturn(List.of());
 
             // When
@@ -191,7 +191,7 @@ public class BudgetControllerTest {
 
             // Given
             List<Long> projectIds = List.of();
-            List<String> fiscalYears = List.of();
+            List<Integer> fiscalYears = List.of();
             Budget budget = generateBudget(BUDGET_ID);
             Budget budget2 = generateBudget(2L);
             budget.setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
@@ -265,7 +265,7 @@ public class BudgetControllerTest {
 
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
-            ArgumentCaptor<String> inputFiscalYear = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
@@ -276,7 +276,7 @@ public class BudgetControllerTest {
             // Then
             assertNotNull(inputBudget.getValue());
             Budget budget = inputBudget.getValue();
-            assertEquals(REQUEST_FISCAL_YEAR, inputFiscalYear.getValue());
+            assertEquals(FISCAL_YEAR, inputFiscalYear.getValue());
             assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
         }
 
@@ -285,7 +285,7 @@ public class BudgetControllerTest {
 
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
-            ArgumentCaptor<String> inputFiscalYear = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
@@ -304,7 +304,7 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, dto.getId());
             assertEquals(PROJECT_ID, dto.getProjectId());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
-            assertEquals("FY" + FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(FISCAL_YEAR, dto.getFiscalYear());
             assertEquals(0, dto.getExpenses().size());
         }
     }
@@ -318,7 +318,7 @@ public class BudgetControllerTest {
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
             ArgumentCaptor<Long> inputBudgetId = ArgumentCaptor.forClass(Long.class);
-            ArgumentCaptor<String> inputFiscalYear = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.empty());
@@ -342,7 +342,7 @@ public class BudgetControllerTest {
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
             ArgumentCaptor<Long> inputBudgetId = ArgumentCaptor.forClass(Long.class);
-            ArgumentCaptor<String> inputFiscalYear = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.of(generateBudget(BUDGET_ID)));
@@ -353,7 +353,7 @@ public class BudgetControllerTest {
             // Then
             Budget budget = inputBudget.getValue();
             assertEquals(BUDGET_ID, inputBudgetId.getValue());
-            assertEquals(REQUEST_FISCAL_YEAR, inputFiscalYear.getValue());
+            assertEquals(FISCAL_YEAR, inputFiscalYear.getValue());
             assertNotNull(budget);
             assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
             assertEquals(COMDEV_COST, budget.getCostCOMDEV());
@@ -364,7 +364,7 @@ public class BudgetControllerTest {
 
             // Given
             ArgumentCaptor<Long> inputBudgetId = ArgumentCaptor.forClass(Long.class);
-            ArgumentCaptor<String> inputFiscalYear = ArgumentCaptor.forClass(String.class);
+            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.of(generateBudget(BUDGET_ID)));
@@ -384,7 +384,7 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, dto.getId());
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
-            assertEquals("FY" + FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(FISCAL_YEAR, dto.getFiscalYear());
             assertEquals(0, dto.getExpenses().size());
         }
     }
@@ -399,13 +399,13 @@ public class BudgetControllerTest {
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.empty());
 
             // When
-            ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
-                    controller.updateExpense(BUDGET_ID, EXPENSE_ID, generateExpenseDTO());
+            ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> response =
+                    controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO());
 
             // Then
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
             assertNotNull(response.getBody());
-            ResponseMessageDTO<ExpenseDTO> messageDTO = response.getBody();
+            ResponseMessageDTO<List<ExpenseDTO>> messageDTO = response.getBody();
             assertEquals(404, messageDTO.getStatusCode());
             assertFalse(messageDTO.getSuccess());
             assertEquals("Budget 1 not found", messageDTO.getMessage());
@@ -417,19 +417,16 @@ public class BudgetControllerTest {
             // Given
             Budget budget = generateBudget(BUDGET_ID);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
-            when(budgetService.patchExpense(any(), any(), any())).thenReturn(Optional.empty());
+            when(budgetService.patchExpenses(any(), any())).thenThrow(new NotFoundException("Expense 4 not found"));
 
             // When
-            ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
-                    controller.updateExpense(BUDGET_ID, EXPENSE_ID, generateExpenseDTO());
+            NotFoundException notFoundException =
+                    assertThrows(
+                            NotFoundException.class,
+                            () -> controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO()));
 
             // Then
-            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
-            assertNotNull(response.getBody());
-            ResponseMessageDTO<ExpenseDTO> messageDTO = response.getBody();
-            assertEquals(404, messageDTO.getStatusCode());
-            assertFalse(messageDTO.getSuccess());
-            assertEquals("Expenses 4 not found", messageDTO.getMessage());
+            assertEquals("Expense 4 not found", notFoundException.getMessage());
         }
 
         @Test
@@ -437,21 +434,21 @@ public class BudgetControllerTest {
 
             // Given
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            ArgumentCaptor<Long> inputExpenseId = ArgumentCaptor.forClass(Long.class);
-            ArgumentCaptor<Expenses> inputExpenses = ArgumentCaptor.forClass(Expenses.class);
+            ArgumentCaptor<List<Expenses>> inputExpenses = ArgumentCaptor.forClass(List.class);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(budgetService.patchExpense(inputBudget.capture(), inputExpenseId.capture(), inputExpenses.capture()))
-                    .thenReturn(Optional.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
+            when(budgetService.patchExpenses(inputBudget.capture(), inputExpenses.capture()))
+                    .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
 
             // When
-            controller.updateExpense(BUDGET_ID, EXPENSE_ID, generateExpenseDTO());
+            controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO());
 
             // Then
             assertNotNull(inputBudget.getValue());
             assertEquals(BUDGET_ID, inputBudget.getValue().getBudgetId());
-            assertEquals(EXPENSE_ID, inputExpenseId.getValue());
             assertNotNull(inputExpenses.getValue());
-            Expenses expenses = inputExpenses.getValue();
+            List<Expenses> expensesList = inputExpenses.getValue();
+            assertEquals(1, expensesList.size());
+            Expenses expenses = expensesList.get(0);
             assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
             assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
@@ -465,24 +462,25 @@ public class BudgetControllerTest {
 
             // Given
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            ArgumentCaptor<Long> inputExpenseId = ArgumentCaptor.forClass(Long.class);
-            ArgumentCaptor<Expenses> inputExpenses = ArgumentCaptor.forClass(Expenses.class);
+            ArgumentCaptor<List<Expenses>> inputExpenses = ArgumentCaptor.forClass(List.class);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(budgetService.patchExpense(inputBudget.capture(), inputExpenseId.capture(), inputExpenses.capture()))
-                    .thenReturn(Optional.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
+            when(budgetService.patchExpenses(inputBudget.capture(), inputExpenses.capture()))
+                    .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
 
             // When
-            ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
-                    controller.updateExpense(BUDGET_ID, EXPENSE_ID, generateExpenseDTO());
+            ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> response =
+                    controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO());
 
             // Then
             assertEquals(HttpStatus.OK, response.getStatusCode());
             assertNotNull(response.getBody());
-            ResponseMessageDTO<ExpenseDTO> messageDTO = response.getBody();
+            ResponseMessageDTO<List<ExpenseDTO>> messageDTO = response.getBody();
             assertEquals(200, messageDTO.getStatusCode());
             assertTrue(messageDTO.getSuccess());
-            ExpenseDTO dto = messageDTO.getData();
-            assertNotNull(dto);
+            List<ExpenseDTO> dtos = messageDTO.getData();
+            assertNotNull(dtos);
+            assertEquals(1, dtos.size());
+            ExpenseDTO dto = dtos.get(0);
             assertEquals(EXPENSE_ID, dto.getId());
             assertEquals(BUDGET_ID, dto.getBudgetId());
             assertEquals(ASSIGNMENT_ID, dto.getAssignmentId());
@@ -500,9 +498,13 @@ public class BudgetControllerTest {
     private static BudgetDTO generateRequestBudget() {
         return BudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
-                .fiscalYear(REQUEST_FISCAL_YEAR)
+                .fiscalYear(FISCAL_YEAR)
                 .comdevCost(COMDEV_COST)
                 .build();
+    }
+
+    private static ExpenseBatchDTO generateExpenseBatchDTO() {
+        return ExpenseBatchDTO.builder().data(List.of(generateExpenseDTO())).build();
     }
 
     private static ExpenseDTO generateExpenseDTO() {

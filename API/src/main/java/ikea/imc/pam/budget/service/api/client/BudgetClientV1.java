@@ -2,6 +2,7 @@ package ikea.imc.pam.budget.service.api.client;
 
 import ikea.imc.pam.budget.service.api.Paths;
 import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
+import ikea.imc.pam.budget.service.api.dto.ExpenseBatchDTO;
 import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
 import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
 import java.util.List;
@@ -32,7 +33,7 @@ public class BudgetClientV1 implements BudgetClient {
     }
 
     @Override
-    public List<BudgetDTO> findBudgets(List<Long> hfbIds, List<String> fiscalYears) {
+    public List<BudgetDTO> findBudgets(List<Long> hfbIds, List<Integer> fiscalYears) {
         String contextUrl =
                 Paths.buildContextUrl(
                         Paths.buildRequestParameter("hfbIds", hfbIds),
@@ -57,8 +58,9 @@ public class BudgetClientV1 implements BudgetClient {
     }
 
     @Override
-    public ExpenseDTO updateExpense(Long budgetId, Long expenseId, ExpenseDTO requestPartialExpenseDTO) {
-        return execute(HttpMethod.PATCH, budgetId + "expenses/" + expenseId);
+    public List<ExpenseDTO> updateExpense(Long budgetId, List<ExpenseDTO> requestPartialExpenseDTO) {
+        String url = budgetId + "expenses";
+        return execute(HttpMethod.PATCH, url, ExpenseBatchDTO.builder().data(requestPartialExpenseDTO).build());
     }
 
     private <T> T execute(HttpMethod operation, String contextUrl) {

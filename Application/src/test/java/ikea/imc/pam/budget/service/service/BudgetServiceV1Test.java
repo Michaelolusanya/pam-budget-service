@@ -3,7 +3,6 @@ package ikea.imc.pam.budget.service.service;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.when;
 
-import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.repository.BudgetRepository;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
@@ -26,13 +25,12 @@ public class BudgetServiceV1Test {
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
-    private static final int BUDGET_VERSION_FISCAL_YEAR = 20;
 
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final double COMDEV_COST = 50_000d;
     private static final Long PROJECT_ID = 2L;
 
-    private static final String INPUT_FISCAL_YEAR = "FY20";
+    private static final Integer FISCAL_YEAR = 2020;
 
     @Mock private BudgetRepository repository;
 
@@ -127,8 +125,8 @@ public class BudgetServiceV1Test {
         void searchFiscalYearAndNullProjectIds() {
 
             // Given
-            List<String> fiscalYears = List.of(INPUT_FISCAL_YEAR);
-            when(repository.getBudgetByFiscalYear(List.of(BUDGET_VERSION_FISCAL_YEAR)))
+            List<Integer> fiscalYears = List.of(FISCAL_YEAR);
+            when(repository.getBudgetByFiscalYear(List.of(FISCAL_YEAR)))
                     .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
 
             // When
@@ -161,8 +159,8 @@ public class BudgetServiceV1Test {
         void searchFiscalYearAndEmptyProjectIds() {
 
             // Given
-            List<String> fiscalYears = List.of(INPUT_FISCAL_YEAR);
-            when(repository.getBudgetByFiscalYear(List.of(BUDGET_VERSION_FISCAL_YEAR)))
+            List<Integer> fiscalYears = List.of(FISCAL_YEAR);
+            when(repository.getBudgetByFiscalYear(List.of(FISCAL_YEAR)))
                     .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
 
             // When
@@ -179,8 +177,8 @@ public class BudgetServiceV1Test {
 
             // Given
             List<Long> projectIds = List.of(PROJECT_ID);
-            List<String> fiscalYears = List.of(INPUT_FISCAL_YEAR);
-            when(repository.getBudgetByProjectIdAndFiscalYear(projectIds, List.of(BUDGET_VERSION_FISCAL_YEAR)))
+            List<Integer> fiscalYears = List.of(FISCAL_YEAR);
+            when(repository.getBudgetByProjectIdAndFiscalYear(projectIds, List.of(FISCAL_YEAR)))
                     .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
 
             // When
@@ -190,34 +188,6 @@ public class BudgetServiceV1Test {
             assertEquals(2, budgets.size());
             assertEquals(BUDGET_ID, budgets.get(0).getBudgetId());
             assertEquals(BUDGET_ID_2, budgets.get(1).getBudgetId());
-        }
-
-        @Test
-        void invalidFiscalYearString() {
-
-            // Given
-            List<String> fiscalYears = List.of("INVALID");
-
-            // When
-            BadRequestException exception =
-                    assertThrows(BadRequestException.class, () -> service.listBudgets(List.of(), fiscalYears));
-
-            // Then
-            assertEquals("Fiscal year INVALID is malformed", exception.getMessage());
-        }
-
-        @Test
-        void invalidFiscalYearStringYearPart() {
-
-            // Given
-            List<String> fiscalYears = List.of("FYYY");
-
-            // When
-            BadRequestException exception =
-                    assertThrows(BadRequestException.class, () -> service.listBudgets(List.of(), fiscalYears));
-
-            // Then
-            assertEquals("Fiscal year FYYY is malformed", exception.getMessage());
         }
     }
 
@@ -286,7 +256,7 @@ public class BudgetServiceV1Test {
         budgetVersion.setBudgetVersionId(BUDGET_VERSION_ID);
         budgetVersion.setBudgetVersionName(BUDGET_VERSION_NAME);
         budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
-        budgetVersion.setFiscalYear(BUDGET_VERSION_FISCAL_YEAR);
+        budgetVersion.setFiscalYear(FISCAL_YEAR);
         return budgetVersion;
     }
 }

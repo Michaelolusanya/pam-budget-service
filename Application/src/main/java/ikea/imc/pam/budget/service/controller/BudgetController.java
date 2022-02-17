@@ -51,7 +51,7 @@ public class BudgetController {
     @GetMapping("/")
     public ResponseEntity<ResponseMessageDTO<List<BudgetDTO>>> findBudgets(
             @RequestParam(required = false, name = "projectIds") List<Long> projectIds,
-            @RequestParam(required = false, name = "fiscalYears") List<String> fiscalYears) {
+            @RequestParam(required = false, name = "fiscalYears") List<Integer> fiscalYears) {
 
         return ResponseEntityFactory.generateResponse(
                 HttpStatus.OK,
@@ -99,30 +99,23 @@ public class BudgetController {
                         });
     }
 
-    @Operation(summary = "Update a budget expense by budgetId and the expenseId")
-    @PatchMapping("/{id}/expenses/{expenseId}")
-    public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> updateExpense(
-            @PathVariable Long id, @PathVariable Long expenseId, @Valid @RequestBody ExpenseDTO dto) {
-        Expenses expenses = BudgetMapper.buildExpense(dto);
+    @Operation(summary = "Update a set of budget expenses by budgetId")
+    @PatchMapping("/{id}/expenses")
+    public ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> updateExpense(
+            @PathVariable Long id, @Valid @RequestBody ExpenseBatchDTO dto) {
+        List<Expenses> expenses = dto.getData().stream().map(BudgetMapper::buildExpense).collect(Collectors.toList());
         Optional<Budget> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
             log.warn("Could not update expenses, could not find budget with id {}", id);
             return getBudgetNotFoundResponse(id);
         }
-        Budget budget = optionalBudget.get();
 
-        return budgetService
-                .patchExpense(budget, expenseId, expenses)
-                .map(
-                        updateExpense ->
-                                ResponseEntityFactory.generateResponse(
-                                        HttpStatus.OK, BudgetMapper.buildExpenseDTO(updateExpense)))
-                .orElseGet(
-                        () -> {
-                            log.warn("Could not update expenses with id {}", id);
-                            return ResponseEntityFactory.generateResponseMessage(
-                                    HttpStatus.NOT_FOUND, String.format("Expenses %d not found", expenseId));
-                        });
+        Budget budget = optionalBudget.get();
+        return ResponseEntityFactory.generateResponse(
+                HttpStatus.OK,
+                budgetService.patchExpenses(budget, expenses).stream()
+                        .map(BudgetMapper::buildExpenseDTO)
+                        .collect(Collectors.toList()));
     }
 
     private <T> ResponseEntity<ResponseMessageDTO<T>> getBudgetNotFoundResponse(Long id) {
