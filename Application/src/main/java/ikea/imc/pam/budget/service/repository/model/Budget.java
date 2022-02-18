@@ -2,6 +2,7 @@ package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
 import java.util.List;
+import java.util.Objects;
 import javax.persistence.*;
 import lombok.*;
 
@@ -47,4 +48,25 @@ public class Budget {
 
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
     private List<Expenses> expenses;
+
+    public boolean isEqual(Budget compareTo) {
+
+        if (compareTo == null) {
+            return false;
+        }
+
+        if (!Objects.equals(this.getProjectId(), compareTo.getProjectId())) {
+            return false;
+        }
+
+        if (!Objects.equals(this.getEstimatedBudget(), compareTo.getEstimatedBudget())) {
+            return false;
+        }
+
+        if (!Objects.equals(this.getStatus(), compareTo.getStatus())) {
+            return false;
+        }
+
+        return true;
+    }
 }
