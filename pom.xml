@@ -26,7 +26,6 @@
 	<properties>
 		<java.version>11</java.version>
 		<log4j2.version>2.17.1</log4j2.version>
-		<modelmapper.version>2.4.2</modelmapper.version>
 		<maven-compiler.version>3.8.1</maven-compiler.version>
 		<spotless.version>2.20.0</spotless.version>
 		<maven.compiler.source>${java.version}</maven.compiler.source>
@@ -73,11 +72,6 @@
 
     <!-- DEFINE COMMON DEPENDENCIES BETWEEN MODULES -->
     <dependencies>
-        <dependency>
-            <groupId>org.postgresql</groupId>
-            <artifactId>postgresql</artifactId>
-            <version>42.2.24</version>
-        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
