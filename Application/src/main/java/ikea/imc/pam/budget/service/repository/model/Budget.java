@@ -2,7 +2,6 @@ package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
 import java.util.List;
-import java.util.Objects;
 import javax.persistence.*;
 import lombok.*;
 
@@ -11,7 +10,7 @@ import lombok.*;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-@Builder
+@Builder(toBuilder = true)
 @NamedQuery(
         name = "Budget.getBudgetByProjectId",
         query = "select b from Budget b where b.projectId in :projectIds AND b.status <> 'ARCHIVED'")
@@ -27,7 +26,7 @@ import lombok.*;
                         + "where b.projectId in :projectIds AND bv.fiscalYear in :fiscalYears "
                         + "AND b.status <> 'ARCHIVED'")
 @NamedQuery(name = "Budget.getAllActive", query = "select b from Budget b where b.status <> 'ARCHIVED'")
-public class Budget {
+public class Budget extends AbstractEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -49,24 +48,28 @@ public class Budget {
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
     private List<Expenses> expenses;
 
+    public static Budget merge(Budget fromBudget, Budget toBudget) {
+
+        BudgetBuilder mergedBudget = fromBudget.toBuilder();
+
+        setNotNullValue(toBudget::getProjectId, mergedBudget::projectId);
+        setNotNullValue(toBudget::getEstimatedBudget, mergedBudget::estimatedBudget);
+        setNotNullValue(toBudget::getCostCOMDEV, mergedBudget::costCOMDEV);
+        setNotNullValue(toBudget::getStatus, mergedBudget::status);
+
+        return mergedBudget.build();
+    }
+
     public boolean isEqual(Budget compareTo) {
 
         if (compareTo == null) {
             return false;
         }
 
-        if (!Objects.equals(this.getProjectId(), compareTo.getProjectId())) {
-            return false;
-        }
-
-        if (!Objects.equals(this.getEstimatedBudget(), compareTo.getEstimatedBudget())) {
-            return false;
-        }
-
-        if (!Objects.equals(this.getStatus(), compareTo.getStatus())) {
-            return false;
-        }
-
-        return true;
+        return isEqual(
+                Getter.of(this::getProjectId, compareTo::getProjectId),
+                Getter.of(this::getEstimatedBudget, compareTo::getEstimatedBudget),
+                Getter.of(this::getCostCOMDEV, compareTo::getCostCOMDEV),
+                Getter.of(this::getStatus, compareTo::getStatus));
     }
 }

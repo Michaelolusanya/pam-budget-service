@@ -1,14 +1,11 @@
 package ikea.imc.pam.budget.service.service;
 
-import ikea.imc.pam.budget.service.exception.ImplementationException;
 import ikea.imc.pam.budget.service.repository.BudgetRepository;
 import ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
-import ikea.imc.pam.budget.service.util.EntityUtil;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Optional;
 import org.apache.logging.log4j.LogManager;
@@ -71,15 +68,7 @@ public class BudgetServiceV1 implements BudgetService {
             return Optional.empty();
         }
 
-        Budget budget = new Budget();
-        try {
-            EntityUtil.merge(budget, optionalBudget.get());
-            EntityUtil.merge(budget, updatedBudget);
-        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
-            log.error(e);
-            throw new ImplementationException(e);
-        }
-
+        Budget budget = Budget.merge(optionalBudget.get(), updatedBudget);
         if (!optionalBudget.get().isEqual(budget)) {
             log.debug("Changes were found and budget with id {} is updated", budgetId);
             budget = repository.saveAndFlush(budget);
