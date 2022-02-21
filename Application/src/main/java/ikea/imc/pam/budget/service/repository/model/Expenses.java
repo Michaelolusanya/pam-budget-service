@@ -16,8 +16,6 @@ public class Expenses {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expensesId;
 
-    private Long assignmentId;
-
     private Long assetTypeId;
 
     private String comment;

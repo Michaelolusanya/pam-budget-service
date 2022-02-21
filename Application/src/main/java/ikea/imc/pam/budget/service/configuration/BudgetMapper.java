@@ -2,11 +2,13 @@ package ikea.imc.pam.budget.service.configuration;
 
 import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
 import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
-import ikea.imc.pam.budget.service.exception.BadRequestException;
+import ikea.imc.pam.budget.service.api.dto.PatchBudgetDTO;
+import ikea.imc.pam.budget.service.api.dto.PatchExpenseDTO;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import java.util.stream.Collectors;
+import javax.validation.Valid;
 
 public class BudgetMapper {
 
@@ -27,7 +29,6 @@ public class BudgetMapper {
         return ExpenseDTO.builder()
                 .id(expenses.getExpensesId())
                 .budgetId(expenses.getBudget().getBudgetId())
-                .assignmentId(expenses.getAssignmentId())
                 .assetTypeId(expenses.getAssetTypeId())
                 .comdevFraction(toFraction(expenses.getPercentCOMDEV()))
                 .comdevCost(expenses.getCostCOMDEV())
@@ -39,7 +40,7 @@ public class BudgetMapper {
                 .build();
     }
 
-    public static Budget buildBudget(BudgetDTO dto) {
+    public static Budget buildBudget(@Valid BudgetDTO dto) {
         Budget budget =
                 Budget.builder()
                         .budgetId(dto.getId())
@@ -58,16 +59,19 @@ public class BudgetMapper {
         return budget;
     }
 
+    public static Budget buildBudget(PatchBudgetDTO dto) {
+        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).costCOMDEV(dto.getComdevCost()).build();
+    }
+
     private static Expenses buildExpense(Budget budget, ExpenseDTO dto) {
         Expenses expenses = buildExpense(dto);
         expenses.setBudget(budget);
         return expenses;
     }
 
-    public static Expenses buildExpense(ExpenseDTO dto) {
+    public static Expenses buildExpense(@Valid ExpenseDTO dto) {
         return Expenses.builder()
                 .expensesId(dto.getId())
-                .assignmentId(dto.getAssignmentId())
                 .assetTypeId(dto.getAssetTypeId())
                 .comment(dto.getComment())
                 .costCOMDEV(dto.getComdevCost())
@@ -79,20 +83,16 @@ public class BudgetMapper {
                 .build();
     }
 
-    public static String toFiscalYear(int fiscalYear) {
-        return "FY" + fiscalYear;
-    }
-
-    public static int toFiscalYear(String fiscalYear) {
-        if (fiscalYear.startsWith("FY")) {
-            try {
-                return Integer.parseInt(fiscalYear.substring(2));
-            } catch (NumberFormatException ignored) {
-                throw new BadRequestException("Fiscal year " + fiscalYear + " is malformed");
-            }
-        }
-
-        throw new BadRequestException("Fiscal year " + fiscalYear + " is malformed");
+    public static Expenses buildExpense(@Valid PatchExpenseDTO dto) {
+        return Expenses.builder()
+                .expensesId(dto.getId())
+                .comment(dto.getComment())
+                .costCOMDEV(dto.getComdevCost())
+                .costPerUnit(dto.getUnitCost())
+                .percentCOMDEV(toPercent(dto.getComdevFraction()))
+                .units(dto.getUnitCount())
+                .weeks(dto.getWeekCount())
+                .build();
     }
 
     public static double toFraction(byte percent) {

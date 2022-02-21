@@ -1,12 +1,10 @@
 package ikea.imc.pam.budget.service.api.client;
 
 import ikea.imc.pam.budget.service.api.Paths;
-import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
-import ikea.imc.pam.budget.service.api.dto.ExpenseBatchDTO;
-import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
-import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.api.dto.*;
 import java.util.List;
 import java.util.Optional;
+import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -48,17 +46,17 @@ public class BudgetClientV1 implements BudgetClient {
     }
 
     @Override
-    public BudgetDTO createBudget(BudgetDTO requestBudgetDTO) {
+    public BudgetDTO createBudget(@Valid BudgetDTO requestBudgetDTO) {
         return execute(HttpMethod.POST, "", requestBudgetDTO);
     }
 
     @Override
-    public BudgetDTO updateBudget(Long id, BudgetDTO requestBudgetDTO) {
+    public BudgetDTO updateBudget(Long id, @Valid PatchBudgetDTO requestBudgetDTO) {
         return execute(HttpMethod.PATCH, "" + id, requestBudgetDTO);
     }
 
     @Override
-    public List<ExpenseDTO> updateExpense(Long budgetId, List<ExpenseDTO> requestPartialExpenseDTO) {
+    public List<ExpenseDTO> updateExpense(Long budgetId, @Valid List<PatchExpenseDTO> requestPartialExpenseDTO) {
         String url = budgetId + "expenses";
         return execute(HttpMethod.PATCH, url, ExpenseBatchDTO.builder().data(requestPartialExpenseDTO).build());
     }

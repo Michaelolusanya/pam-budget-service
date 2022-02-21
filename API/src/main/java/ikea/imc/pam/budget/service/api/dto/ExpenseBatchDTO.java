@@ -4,10 +4,12 @@ import java.util.List;
 import javax.validation.Valid;
 import lombok.Builder;
 import lombok.Data;
+import lombok.extern.jackson.Jacksonized;
 
 @Data
 @Builder
+@Jacksonized
 public class ExpenseBatchDTO {
 
-    @Valid private List<ExpenseDTO> data;
+    @Valid private List<PatchExpenseDTO> data;
 }

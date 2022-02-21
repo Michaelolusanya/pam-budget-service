@@ -84,7 +84,7 @@ public class BudgetController {
     @Operation(summary = "Update budget by Id")
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> updateBudget(
-            @PathVariable Long id, @RequestBody BudgetDTO dto) {
+            @PathVariable Long id, @RequestBody @Valid PatchBudgetDTO dto) {
         Budget budget = BudgetMapper.buildBudget(dto);
         return budgetService
                 .patchBudget(id, dto.getFiscalYear(), budget)

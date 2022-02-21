@@ -35,7 +35,6 @@
             <column name="expenses_id" type="BIGINT">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_expenses"/>
             </column>
-            <column name="assignment_id" type="BIGINT"/>
             <column name="asset_type_id" type="BIGINT"/>
             <column name="comment" type="VARCHAR(255)"/>
             <column name="cost" type="INT"/>

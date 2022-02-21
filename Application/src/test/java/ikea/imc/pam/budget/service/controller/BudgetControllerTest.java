@@ -32,7 +32,6 @@ public class BudgetControllerTest {
     private static final Long PROJECT_ID = 2L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
     private static final Long ASSET_TYPE_ID = 5L;
-    private static final Long ASSIGNMENT_ID = 5L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
@@ -128,7 +127,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_ID, expenses1.getId());
             assertEquals(EXPENSE_ID_2, dto.getExpenses().get(1).getId());
             assertEquals(BUDGET_ID, expenses1.getBudgetId());
-            assertEquals(ASSIGNMENT_ID, expenses1.getAssignmentId());
             assertEquals(ASSET_TYPE_ID, expenses1.getAssetTypeId());
             assertEquals(EXPENSE_COMMENT, expenses1.getComment());
             assertEquals(EXPENSE_COST_COMDEV, expenses1.getComdevCost());
@@ -316,7 +314,7 @@ public class BudgetControllerTest {
         void notFoundBudget() {
 
             // Given
-            BudgetDTO requestBudgetDTO = generateRequestBudget();
+            PatchBudgetDTO requestBudgetDTO = generateRequestPatchBudget();
             ArgumentCaptor<Long> inputBudgetId = ArgumentCaptor.forClass(Long.class);
             ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
@@ -340,7 +338,7 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            BudgetDTO requestBudgetDTO = generateRequestBudget();
+            PatchBudgetDTO requestBudgetDTO = generateRequestPatchBudget();
             ArgumentCaptor<Long> inputBudgetId = ArgumentCaptor.forClass(Long.class);
             ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
@@ -371,7 +369,7 @@ public class BudgetControllerTest {
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response =
-                    controller.updateBudget(BUDGET_ID, generateRequestBudget());
+                    controller.updateBudget(BUDGET_ID, generateRequestPatchBudget());
 
             // Then
             ResponseMessageDTO<BudgetDTO> messageDTO = response.getBody();
@@ -483,7 +481,6 @@ public class BudgetControllerTest {
             ExpenseDTO dto = dtos.get(0);
             assertEquals(EXPENSE_ID, dto.getId());
             assertEquals(BUDGET_ID, dto.getBudgetId());
-            assertEquals(ASSIGNMENT_ID, dto.getAssignmentId());
             assertEquals(ASSET_TYPE_ID, dto.getAssetTypeId());
             assertEquals(EXPENSE_COMMENT, dto.getComment());
             assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
@@ -495,6 +492,14 @@ public class BudgetControllerTest {
         }
     }
 
+    private static PatchBudgetDTO generateRequestPatchBudget() {
+        return PatchBudgetDTO.builder()
+                .estimatedCost(ESTIMATED_COST)
+                .fiscalYear(FISCAL_YEAR)
+                .comdevCost(COMDEV_COST)
+                .build();
+    }
+
     private static BudgetDTO generateRequestBudget() {
         return BudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
@@ -504,11 +509,12 @@ public class BudgetControllerTest {
     }
 
     private static ExpenseBatchDTO generateExpenseBatchDTO() {
-        return ExpenseBatchDTO.builder().data(List.of(generateExpenseDTO())).build();
+        return ExpenseBatchDTO.builder().data(List.of(generatePatchExpenseDTO())).build();
     }
 
-    private static ExpenseDTO generateExpenseDTO() {
-        return ExpenseDTO.builder()
+    private static PatchExpenseDTO generatePatchExpenseDTO() {
+        return PatchExpenseDTO.builder()
+                .id(EXPENSE_ID)
                 .comdevFraction(EXPENSE_FRACTION_COMDEV)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .comdevCost(EXPENSE_COST_COMDEV)
@@ -521,7 +527,6 @@ public class BudgetControllerTest {
     private static Expenses generateExpense(Budget budget, Long id) {
         return Expenses.builder()
                 .expensesId(id)
-                .assignmentId(ASSIGNMENT_ID)
                 .assetTypeId(ASSET_TYPE_ID)
                 .comment(EXPENSE_COMMENT)
                 .cost(EXPENSE_COST)

@@ -1,21 +1,14 @@
 package ikea.imc.pam.budget.service.api.dto;
 
-import java.util.List;
-import javax.validation.constraints.*;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 import lombok.Builder;
 import lombok.Data;
 
 @Data
 @Builder
-public class BudgetDTO {
+public class PatchBudgetDTO {
 
-    private Long id;
-
-    @NotNull
-    @Min(Constants.MINIMUM_ID)
-    private Long projectId;
-
-    @NotNull
     @Min(Constants.MINIMUM_YEAR)
     @Max(Constants.MAXIMUM_YEAR)
     private Integer fiscalYear;
@@ -26,6 +19,4 @@ public class BudgetDTO {
 
     @Min(Constants.MINIMUM_COST)
     private Double comdevCost;
-
-    private List<ExpenseDTO> expenses;
 }
