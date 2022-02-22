@@ -1,12 +1,17 @@
 package ikea.imc.pam.budget.service.service;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.BudgetRepository;
 import ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
+import ikea.imc.pam.budget.service.repository.ExpensesRepository;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
+import ikea.imc.pam.budget.service.repository.model.Expenses;
+import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +20,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -25,9 +31,12 @@ public class BudgetServiceV1Test {
     private static final Long BUDGET_ID = 1L;
     private static final Long BUDGET_ID_2 = 2L;
     private static final Long BUDGET_VERSION_ID = 3L;
+    private static final Long EXPENSE_ID = 5L;
+    private static final Long EXPENSE_ID_2 = 6L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
+    private static final Integer FISCAL_YEAR = 2020;
 
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_BUDGET_2 = 200_000L;
@@ -35,11 +44,28 @@ public class BudgetServiceV1Test {
     private static final double COMDEV_COST_2 = 60_000d;
     private static final Long PROJECT_ID = 2L;
 
-    private static final Integer FISCAL_YEAR = 2020;
+    private static final Long ASSET_TYPE_ID = 111L;
+    private static final Long ASSET_TYPE_ID_2 = 222L;
+    private static final String COMMENT = "comment1";
+    private static final String COMMENT_2 = "comment2";
+    private static final Integer COST = 123;
+    private static final Integer COST_2 = 234;
+    private static final Integer COST_PER_UNIT = 23;
+    private static final Integer COST_PER_UNIT_2 = 34;
+    private static final Byte PERCENT_COMDEV = 10;
+    private static final Byte PERCENT_COMDEV_2 = 11;
+    private static final Short UNITS = 2;
+    private static final Short UNITS_2 = 4;
+    private static final Byte WEEKS = 3;
+    private static final Byte WEEKS_2 = 5;
+    private static final InvoicingTypeOption INVOICING_TYPE_OPTION = InvoicingTypeOption.FIXED_PRICE;
+    private static final InvoicingTypeOption INVOICING_TYPE_OPTION_2 = InvoicingTypeOption.HOURLY_PRICE;
 
     @Mock private BudgetRepository repository;
 
     @Mock private BudgetVersionRepository budgetVersionRepository;
+
+    @Mock private ExpensesRepository expensesRepository;
 
     @InjectMocks private BudgetServiceV1 service;
 
@@ -384,6 +410,191 @@ public class BudgetServiceV1Test {
         }
     }
 
+    @Nested
+    class PatchExpensesTest {
+
+        @Captor private ArgumentCaptor<List<Expenses>> expensesListArgumentCaptor;
+
+        @Test
+        void budgetIsNull() {
+
+            // Given
+            List<Expenses> inputExpenses = List.of();
+
+            // When
+            NotFoundException notFoundException =
+                    assertThrows(NotFoundException.class, () -> service.patchExpenses(null, inputExpenses));
+
+            // Then
+            assertEquals("Budget 0 not found", notFoundException.getMessage());
+        }
+
+        @Test
+        void budgetIsDeleted() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setStatus(Status.ARCHIVED);
+            List<Expenses> inputExpenses = List.of();
+
+            // When
+            NotFoundException notFoundException =
+                    assertThrows(NotFoundException.class, () -> service.patchExpenses(budget, inputExpenses));
+
+            // Then
+            assertEquals("Budget 1 not found", notFoundException.getMessage());
+        }
+
+        @Test
+        void expenseIsNotFound() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setExpenses(List.of());
+            List<Expenses> inputExpenses = List.of(generateExpenses(EXPENSE_ID, budget));
+
+            // When
+            NotFoundException exception =
+                    assertThrows(NotFoundException.class, () -> service.patchExpenses(budget, inputExpenses));
+
+            // Then
+            assertEquals("Expenses with id 5 not found", exception.getMessage());
+        }
+
+        @Test
+        void updatedExpensesIsEmptyAndBudgetHasNoExpenses() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            List<Expenses> inputExpenses = List.of();
+            when(expensesRepository.saveAllAndFlush(any())).thenReturn(List.of());
+
+            // When
+            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(0, expenses.size());
+        }
+
+        @Test
+        void updatedExpensesIsEmpty() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            List<Expenses> inputExpenses = List.of();
+            when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(List.of());
+
+            // When
+            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(2, expenses.size());
+            assertEquals(0, expensesListArgumentCaptor.getValue().size());
+            assertEquals(EXPENSE_ID, expenses.get(0).getExpensesId());
+            assertEquals(EXPENSE_ID_2, expenses.get(1).getExpensesId());
+        }
+
+        @Test
+        void expensesContainsNoUpdate() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            List<Expenses> inputExpenses =
+                    List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget));
+            budget.setExpenses(inputExpenses);
+            when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(List.of());
+
+            // When
+            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(2, expenses.size());
+            assertEquals(0, expensesListArgumentCaptor.getValue().size());
+            assertEquals(EXPENSE_ID, expenses.get(0).getExpensesId());
+            assertEquals(EXPENSE_ID_2, expenses.get(1).getExpensesId());
+        }
+
+        @Test
+        void oneExpenseIsChanged() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            List<Expenses> inputExpenses =
+                    List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
+            when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture()))
+                    .thenReturn(List.of(generateExpenses2(EXPENSE_ID_2, budget)));
+
+            // When
+            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(2, expenses.size());
+            assertEquals(1, expensesListArgumentCaptor.getValue().size());
+            assertEquals(EXPENSE_ID, expenses.get(0).getExpensesId());
+
+            Expenses updatedExpense = expenses.get(1);
+            assertEquals(EXPENSE_ID_2, updatedExpense.getExpensesId());
+            assertEquals(ASSET_TYPE_ID_2, updatedExpense.getAssetTypeId());
+            assertEquals(COMMENT_2, updatedExpense.getComment());
+            assertEquals(COST_2, updatedExpense.getCost());
+            assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
+            assertEquals(PERCENT_COMDEV_2, updatedExpense.getPercentCOMDEV());
+            assertEquals(UNITS_2, updatedExpense.getUnits());
+            assertEquals(WEEKS_2, updatedExpense.getWeeks());
+            assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
+        }
+
+        @Test
+        void oneExpenseIsChangedSaveValidation() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            List<Expenses> inputExpenses =
+                    List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
+            when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture()))
+                    .thenReturn(List.of(generateExpenses2(EXPENSE_ID_2, budget)));
+
+            // When
+            service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(1, expensesListArgumentCaptor.getValue().size());
+            Expenses updatedExpense = expensesListArgumentCaptor.getValue().get(0);
+            assertEquals(EXPENSE_ID_2, updatedExpense.getExpensesId());
+            assertEquals(ASSET_TYPE_ID_2, updatedExpense.getAssetTypeId());
+            assertEquals(COMMENT_2, updatedExpense.getComment());
+            assertEquals(COST_2, updatedExpense.getCost());
+            assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
+            assertEquals(PERCENT_COMDEV_2, updatedExpense.getPercentCOMDEV());
+            assertEquals(UNITS_2, updatedExpense.getUnits());
+            assertEquals(WEEKS_2, updatedExpense.getWeeks());
+            assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
+        }
+
+        @Test
+        void allExpensesAreChanged() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            List<Expenses> inputExpenses =
+                    List.of(generateExpenses2(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
+            when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(inputExpenses);
+
+            // When
+            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+
+            // Then
+            assertEquals(2, expenses.size());
+            assertEquals(2, expensesListArgumentCaptor.getValue().size());
+            assertEquals(EXPENSE_ID, expenses.get(0).getExpensesId());
+            assertEquals(EXPENSE_ID_2, expenses.get(1).getExpensesId());
+        }
+    }
+
     private static Budget generateBudget(Long id) {
         return Budget.builder()
                 .budgetId(id)
@@ -403,5 +614,37 @@ public class BudgetServiceV1Test {
         budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
         budgetVersion.setFiscalYear(FISCAL_YEAR);
         return budgetVersion;
+    }
+
+    private static Expenses generateExpenses(Long id, Budget budget) {
+        return Expenses.builder()
+                .expensesId(id)
+                .assetTypeId(ASSET_TYPE_ID)
+                .comment(COMMENT)
+                .cost(COST)
+                .costCOMDEV(COMDEV_COST)
+                .costPerUnit(COST_PER_UNIT)
+                .percentCOMDEV(PERCENT_COMDEV)
+                .units(UNITS)
+                .weeks(WEEKS)
+                .invoicingTypeOption(INVOICING_TYPE_OPTION)
+                .budget(budget)
+                .build();
+    }
+
+    private static Expenses generateExpenses2(Long id, Budget budget) {
+        return Expenses.builder()
+                .expensesId(id)
+                .assetTypeId(ASSET_TYPE_ID_2)
+                .comment(COMMENT_2)
+                .cost(COST_2)
+                .costCOMDEV(COMDEV_COST_2)
+                .costPerUnit(COST_PER_UNIT_2)
+                .percentCOMDEV(PERCENT_COMDEV_2)
+                .units(UNITS_2)
+                .weeks(WEEKS_2)
+                .invoicingTypeOption(INVOICING_TYPE_OPTION_2)
+                .budget(budget)
+                .build();
     }
 }

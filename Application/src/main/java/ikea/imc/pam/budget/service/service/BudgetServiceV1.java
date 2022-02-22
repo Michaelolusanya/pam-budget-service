@@ -1,13 +1,15 @@
 package ikea.imc.pam.budget.service.service;
 
+import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.BudgetRepository;
 import ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
+import ikea.imc.pam.budget.service.repository.ExpensesRepository;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.stereotype.Service;
@@ -18,10 +20,15 @@ public class BudgetServiceV1 implements BudgetService {
     private static final Logger log = LogManager.getLogger(BudgetServiceV1.class);
     private final BudgetRepository repository;
     private final BudgetVersionRepository budgetVersionRepository;
+    private final ExpensesRepository expensesRepository;
 
-    public BudgetServiceV1(BudgetRepository repository, BudgetVersionRepository budgetVersionRepository) {
+    public BudgetServiceV1(
+            BudgetRepository repository,
+            BudgetVersionRepository budgetVersionRepository,
+            ExpensesRepository expensesRepository) {
         this.repository = repository;
         this.budgetVersionRepository = budgetVersionRepository;
+        this.expensesRepository = expensesRepository;
     }
 
     @Override
@@ -91,12 +98,53 @@ public class BudgetServiceV1 implements BudgetService {
     public List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses) {
 
         if (budget == null || budget.getStatus() == Status.ARCHIVED) {
-            return null;
+            throw new NotFoundException(
+                    String.format("Budget %d not found", budget != null ? budget.getBudgetId() : 0));
+        }
+        log.debug("Patching expenses for budget {}", budget.getBudgetId());
+
+        Map<Long, Expenses> expensesMap =
+                budget.getExpenses().stream().collect(Collectors.toMap(Expenses::getExpensesId, expenses -> expenses));
+
+        List<Expenses> savedExpenses = updateExpenses(updatedExpenses, expensesMap);
+
+        return expensesMap.keySet().stream()
+                .map(id -> toUpdatedExpenses(id, expensesMap, savedExpenses))
+                .sorted(Comparator.comparing(Expenses::getExpensesId))
+                .collect(Collectors.toList());
+    }
+
+    private List<Expenses> updateExpenses(List<Expenses> updatedExpenses, Map<Long, Expenses> expensesMap) {
+
+        List<Expenses> expensesToUpdate = new ArrayList<>();
+        for (Expenses updatedExpense : updatedExpenses) {
+
+            Expenses expenses = mergeExpense(expensesMap.get(updatedExpense.getExpensesId()), updatedExpense);
+            if (!expensesMap.get(updatedExpense.getExpensesId()).isEqual(expenses)) {
+                log.debug("Patching expense {}", expenses.getExpensesId());
+                expensesToUpdate.add(expenses);
+            }
         }
 
-        // TODO
+        return expensesRepository.saveAllAndFlush(expensesToUpdate);
+    }
 
-        return List.of();
+    private Expenses mergeExpense(Expenses currentExpense, Expenses updatedExpense) {
+
+        if (currentExpense == null) {
+            throw new NotFoundException(String.format("Expenses with id %d not found", updatedExpense.getExpensesId()));
+        }
+
+        return Expenses.merge(currentExpense, updatedExpense);
+    }
+
+    private Expenses toUpdatedExpenses(
+            Long expenseId, Map<Long, Expenses> allExpenses, List<Expenses> updatedExpenses) {
+        Optional<Expenses> optionalExpenses =
+                updatedExpenses.stream()
+                        .filter(expenses -> Objects.equals(expenses.getExpensesId(), expenseId))
+                        .findAny();
+        return optionalExpenses.orElseGet(() -> allExpenses.get(expenseId));
     }
 
     @Override

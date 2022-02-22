@@ -36,7 +36,7 @@ public class BudgetMapper {
                 .unitCount(expenses.getUnits())
                 .weekCount(expenses.getWeeks())
                 .comment(expenses.getComment())
-                .priceModel(expenses.getInvoicingTypeName())
+                .priceModel(expenses.toInvoicingTypeName())
                 .build();
     }
 
