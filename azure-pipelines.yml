@@ -20,6 +20,7 @@ variables:
   value: '{"loginServer":"$(containerRegistryName).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryName)"}'
 
 steps:
+  # Build application
   - task: Maven@3
     inputs:
       mavenPomFile: 'pom.xml'
@@ -40,25 +41,27 @@ steps:
     condition: succeededOrFailed()
 
   - task: PublishBuildArtifacts@1
-    displayName: 'Publish Artifact: drop'
+    displayName: 'Publish Artifact: icomdev.pam-budget-service'
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
+  
+  # Build container image
   - task: Docker@1
     displayName: 'Build an image'
     inputs:
-      azureSubscription: 'cbrs-ikeaorderandcreate-nonprd'
+      azureSubscription: 'sc-cbrs-ikeaorderandcreate-nonprd'
       dockerFile: '**/Dockerfile'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       action: 'Build an image'
       azureContainerRegistry: $(containerConnection)
-      buildContext: 'Application/target'
       includeLatestTag: true
 
+  # Push container image
   - task: Docker@1
     displayName: 'Push an image'
     inputs:
-      azureSubscription: 'cbrs-ikeaorderandcreate-nonprd'
+      azureSubscription: 'sc-cbrs-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       azureContainerRegistry: $(containerConnection)
       action: 'Push an image'
