@@ -11,12 +11,12 @@ services:
         privileged: true
         restart: unless-stopped
         ports:
-            - "23154:8080" # Default application port
+            - "23154:23154" # Default application port
             - "5006:5006" # Debug port
         environment:
             - "SPRING_PROFILES_ACTIVE=local"
         healthcheck:
-            test: "curl --fail --silent localhost:8080/actuator/health | grep UP || exit 1"
+            test: "curl --fail --silent localhost:23154/actuator/health | grep UP || exit 1"
             interval: 20s
             timeout: 5s
             retries: 5
