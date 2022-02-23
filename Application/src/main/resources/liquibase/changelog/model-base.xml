@@ -8,7 +8,7 @@
 
     <changeSet id="1645098515079-1" author="david-stromner (generated)">
         <createTable tableName="budget">
-            <column name="budget_id" type="BIGINT">
+            <column name="budget_id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_budget"/>
             </column>
             <column name="project_id" type="BIGINT"/>
@@ -16,23 +16,25 @@
             <column name="costcomdev" type="DOUBLE"/>
             <column name="status" type="VARCHAR(255)" defaultValue="ACTIVE"/>
             <column name="budget_version_id" type="BIGINT"/>
+            <column name="last_updated" type="datetime" />
         </createTable>
     </changeSet>
 
     <changeSet id="1645098515079-2" author="david-stromner (generated)">
         <createTable tableName="budget_version">
-            <column name="budget_version_id" type="BIGINT">
+            <column name="budget_version_id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_budgetversion"/>
             </column>
             <column name="budget_version_name" type="VARCHAR(255)"/>
             <column name="fiscal_year" type="INT"/>
             <column name="budget_version_date" type="DATE"/>
+            <column name="last_updated" type="datetime" />
         </createTable>
     </changeSet>
 
     <changeSet id="1645098515079-3" author="david-stromner (generated)">
         <createTable tableName="expenses">
-            <column name="expenses_id" type="BIGINT">
+            <column name="expenses_id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_expenses"/>
             </column>
             <column name="asset_type_id" type="BIGINT"/>
@@ -45,6 +47,7 @@
             <column name="weeks" type="SMALLINT"/>
             <column name="invoicing_type_option" type="VARCHAR(255)"/>
             <column name="budget_id" type="BIGINT"/>
+            <column name="last_updated" type="datetime" />
         </createTable>
     </changeSet>
 

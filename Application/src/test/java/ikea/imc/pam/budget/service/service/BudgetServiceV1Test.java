@@ -70,6 +70,104 @@ public class BudgetServiceV1Test {
     @InjectMocks private BudgetServiceV1 service;
 
     @Nested
+    class CreateBudgetTest {
+
+        @Captor ArgumentCaptor<BudgetVersion> budgetVersionCaptor;
+        @Captor ArgumentCaptor<Budget> budgetCaptor;
+
+        @Test
+        void validateSavedBudgetVersion() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            when(budgetVersionRepository.saveAndFlush(budgetVersionCaptor.capture()))
+                    .thenReturn(generateBudgetVersion());
+            when(repository.saveAndFlush(any())).thenReturn(budget);
+
+            // When
+            service.createBudget(FISCAL_YEAR, budget);
+
+            // Then
+            assertNotNull(budgetVersionCaptor.getValue());
+            BudgetVersion version = budgetVersionCaptor.getValue();
+            assertEquals(FISCAL_YEAR, version.getFiscalYear());
+        }
+
+        @Test
+        void validateSavedBudget() {
+
+            // Given
+            when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
+            when(repository.saveAndFlush(budgetCaptor.capture())).thenReturn(generateBudget(BUDGET_ID));
+
+            // When
+            service.createBudget(FISCAL_YEAR, generateBudget(null));
+
+            // Then
+            assertNotNull(budgetCaptor.getValue());
+            Budget budget = budgetCaptor.getValue();
+            assertNull(budget.getBudgetId());
+            assertEquals(PROJECT_ID, budget.getProjectId());
+            assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
+            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(Status.ACTIVE, budget.getStatus());
+            assertNotNull(budget.getBudgetVersion());
+            assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
+        }
+
+        @Test
+        void createBudgetWithoutExpenses() {
+
+            // Given
+            when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
+            when(repository.saveAndFlush(any())).thenReturn(generateBudget(BUDGET_ID));
+
+            // When
+            Budget budget = service.createBudget(FISCAL_YEAR, generateBudget(null));
+
+            // Then
+            assertEquals(BUDGET_ID, budget.getBudgetId());
+            assertEquals(PROJECT_ID, budget.getProjectId());
+            assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
+            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(Status.ACTIVE, budget.getStatus());
+            assertNotNull(budget.getBudgetVersion());
+            assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
+            assertEquals(0, budget.getExpenses().size());
+        }
+
+        @Test
+        void createBudgetWithExpenses() {
+
+            // Given
+            Budget inputBudget = generateBudget(BUDGET_ID);
+            inputBudget.setExpenses(List.of(generateExpenses(null, inputBudget), generateExpenses2(null, inputBudget)));
+            Budget outputBudget = generateBudget(BUDGET_ID);
+            outputBudget.setExpenses(
+                    List.of(generateExpenses(EXPENSE_ID, outputBudget), generateExpenses2(EXPENSE_ID_2, outputBudget)));
+            when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
+            when(repository.saveAndFlush(any())).thenReturn(outputBudget);
+
+            // When
+            Budget budget = service.createBudget(FISCAL_YEAR, generateBudget(null));
+
+            // Then
+            assertEquals(2, budget.getExpenses().size());
+            Expenses expenses = budget.getExpenses().get(0);
+            assertEquals(EXPENSE_ID, expenses.getExpensesId());
+            assertEquals(EXPENSE_ID_2, budget.getExpenses().get(1).getExpensesId());
+            assertEquals(ASSET_TYPE_ID, expenses.getAssetTypeId());
+            assertEquals(COMMENT, expenses.getComment());
+            assertEquals(COST, expenses.getCost());
+            assertEquals(COST_PER_UNIT, expenses.getCostPerUnit());
+            assertEquals(PERCENT_COMDEV, expenses.getPercentCOMDEV());
+            assertEquals(UNITS, expenses.getUnits());
+            assertEquals(WEEKS, expenses.getWeeks());
+            assertEquals(INVOICING_TYPE_OPTION, expenses.getInvoicingTypeOption());
+        }
+    }
+
+    @Nested
     class GetByIdTest {
 
         @Test

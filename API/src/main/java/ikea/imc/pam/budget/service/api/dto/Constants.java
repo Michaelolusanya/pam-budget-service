@@ -13,7 +13,7 @@ public class Constants {
     public static final long MINIMUM_ID = 1L;
 
     public static final int MINIMUM_YEAR = 1970;
-    public static final int MAXIMUM_YEAR = 1970;
+    public static final int MAXIMUM_YEAR = 3000;
 
     private Constants() {}
 }

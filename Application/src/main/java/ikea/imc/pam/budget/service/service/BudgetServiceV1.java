@@ -8,6 +8,7 @@ import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
+import java.time.LocalDate;
 import java.util.*;
 import java.util.stream.Collectors;
 import org.apache.logging.log4j.LogManager;
@@ -33,7 +34,19 @@ public class BudgetServiceV1 implements BudgetService {
 
     @Override
     public Budget createBudget(Integer fiscalYear, Budget budget) {
-        return null;
+
+        BudgetVersion budgetVersion =
+                BudgetVersion.builder()
+                        .fiscalYear(fiscalYear)
+                        .budgetVersionName(fiscalYear.toString())
+                        .budgetVersionDate(LocalDate.of(fiscalYear, 1, 1))
+                        .build();
+        budgetVersion = budgetVersionRepository.saveAndFlush(budgetVersion);
+
+        budget.setBudgetVersion(budgetVersion);
+        budget.setStatus(Status.ACTIVE);
+
+        return repository.saveAndFlush(budget);
     }
 
     @Override
