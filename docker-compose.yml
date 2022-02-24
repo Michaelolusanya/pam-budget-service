@@ -3,7 +3,7 @@ services:
     budget-service-application:
         build:
             context: .
-            dockerfile: Dockerfile
+            dockerfile: Dockerfile-local
             args:
                 - SUSPENDED_BOOT=n
                 - DEBUG_PORT=5006
