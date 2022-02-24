@@ -50,7 +50,7 @@ steps:
   - task: Docker@1
     displayName: 'Build an image'
     inputs:
-      azureSubscription: 'sc-cbrs-ikeaorderandcreate-nonprd'
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       dockerFile: '**/Dockerfile'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       action: 'Build an image'
@@ -61,7 +61,7 @@ steps:
   - task: Docker@1
     displayName: 'Push an image'
     inputs:
-      azureSubscription: 'sc-cbrs-ikeaorderandcreate-nonprd'
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       azureContainerRegistry: $(containerConnection)
       action: 'Push an image'
