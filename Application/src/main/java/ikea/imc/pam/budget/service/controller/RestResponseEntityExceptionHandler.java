@@ -22,7 +22,7 @@ public class RestResponseEntityExceptionHandler {
 
     @ExceptionHandler(Throwable.class)
     protected ResponseEntity<ResponseMessageDTO<Object>> handleAllOtherExceptions(Throwable ex) {
-        log.error(ex);
+        log.error(ex.getMessage(), ex);
         return ResponseEntityFactory.generateResponse(ex);
     }
 }
