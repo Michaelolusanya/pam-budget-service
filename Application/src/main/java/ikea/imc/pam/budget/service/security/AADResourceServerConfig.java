@@ -20,6 +20,8 @@ public class AADResourceServerConfig extends AADResourceServerWebSecurityConfigu
 
         if (isAuthenticationEnabled) {
             http.antMatcher("/**").authorizeRequests().anyRequest().authenticated();
+        } else {
+            http.csrf().disable();
         }
     }
 
