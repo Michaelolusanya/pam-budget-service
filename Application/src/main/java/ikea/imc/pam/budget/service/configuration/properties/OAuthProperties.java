@@ -1,6 +1,5 @@
 package ikea.imc.pam.budget.service.configuration.properties;
 
-import javax.validation.constraints.NotEmpty;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
@@ -45,53 +44,33 @@ public class OAuthProperties {
      */
     public static class ClientScope {
         private final String id;
-        private final String readScopeDesc;
-        private final String writeScopeDesc;
+        private final String scopeName;
 
-        public ClientScope(String id, String readScopeDesc, String writeScopeDesc) {
+        public ClientScope(String id, String scopeName) {
             this.id = id;
-            this.readScopeDesc = readScopeDesc;
-            this.writeScopeDesc = writeScopeDesc;
+            this.scopeName = scopeName;
         }
 
         public String getId() {
             return id;
         }
 
-        public String getReadScopeDesc() {
-            return readScopeDesc;
+        public String getScopeName() {
+            return scopeName;
         }
 
-        public String getWriteScopeDesc() {
-            return writeScopeDesc;
-        }
-
-        public String getReadScope() {
-            return createScope(readScopeDesc);
-        }
-
-        public String getWriteScope() {
-            return createScope(writeScopeDesc);
-        }
-
-        private String createScope(String desc) {
-            return "api://" + id + "/" + desc;
+        public String getScope() {
+            return "api://" + id + "/" + scopeName;
         }
     }
 
     public static class Microsoft {
-        @NotEmpty private final String tenantId;
-        @NotEmpty private final String authorizationUrl;
-        @NotEmpty private final String tokenUrl;
+        private final String authorizationUrl;
+        private final String tokenUrl;
 
-        public Microsoft(String tenantId, String authorizationUrl, String tokenUrl) {
-            this.tenantId = tenantId;
+        public Microsoft(String authorizationUrl, String tokenUrl) {
             this.authorizationUrl = authorizationUrl;
             this.tokenUrl = tokenUrl;
-        }
-
-        public String getTenantId() {
-            return tenantId;
         }
 
         public String getAuthorizationUrl() {

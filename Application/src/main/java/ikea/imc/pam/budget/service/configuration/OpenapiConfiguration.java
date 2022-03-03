@@ -4,7 +4,6 @@ import com.google.common.base.Joiner;
 import ikea.imc.pam.budget.service.configuration.properties.NetworkProperties;
 import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties;
 import ikea.imc.pam.budget.service.configuration.properties.OAuthProperties.ClientScope;
-import ikea.imc.pam.budget.service.configuration.properties.OpenApiProperties;
 import ikea.imc.pam.budget.service.util.ApplicationContextUtil;
 import io.swagger.v3.oas.models.Components;
 import io.swagger.v3.oas.models.OpenAPI;
@@ -25,13 +24,10 @@ public class OpenapiConfiguration {
 
     private final NetworkProperties networkProperties;
     private final OAuthProperties oauthProperties;
-    private final OpenApiProperties openApiProperties;
 
-    public OpenapiConfiguration(
-            NetworkProperties networkProperties, OAuthProperties oauthProperties, OpenApiProperties openApiProperties) {
+    public OpenapiConfiguration(NetworkProperties networkProperties, OAuthProperties oauthProperties) {
         this.networkProperties = networkProperties;
         this.oauthProperties = oauthProperties;
-        this.openApiProperties = openApiProperties;
     }
 
     @Bean
@@ -42,6 +38,7 @@ public class OpenapiConfiguration {
         openapi.addServersItem(new Server().url(networkProperties.getDomain()));
         openapi.components(openapiComponents);
         openapi.setInfo(getApplicationInformation());
+        openapi.addSecurityItem(new SecurityRequirement().addList("OAuth"));
         return openapi;
     }
 
@@ -82,7 +79,7 @@ public class OpenapiConfiguration {
         parameter.required(false);
 
         Components components = new Components();
-        components.addSecuritySchemes("Open Id Connect", getOpenIdConnectSecurityScheme());
+        components.addSecuritySchemes("OAuth", getOpenIdConnectSecurityScheme());
         components.addSecuritySchemes("JWT-Token", getJwtTokenSecurityScheme());
         components.addParameters("Version", parameter);
         return components;
@@ -96,6 +93,10 @@ public class OpenapiConfiguration {
     private SecurityScheme getOpenIdConnectSecurityScheme() {
         SecurityScheme secScheme = new SecurityScheme();
         secScheme.type(SecurityScheme.Type.OAUTH2);
+        secScheme.scheme("bearer");
+        secScheme.bearerFormat("jwt");
+        secScheme.in(SecurityScheme.In.HEADER);
+        secScheme.name("Authorization");
         secScheme.description("Oauth2 flow");
         secScheme.flows(getAuthorizationCodeOAuthFlows());
         return secScheme;
@@ -104,8 +105,7 @@ public class OpenapiConfiguration {
     private OAuthFlows getAuthorizationCodeOAuthFlows() {
         ClientScope clientScopeProperties = oauthProperties.getClientScope();
         Scopes scopes = new Scopes();
-        scopes.addString(clientScopeProperties.getReadScope(), clientScopeProperties.getReadScopeDesc());
-        scopes.addString(clientScopeProperties.getWriteScope(), clientScopeProperties.getWriteScopeDesc());
+        scopes.addString(clientScopeProperties.getScope(), clientScopeProperties.getScopeName());
 
         OAuthFlow oAuthFlow = new OAuthFlow();
         oAuthFlow.setAuthorizationUrl(oauthProperties.getMicrosoft().getAuthorizationUrl());
