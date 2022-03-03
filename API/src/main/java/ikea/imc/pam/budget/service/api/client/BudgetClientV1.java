@@ -2,6 +2,7 @@ package ikea.imc.pam.budget.service.api.client;
 
 import ikea.imc.pam.budget.service.api.Paths;
 import ikea.imc.pam.budget.service.api.dto.*;
+import ikea.imc.pam.budget.service.api.exception.BudgetClientRequestException;
 import java.util.List;
 import java.util.Optional;
 import javax.validation.Valid;
@@ -100,6 +101,9 @@ public class BudgetClientV1 implements BudgetClient {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(body)
                         .retrieve()
+                        .onStatus(
+                                HttpStatus::is4xxClientError,
+                                response -> response.bodyToMono(returnType).map(BudgetClientRequestException::new))
                         .onStatus(
                                 HttpStatus::isError,
                                 response -> {

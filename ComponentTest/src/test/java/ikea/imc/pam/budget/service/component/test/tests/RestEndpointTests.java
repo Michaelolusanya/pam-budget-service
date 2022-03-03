@@ -8,11 +8,13 @@ import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
 import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
 import ikea.imc.pam.budget.service.api.dto.PatchBudgetDTO;
 import ikea.imc.pam.budget.service.api.dto.PatchExpenseDTO;
+import ikea.imc.pam.budget.service.api.exception.BudgetClientRequestException;
 import ikea.imc.pam.budget.service.component.test.AbstractBaseTest;
 import java.util.List;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 
 class RestEndpointTests extends AbstractBaseTest {
     @Autowired BudgetClient budgetClient;
@@ -37,7 +39,12 @@ class RestEndpointTests extends AbstractBaseTest {
         // GIVEN (Budget doesn't exist in budget-service)
 
         // WHEN (REST call to budget-service to get nonexistent budget)
-        assertThrows(RuntimeException.class, () -> budgetClient.getBudget(testData.projectId).orElseThrow());
+        BudgetClientRequestException exception =
+                assertThrows(BudgetClientRequestException.class, () -> budgetClient.getBudget(testData.projectId));
+
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+        assertNotNull(exception.getBody());
+        assertEquals(404, exception.getBody().getStatusCode());
     }
 
     @Test
@@ -214,11 +221,16 @@ class RestEndpointTests extends AbstractBaseTest {
     @Test
     void updateMissingBudgetWithExpense() {
         // GIVEN (Budget doesn't exist in budget-service)
+        PatchExpenseDTO patchExpenseDTO =
+                PatchExpenseDTO.builder().id(1L).comdevFraction(MINIMUM_FRACTION + 1.0).build();
+        List<PatchExpenseDTO> expenses = List.of(patchExpenseDTO);
 
         // WHEN (REST call to budget-service to update expenses for nonexistent budget)
-        PatchExpenseDTO patchExpenseDTO =
-                PatchExpenseDTO.builder().id(0L).comdevFraction(MINIMUM_FRACTION + 1.0).build();
-        assertThrows(RuntimeException.class, () -> budgetClient.updateExpense(-1L, List.of(patchExpenseDTO)));
+        BudgetClientRequestException exception =
+                assertThrows(BudgetClientRequestException.class, () -> budgetClient.updateExpense(-1L, expenses));
+
+        // Then
+        assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
     }
 
     private BudgetDTO.BudgetDTOBuilder minimalBudgetBuilder(Long projectId, Integer fiscalYear) {
