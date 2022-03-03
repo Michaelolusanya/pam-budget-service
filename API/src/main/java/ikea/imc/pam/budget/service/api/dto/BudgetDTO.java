@@ -1,11 +1,13 @@
 package ikea.imc.pam.budget.service.api.dto;
 
 import java.util.List;
+import javax.validation.Valid;
 import javax.validation.constraints.*;
-import lombok.Builder;
-import lombok.Data;
+import lombok.*;
 
 @Data
+@NoArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder
 public class BudgetDTO {
 
@@ -27,5 +29,5 @@ public class BudgetDTO {
     @Min(Constants.MINIMUM_COST)
     private Double comdevCost;
 
-    private List<ExpenseDTO> expenses;
+    @NotNull @Valid private List<ExpenseDTO> expenses;
 }

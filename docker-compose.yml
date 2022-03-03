@@ -17,7 +17,7 @@ services:
             - "SPRING_PROFILES_ACTIVE=local"
         healthcheck:
             test: "curl --fail --silent localhost:23154/actuator/health | grep UP || exit 1"
-            interval: 20s
+            interval: 30s
             timeout: 5s
-            retries: 5
+            retries: 10
             start_period: 40s

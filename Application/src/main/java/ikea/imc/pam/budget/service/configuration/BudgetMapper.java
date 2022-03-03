@@ -99,7 +99,10 @@ public class BudgetMapper {
         return percent / 100d;
     }
 
-    public static byte toPercent(double fraction) {
+    public static Byte toPercent(Double fraction) {
+        if (fraction == null) {
+            return null;
+        }
         return (byte) (fraction * 100);
     }
 }

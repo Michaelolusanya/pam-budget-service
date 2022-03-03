@@ -8,7 +8,7 @@ public interface BudgetClient {
 
     Optional<BudgetDTO> getBudget(Long id);
 
-    List<BudgetDTO> findBudgets(List<Long> hfbIds, List<Integer> fiscalYears);
+    List<BudgetDTO> findBudgets(List<Long> projectIds, List<Integer> fiscalYears);
 
     BudgetDTO deleteBudget(Long id);
 

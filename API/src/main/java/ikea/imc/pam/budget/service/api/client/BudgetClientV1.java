@@ -8,7 +8,9 @@ import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -27,45 +29,67 @@ public class BudgetClientV1 implements BudgetClient {
 
     @Override
     public Optional<BudgetDTO> getBudget(Long id) {
-        return Optional.of(execute(HttpMethod.GET, "" + id));
+        ParameterizedTypeReference<ResponseMessageDTO<BudgetDTO>> typeReference = new ParameterizedTypeReference<>() {};
+
+        return Optional.of(execute(HttpMethod.GET, "" + id, typeReference));
     }
 
     @Override
-    public List<BudgetDTO> findBudgets(List<Long> hfbIds, List<Integer> fiscalYears) {
+    public List<BudgetDTO> findBudgets(List<Long> projectIds, List<Integer> fiscalYears) {
+        ParameterizedTypeReference<ResponseMessageDTO<List<BudgetDTO>>> typeReference =
+                new ParameterizedTypeReference<>() {};
+
         String contextUrl =
                 Paths.buildContextUrl(
-                        Paths.buildRequestParameter("hfbIds", hfbIds),
+                        Paths.buildRequestParameter("projectIds", projectIds),
                         Paths.buildRequestParameter("fiscalYears", fiscalYears));
 
-        return execute(HttpMethod.GET, contextUrl);
+        return execute(HttpMethod.GET, contextUrl, typeReference);
     }
 
     @Override
     public BudgetDTO deleteBudget(Long id) {
-        return execute(HttpMethod.DELETE, "" + id);
+        ParameterizedTypeReference<ResponseMessageDTO<BudgetDTO>> typeReference = new ParameterizedTypeReference<>() {};
+
+        return execute(HttpMethod.DELETE, "" + id, typeReference);
     }
 
     @Override
     public BudgetDTO createBudget(@Valid BudgetDTO requestBudgetDTO) {
-        return execute(HttpMethod.POST, "", requestBudgetDTO);
+        ParameterizedTypeReference<ResponseMessageDTO<BudgetDTO>> typeReference = new ParameterizedTypeReference<>() {};
+
+        return execute(HttpMethod.POST, "", requestBudgetDTO, typeReference);
     }
 
     @Override
     public BudgetDTO updateBudget(Long id, @Valid PatchBudgetDTO requestBudgetDTO) {
-        return execute(HttpMethod.PATCH, "" + id, requestBudgetDTO);
+        ParameterizedTypeReference<ResponseMessageDTO<BudgetDTO>> typeReference = new ParameterizedTypeReference<>() {};
+
+        return execute(HttpMethod.PATCH, "" + id, requestBudgetDTO, typeReference);
     }
 
     @Override
     public List<ExpenseDTO> updateExpense(Long budgetId, @Valid List<PatchExpenseDTO> requestPartialExpenseDTO) {
-        String url = budgetId + "expenses";
-        return execute(HttpMethod.PATCH, url, ExpenseBatchDTO.builder().data(requestPartialExpenseDTO).build());
+        ParameterizedTypeReference<ResponseMessageDTO<List<ExpenseDTO>>> typeReference =
+                new ParameterizedTypeReference<>() {};
+
+        return execute(
+                HttpMethod.PATCH,
+                budgetId + "/expenses",
+                ExpenseBatchDTO.builder().data(requestPartialExpenseDTO).build(),
+                typeReference);
     }
 
-    private <T> T execute(HttpMethod operation, String contextUrl) {
-        return execute(operation, contextUrl, "");
+    private <T> T execute(
+            HttpMethod operation, String contextUrl, ParameterizedTypeReference<ResponseMessageDTO<T>> returnType) {
+        return execute(operation, contextUrl, "", returnType);
     }
 
-    private <T> T execute(HttpMethod operation, String contextUrl, Object body) {
+    private <T> T execute(
+            HttpMethod operation,
+            String contextUrl,
+            Object body,
+            ParameterizedTypeReference<ResponseMessageDTO<T>> returnType) {
         String url = budgetServiceEndpoint + contextUrl;
 
         log.debug("Calling endpoint {}", url);
@@ -76,13 +100,18 @@ public class BudgetClientV1 implements BudgetClient {
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(body)
                         .retrieve()
-                        .bodyToMono(ResponseMessageDTO.class)
+                        .onStatus(
+                                HttpStatus::isError,
+                                response -> {
+                                    throw new RuntimeException("Illegal status code " + response.statusCode());
+                                })
+                        .bodyToMono(returnType)
                         .block();
 
-        assert wrapper != null;
-        T result = wrapper.getData();
-        log.debug("Result from call {}", result);
-
-        return result;
+        if (wrapper == null) {
+            log.debug("No Content(204) response");
+            return null;
+        }
+        return wrapper.getData();
     }
 }
