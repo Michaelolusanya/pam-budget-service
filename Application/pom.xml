@@ -36,6 +36,9 @@
                 </dependencies>
             </plugin>
         </plugins>
+        <finalName>
+            pam-budget-service-application
+        </finalName>
     </build>
 
     <dependencies>

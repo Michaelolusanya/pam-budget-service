@@ -5,4 +5,4 @@ WORKDIR /budget-service
 
 COPY /Application/target /budget-service
 
-ENTRYPOINT java -Dspring.profiles.active=$PROFILE -jar /budget-service/pam-budget-service-application-0.0.1-SNAPSHOT-exec.jar
+ENTRYPOINT java -Dspring.profiles.active=$PROFILE -jar /budget-service/pam-budget-service-application-exec.jar
