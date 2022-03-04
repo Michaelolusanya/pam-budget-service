@@ -14,10 +14,18 @@ variables:
   value: '73352462-5185-4eab-afca-eed6b857bbe0'
 - name: resourceGroup
   value: 'BackendRewrite'
-- name: containerRegistryName
+- name: containerRegistryNameDev
   value: crbackendrewritedev
-- name: containerConnection
-  value: '{"loginServer":"$(containerRegistryName).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryName)"}'
+- name: containerConnectionDev
+  value: '{"loginServer":"$(containerRegistryNameDev).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameDev)"}'
+- name: containerRegistryNameTest
+  value: crbackendrewritetest
+- name: containerConnectionTest
+  value: '{"loginServer":"$(containerRegistryNameTest).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameTest)"}'
+- name: containerRegistryNameStage
+  value: crbackendrewritestage
+- name: containerConnectionStage
+  value: '{"loginServer":"$(containerRegistryNameStage).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameStage)"}'
 
 steps:
   # Build application
@@ -46,7 +54,7 @@ steps:
       PathtoPublish: '$(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
   
-  # Build container image
+  # Build container image DEV
   - task: Docker@0
     displayName: 'Build an image'
     inputs:
@@ -54,15 +62,57 @@ steps:
       dockerFile: '**/Dockerfile'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       action: 'Build an image'
-      azureContainerRegistry: $(containerConnection)
+      azureContainerRegistry: $(containerConnectionDev)
       includeLatestTag: true
 
-  # Push container image
+  # Push container image DEV
   - task: Docker@0
     displayName: 'Push an image'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
-      azureContainerRegistry: $(containerConnection)
+      azureContainerRegistry: $(containerConnectionDev)
+      action: 'Push an image'
+      includeLatestTag: true
+
+  # Build container image TEST
+  - task: Docker@0
+    displayName: 'Build an image'
+    inputs:
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
+      dockerFile: '**/Dockerfile'
+      imageName: $(Build.Repository.Name):$(Build.BuildId)
+      action: 'Build an image'
+      azureContainerRegistry: $(containerConnectionTest)
+      includeLatestTag: true
+
+  # Push container image TEST
+  - task: Docker@0
+    displayName: 'Push an image'
+    inputs:
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
+      imageName: $(Build.Repository.Name):$(Build.BuildId)
+      azureContainerRegistry: $(containerConnectionTest)
+      action: 'Push an image'
+      includeLatestTag: true
+
+  # Build container image STAGE
+  - task: Docker@0
+    displayName: 'Build an image'
+    inputs:
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
+      dockerFile: '**/Dockerfile'
+      imageName: $(Build.Repository.Name):$(Build.BuildId)
+      action: 'Build an image'
+      azureContainerRegistry: $(containerConnectionStage)
+      includeLatestTag: true
+
+  # Push container image STAGE
+  - task: Docker@0
+    displayName: 'Push an image'
+    inputs:
+      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
+      imageName: $(Build.Repository.Name):$(Build.BuildId)
+      azureContainerRegistry: $(containerConnectionStage)
       action: 'Push an image'
       includeLatestTag: true
