@@ -48,3 +48,32 @@ The configuration file for swagger is in **apiconfiguration/OpenapiConfiguration
 ## Local Tips
 * For component-test set property *ikea.imc.pam.budget.service.docker.standalone* to true for faster tests. Keep in mind
 though that you, the user, is responsible for the application lifecycle.
+
+## How to use BudgetClient
+The BudgetClient has to be configured to work properly with the following values:
+```
+ikea.imc.pam.budget.service.url = <URL of the budget service>
+ikea.imc.pam.budget.service.registration.id=pam-budget-service <if changed, the azure...-clients.pam-budget-service... has to be changed to the same>
+
+azure.activedirectory.authorization-clients.pam-budget-service.authorization-grant-type=on_behalf_of
+azure.activedirectory.authorization-clients.pam-budget-service.scopes[0]= <The same value as in the budgets azure.activedirectory.app-id-uri config>
+
+spring.security.oauth2.client.registration.pam-budget-service.authorization-grant-type=client_credentials
+spring.security.oauth2.client.registration.pam-budget-service.client-id=<The same value as in the budgets azure.activedirectory.client-id config>
+spring.security.oauth2.client.registration.pam-budget-service.client-secret=<The same value as in the budgets azure.activedirectory.app-secret config>
+spring.security.oauth2.client.provider.pam-budget-service.token-uri=<The same value as in the budgets ikea.imc.pam.oauth.microsoft.token-url config>
+```
+
+Example:
+```
+ikea.imc.pam.budget.service.url = https://ikea.budgetservice.com/
+ikea.imc.pam.budget.service.registration.id=change-value
+
+azure.activedirectory.authorization-clients.change-value.authorization-grant-type=on_behalf_of
+azure.activedirectory.authorization-clients.change-value.scopes[0]= api://0000aaaa-0000-aaaa-0000-000000000000/budget-ad
+
+spring.security.oauth2.client.registration.change-value.authorization-grant-type=client_credentials
+spring.security.oauth2.client.registration.change-value.client-id=0000aaaa-0000-aaaa-0000-000000000000
+spring.security.oauth2.client.registration.change-value.client-secret=00aa00aa00aa@@00!!00--00aa00aa00aa00a
+spring.security.oauth2.client.provider.change-value.token-uri=https://login.microsoftonline.com/tenantid-0000-0000-0000-aa00/oauth2/v2.0/token
+```

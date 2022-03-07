@@ -4,7 +4,9 @@ import ikea.imc.pam.budget.service.api.Paths;
 import ikea.imc.pam.budget.service.api.dto.*;
 import ikea.imc.pam.budget.service.api.exception.BudgetClientRequestException;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Consumer;
 import javax.validation.Valid;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -13,6 +15,7 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.oauth2.client.web.reactive.function.client.ServerOAuth2AuthorizedClientExchangeFilterFunction;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 
@@ -21,10 +24,15 @@ public class BudgetClientV1 implements BudgetClient {
     private static final Logger log = LoggerFactory.getLogger(BudgetClientV1.class);
     private final WebClient webClient;
     private final String budgetServiceEndpoint;
+    private final String budgetServiceRegistrationId;
 
     public BudgetClientV1(
-            @Value("${ikea.imc.pam.budget.service.url:}") String budgetServiceBaseUrl, WebClient webClient) {
+            @Value("${ikea.imc.pam.budget.service.url:}") String budgetServiceBaseUrl,
+            @Value("${ikea.imc.pam.budget.service.registration.id:pam-budget-service}")
+                    String budgetServiceRegistrationId,
+            WebClient webClient) {
         this.budgetServiceEndpoint = budgetServiceBaseUrl + Paths.BUDGET_V1_ENDPOINT;
+        this.budgetServiceRegistrationId = budgetServiceRegistrationId;
         this.webClient = webClient;
     }
 
@@ -93,11 +101,15 @@ public class BudgetClientV1 implements BudgetClient {
             ParameterizedTypeReference<ResponseMessageDTO<T>> returnType) {
         String url = budgetServiceEndpoint + contextUrl;
 
+        Consumer<Map<String, Object>> clientRegistrationValues =
+                ServerOAuth2AuthorizedClientExchangeFilterFunction.clientRegistrationId(budgetServiceRegistrationId);
+
         log.debug("Calling endpoint {}", url);
         ResponseMessageDTO<T> wrapper =
                 webClient
                         .method(operation)
                         .uri(url)
+                        .attributes(clientRegistrationValues)
                         .contentType(MediaType.APPLICATION_JSON)
                         .bodyValue(body)
                         .retrieve()

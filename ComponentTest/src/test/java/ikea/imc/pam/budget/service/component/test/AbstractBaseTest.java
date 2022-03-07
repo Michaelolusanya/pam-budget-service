@@ -3,14 +3,17 @@ package ikea.imc.pam.budget.service.component.test;
 import com.github.tomakehurst.wiremock.client.WireMock;
 import java.io.File;
 import javax.annotation.PostConstruct;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
+import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
@@ -44,7 +47,18 @@ public abstract class AbstractBaseTest {
 
     @Configuration
     @ComponentScan("ikea.imc.pam.budget.service")
-    public static class TestConfig {}
+    public static class TestConfig {
+
+        @Bean
+        OAuth2AuthorizedClientManager oAuth2AuthorizedClientManager() {
+            return new OAuth2AuthorizedClientManager() {
+                @Override
+                public OAuth2AuthorizedClient authorize(OAuth2AuthorizeRequest authorizeRequest) {
+                    return null;
+                }
+            };
+        }
+    }
 
     @PostConstruct
     public void init() {
