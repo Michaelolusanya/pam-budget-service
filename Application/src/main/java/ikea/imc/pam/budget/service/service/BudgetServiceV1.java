@@ -108,6 +108,21 @@ public class BudgetServiceV1 implements BudgetService {
     }
 
     @Override
+    public Expenses createExpenses(Budget budget, Expenses createExpense) {
+
+        if (budget == null || budget.getStatus() == Status.ARCHIVED) {
+            throw new NotFoundException(
+                    String.format("Budget %d not found", budget != null ? budget.getBudgetId() : 0));
+        }
+        log.debug("Creating expenses for budget {}", budget.getBudgetId());
+
+        createExpense.setBudget(budget);
+        Expenses expenses = expensesRepository.saveAndFlush(createExpense);
+        log.debug("Created expenses with id {} for budget {} ", expenses.getExpensesId(), budget.getBudgetId());
+        return expenses;
+    }
+
+    @Override
     public List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses) {
 
         if (budget == null || budget.getStatus() == Status.ARCHIVED) {

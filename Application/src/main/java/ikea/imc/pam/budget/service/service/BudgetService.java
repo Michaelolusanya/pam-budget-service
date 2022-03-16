@@ -15,6 +15,8 @@ public interface BudgetService {
 
     Optional<Budget> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget);
 
+    Expenses createExpenses(Budget budget, Expenses createExpense);
+
     List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses);
 
     Optional<Budget> deleteById(Long budgetId);

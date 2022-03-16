@@ -99,6 +99,21 @@ public class BudgetController {
                         });
     }
 
+    @Operation(summary = "Create an expense for budget with id {id}")
+    @PostMapping("/{id}/expenses")
+    public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> createExpense(
+            @PathVariable Long id, @Valid @RequestBody ExpenseDTO dto) {
+        Optional<Budget> optionalBudget = budgetService.getById(id);
+        if (optionalBudget.isEmpty()) {
+            log.warn("Could not create expenses, could not find budget with id {}", id);
+            return getBudgetNotFoundResponse(id);
+        }
+        Budget budget = optionalBudget.get();
+        Expenses expenses = BudgetMapper.buildExpense(dto);
+        return ResponseEntityFactory.generateResponse(
+                HttpStatus.CREATED, BudgetMapper.buildExpenseDTO(budgetService.createExpenses(budget, expenses)));
+    }
+
     @Operation(summary = "Update a set of budget expenses by budgetId")
     @PatchMapping("/{id}/expenses")
     public ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> updateExpense(

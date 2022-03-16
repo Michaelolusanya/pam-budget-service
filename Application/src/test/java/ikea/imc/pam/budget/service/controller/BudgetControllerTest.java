@@ -18,6 +18,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
+import org.mockito.Captor;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -141,26 +142,27 @@ public class BudgetControllerTest {
     @Nested
     class FindBudgetsTest {
 
+        @Captor private ArgumentCaptor<List<Long>> projectIdListsArgumentCaptor;
+        @Captor private ArgumentCaptor<List<Integer>> fiscalYearListsArgumentCaptor;
+
         @Test
         void filterOnProjectsAndFiscalYears() {
 
             // Given
-            ArgumentCaptor<List<Long>> argumentCaptorProjectIds = ArgumentCaptor.forClass(List.class);
-            ArgumentCaptor<List<Integer>> argumentCaptorFiscalYears = ArgumentCaptor.forClass(List.class);
-
             List<Long> projectIds = List.of(1L, 5L);
             List<Integer> fiscalYears = List.of(2020, 2021);
-            when(budgetService.listBudgets(argumentCaptorProjectIds.capture(), argumentCaptorFiscalYears.capture()))
+            when(budgetService.listBudgets(
+                            projectIdListsArgumentCaptor.capture(), fiscalYearListsArgumentCaptor.capture()))
                     .thenReturn(List.of());
 
             // When
             controller.findBudgets(projectIds, fiscalYears);
 
             // Then
-            assertEquals(1L, argumentCaptorProjectIds.getValue().get(0));
-            assertEquals(5L, argumentCaptorProjectIds.getValue().get(1));
-            assertEquals(2020, argumentCaptorFiscalYears.getValue().get(0));
-            assertEquals(2021, argumentCaptorFiscalYears.getValue().get(1));
+            assertEquals(1L, projectIdListsArgumentCaptor.getValue().get(0));
+            assertEquals(5L, projectIdListsArgumentCaptor.getValue().get(1));
+            assertEquals(2020, fiscalYearListsArgumentCaptor.getValue().get(0));
+            assertEquals(2021, fiscalYearListsArgumentCaptor.getValue().get(1));
         }
 
         @Test
@@ -388,7 +390,96 @@ public class BudgetControllerTest {
     }
 
     @Nested
+    class CreateExpenseTest {
+
+        @Captor private ArgumentCaptor<Budget> budgetArgumentCaptor;
+
+        @Captor private ArgumentCaptor<Expenses> expensesArgumentCaptor;
+
+        @Test
+        void notFoundBudget() {
+
+            // Given
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.empty());
+
+            // When
+            ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
+                    controller.createExpense(BUDGET_ID, generateExpenseDTO());
+
+            // Then
+            assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
+            assertNotNull(response.getBody());
+            ResponseMessageDTO<ExpenseDTO> messageDTO = response.getBody();
+            assertEquals(404, messageDTO.getStatusCode());
+            assertFalse(messageDTO.getSuccess());
+            assertEquals("Budget 1 not found", messageDTO.getMessage());
+        }
+
+        @Test
+        void inputValues() {
+
+            // Given
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+
+            when(budgetService.createExpenses(budgetArgumentCaptor.capture(), expensesArgumentCaptor.capture()))
+                    .thenReturn(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID));
+
+            // When
+            controller.createExpense(BUDGET_ID, generateExpenseDTO());
+
+            // Then
+            assertNotNull(budgetArgumentCaptor.getValue());
+            assertNotNull(expensesArgumentCaptor.getValue());
+            assertEquals(BUDGET_ID, budgetArgumentCaptor.getValue().getBudgetId());
+            Expenses expenses = expensesArgumentCaptor.getValue();
+            assertEquals(ASSET_TYPE_ID, expenses.getAssetTypeId());
+            assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
+            assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
+            assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
+            assertEquals(EXPENSE_COMMENT, expenses.getComment());
+            assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
+            assertEquals(EXPENSE_UNITS, expenses.getUnits());
+            assertEquals(EXPENSES_INVOICINGTYPEOPTION, expenses.getInvoicingTypeOption());
+        }
+
+        @Test
+        void outputValues() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            when(budgetService.createExpenses(any(), any())).thenReturn(generateExpense(budget, EXPENSE_ID));
+
+            // When
+            ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
+                    controller.createExpense(BUDGET_ID, generateExpenseDTO());
+
+            // Then
+            assertEquals(HttpStatus.CREATED, response.getStatusCode());
+            assertNotNull(response.getBody());
+            ResponseMessageDTO<ExpenseDTO> messageDTO = response.getBody();
+            assertEquals(201, messageDTO.getStatusCode());
+            assertTrue(messageDTO.getSuccess());
+            assertNotNull(messageDTO.getData());
+            ExpenseDTO dto = messageDTO.getData();
+            assertEquals(EXPENSE_ID, dto.getId());
+            assertEquals(BUDGET_ID, dto.getBudgetId());
+            assertEquals(ASSET_TYPE_ID, dto.getAssetTypeId());
+            assertEquals(EXPENSE_COMMENT, dto.getComment());
+            assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
+            assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
+            assertEquals(EXPENSE_FRACTION_COMDEV, dto.getComdevFraction());
+            assertEquals(EXPENSE_UNITS, dto.getUnitCount());
+            assertEquals(EXPENSE_WEEKS, dto.getWeekCount());
+            assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), dto.getPriceModel());
+        }
+    }
+
+    @Nested
     class UpdateExpenseTest {
+
+        @Captor private ArgumentCaptor<Budget> budgetArgumentCaptor;
+        @Captor private ArgumentCaptor<List<Expenses>> expensesListsArgumentCaptor;
 
         @Test
         void notFoundBudget() {
@@ -414,14 +505,13 @@ public class BudgetControllerTest {
 
             // Given
             Budget budget = generateBudget(BUDGET_ID);
+            ExpenseBatchDTO expenseBatchDTO = generateExpenseBatchDTO();
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetService.patchExpenses(any(), any())).thenThrow(new NotFoundException("Expense 4 not found"));
 
             // When
             NotFoundException notFoundException =
-                    assertThrows(
-                            NotFoundException.class,
-                            () -> controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO()));
+                    assertThrows(NotFoundException.class, () -> controller.updateExpense(BUDGET_ID, expenseBatchDTO));
 
             // Then
             assertEquals("Expense 4 not found", notFoundException.getMessage());
@@ -431,20 +521,18 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            ArgumentCaptor<List<Expenses>> inputExpenses = ArgumentCaptor.forClass(List.class);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(budgetService.patchExpenses(inputBudget.capture(), inputExpenses.capture()))
+            when(budgetService.patchExpenses(budgetArgumentCaptor.capture(), expensesListsArgumentCaptor.capture()))
                     .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
 
             // When
             controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO());
 
             // Then
-            assertNotNull(inputBudget.getValue());
-            assertEquals(BUDGET_ID, inputBudget.getValue().getBudgetId());
-            assertNotNull(inputExpenses.getValue());
-            List<Expenses> expensesList = inputExpenses.getValue();
+            assertNotNull(budgetArgumentCaptor.getValue());
+            assertEquals(BUDGET_ID, budgetArgumentCaptor.getValue().getBudgetId());
+            assertNotNull(expensesListsArgumentCaptor.getValue());
+            List<Expenses> expensesList = expensesListsArgumentCaptor.getValue();
             assertEquals(1, expensesList.size());
             Expenses expenses = expensesList.get(0);
             assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
@@ -459,10 +547,8 @@ public class BudgetControllerTest {
         void outputValues() {
 
             // Given
-            ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            ArgumentCaptor<List<Expenses>> inputExpenses = ArgumentCaptor.forClass(List.class);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(budgetService.patchExpenses(inputBudget.capture(), inputExpenses.capture()))
+            when(budgetService.patchExpenses(budgetArgumentCaptor.capture(), expensesListsArgumentCaptor.capture()))
                     .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
 
             // When
@@ -510,6 +596,19 @@ public class BudgetControllerTest {
 
     private static ExpenseBatchDTO generateExpenseBatchDTO() {
         return ExpenseBatchDTO.builder().data(List.of(generatePatchExpenseDTO())).build();
+    }
+
+    private static ExpenseDTO generateExpenseDTO() {
+        return ExpenseDTO.builder()
+                .assetTypeId(ASSET_TYPE_ID)
+                .comdevFraction(EXPENSE_FRACTION_COMDEV)
+                .comdevCost(EXPENSE_COST_COMDEV)
+                .unitCost(EXPENSE_COST_PER_UNIT)
+                .unitCount(EXPENSE_UNITS)
+                .weekCount(EXPENSE_WEEKS)
+                .comment(EXPENSE_COMMENT)
+                .priceModel(EXPENSES_INVOICINGTYPEOPTION.getDescription())
+                .build();
     }
 
     private static PatchExpenseDTO generatePatchExpenseDTO() {

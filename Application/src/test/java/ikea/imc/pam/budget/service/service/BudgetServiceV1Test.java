@@ -509,6 +509,93 @@ public class BudgetServiceV1Test {
     }
 
     @Nested
+    class CreateExpensesTest {
+
+        @Captor private ArgumentCaptor<Expenses> expensesArgumentCaptor;
+
+        @Test
+        void budgetIsNull() {
+
+            // Given
+            Expenses inputExpenses = generateExpenses(null, null);
+
+            // When
+            NotFoundException notFoundException =
+                    assertThrows(NotFoundException.class, () -> service.createExpenses(null, inputExpenses));
+
+            // Then
+            assertEquals("Budget 0 not found", notFoundException.getMessage());
+        }
+
+        @Test
+        void budgetIsDeleted() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            budget.setStatus(Status.ARCHIVED);
+            Expenses inputExpenses = generateExpenses(null, null);
+
+            // When
+            NotFoundException notFoundException =
+                    assertThrows(NotFoundException.class, () -> service.createExpenses(budget, inputExpenses));
+
+            // Then
+            assertEquals("Budget 1 not found", notFoundException.getMessage());
+        }
+
+        @Test
+        void createExpenses_SavedValuesValidation() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            Expenses inputExpenses = generateExpenses(null, null);
+            when(expensesRepository.saveAndFlush(expensesArgumentCaptor.capture()))
+                    .thenReturn(generateExpenses(EXPENSE_ID, budget));
+
+            // When
+            service.createExpenses(budget, inputExpenses);
+
+            // Then
+            assertNotNull(expensesArgumentCaptor.getValue());
+            Expenses createdExpense = expensesArgumentCaptor.getValue();
+            assertEquals(ASSET_TYPE_ID, createdExpense.getAssetTypeId());
+            assertEquals(COMMENT, createdExpense.getComment());
+            assertEquals(COST, createdExpense.getCost());
+            assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
+            assertEquals(PERCENT_COMDEV, createdExpense.getPercentCOMDEV());
+            assertEquals(UNITS, createdExpense.getUnits());
+            assertEquals(WEEKS, createdExpense.getWeeks());
+            assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
+        }
+
+        @Test
+        void createExpenses() {
+
+            // Given
+            Budget budget = generateBudget(BUDGET_ID);
+            Expenses inputExpenses = generateExpenses(null, null);
+            when(expensesRepository.saveAndFlush(any())).thenReturn(generateExpenses(EXPENSE_ID, budget));
+
+            // When
+            Expenses createdExpense = service.createExpenses(budget, inputExpenses);
+
+            // Then
+            assertNotNull(createdExpense);
+            assertEquals(EXPENSE_ID, createdExpense.getExpensesId());
+            assertEquals(ASSET_TYPE_ID, createdExpense.getAssetTypeId());
+            assertEquals(COMMENT, createdExpense.getComment());
+            assertEquals(COST, createdExpense.getCost());
+            assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
+            assertEquals(PERCENT_COMDEV, createdExpense.getPercentCOMDEV());
+            assertEquals(UNITS, createdExpense.getUnits());
+            assertEquals(WEEKS, createdExpense.getWeeks());
+            assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
+            assertNotNull(createdExpense.getBudget());
+            assertEquals(BUDGET_ID, createdExpense.getBudget().getBudgetId());
+        }
+    }
+
+    @Nested
     class PatchExpensesTest {
 
         @Captor private ArgumentCaptor<List<Expenses>> expensesListArgumentCaptor;

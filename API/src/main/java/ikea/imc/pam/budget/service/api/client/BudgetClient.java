@@ -16,5 +16,7 @@ public interface BudgetClient {
 
     BudgetDTO updateBudget(Long id, PatchBudgetDTO requestBudgetDTO);
 
+    ExpenseDTO createExpense(Long budgetId, ExpenseDTO requestExpenseDTO);
+
     List<ExpenseDTO> updateExpense(Long budgetId, List<PatchExpenseDTO> expenseDTO);
 }

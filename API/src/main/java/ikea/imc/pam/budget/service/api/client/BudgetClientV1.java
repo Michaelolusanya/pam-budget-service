@@ -78,6 +78,18 @@ public class BudgetClientV1 implements BudgetClient {
     }
 
     @Override
+    public ExpenseDTO createExpense(Long budgetId, ExpenseDTO requestExpenseDTO) {
+        ParameterizedTypeReference<ResponseMessageDTO<ExpenseDTO>> typeReference =
+                new ParameterizedTypeReference<>() {};
+
+        return execute(
+                HttpMethod.POST,
+                budgetId + "/expenses",
+                requestExpenseDTO,
+                typeReference);
+    }
+
+    @Override
     public List<ExpenseDTO> updateExpense(Long budgetId, @Valid List<PatchExpenseDTO> requestPartialExpenseDTO) {
         ParameterizedTypeReference<ResponseMessageDTO<List<ExpenseDTO>>> typeReference =
                 new ParameterizedTypeReference<>() {};

@@ -37,7 +37,6 @@ public class ExpenseDTO {
     @Min(Constants.MINIMUM_COUNT)
     private Short unitCount;
 
-    @NotNull
     @Min(Constants.MINIMUM_COUNT)
     private Byte weekCount;
 
