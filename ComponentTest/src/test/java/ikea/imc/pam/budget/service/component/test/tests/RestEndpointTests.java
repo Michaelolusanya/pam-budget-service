@@ -4,19 +4,17 @@ import static ikea.imc.pam.budget.service.api.dto.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
 import ikea.imc.pam.budget.service.api.client.BudgetClient;
-import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
-import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
-import ikea.imc.pam.budget.service.api.dto.PatchBudgetDTO;
-import ikea.imc.pam.budget.service.api.dto.PatchExpenseDTO;
+import ikea.imc.pam.budget.service.api.dto.*;
 import ikea.imc.pam.budget.service.api.exception.BudgetClientRequestException;
 import ikea.imc.pam.budget.service.component.test.AbstractBaseTest;
 import java.util.List;
-import org.junit.jupiter.api.Disabled;
+import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 
 class RestEndpointTests extends AbstractBaseTest {
+
     @Autowired BudgetClient budgetClient;
 
     @Test
@@ -32,6 +30,24 @@ class RestEndpointTests extends AbstractBaseTest {
         assertNotNull(res);
         assertEquals(testData.projectId, res.getProjectId());
         assertEquals(MINIMUM_YEAR, res.getFiscalYear());
+    }
+
+    @Test
+    void getExistingBudgetWithExpenses() {
+        // GIVEN (Budget already exists in budget-service)
+        Long budgetId =
+                budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build()).getId();
+        Long expenseId = budgetClient.createExpense(budgetId, minimalExpense()).getId();
+
+        // WHEN (REST call to budget-service to get budget)
+        var res = budgetClient.getBudget(budgetId).orElseThrow();
+
+        // THEN (Response from budget-service with data for the budget)
+        assertNotNull(res);
+        assertEquals(testData.projectId, res.getProjectId());
+        assertEquals(MINIMUM_YEAR, res.getFiscalYear());
+        assertEquals(1, res.getExpenses().size());
+        assertEquals(expenseId, res.getExpenses().get(0).getId());
     }
 
     @Test
@@ -187,10 +203,128 @@ class RestEndpointTests extends AbstractBaseTest {
         assertEquals(MINIMUM_FRACTION + 1.0, res.get(0).getComdevFraction());
     }
 
-    @Test
-    @Disabled("TODO Post endpoint not ready yet, see HUSH-497")
-    void updateBudgetWithNewExpense() {
-        fail();
+    @Nested
+    class CreateExpensesTest {
+
+        @Test
+        void createExpenseWithMissingBudget() {
+
+            // GIVEN (Budget with expenses already exists in budget-service)
+            ExpenseDTO expenseToBeCreated = minimalExpense();
+
+            // WHEN (REST call to budget-service to update expenses for a budget)
+            var exception =
+                    assertThrows(
+                            BudgetClientRequestException.class,
+                            () -> budgetClient.createExpense(0L, expenseToBeCreated));
+
+            // THEN (Response from budget-service with updated data for the budget's expenses)
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertNotNull(exception.getBody());
+            assertEquals(404, exception.getBody().getStatusCode());
+            assertEquals("Budget 0 not found", exception.getMessage());
+            assertEquals("Budget 0 not found", exception.getBody().getMessage());
+        }
+
+        @Test
+        void createExpenseWithDeletedBudget() {
+
+            // GIVEN (Budget with expenses already exists in budget-service)
+            var budget = budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build());
+            Long budgetId = budget.getId();
+            budgetClient.deleteBudget(budgetId);
+            ExpenseDTO expenseToBeCreated = minimalExpense();
+
+            // WHEN (REST call to budget-service to update expenses for a budget)
+            var exception =
+                    assertThrows(
+                            BudgetClientRequestException.class,
+                            () -> budgetClient.createExpense(budgetId, expenseToBeCreated));
+
+            // THEN (Response from budget-service with updated data for the budget's expenses)
+            assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+            assertNotNull(exception.getBody());
+            assertEquals(404, exception.getBody().getStatusCode());
+            assertEquals("Budget " + budget.getId() + " not found", exception.getMessage());
+            assertEquals(exception.getMessage(), exception.getBody().getMessage());
+        }
+
+        @Test
+        void createExpenseWithInvalidValues() {
+
+            // GIVEN (Budget with expenses already exists in budget-service)
+            var budget = budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build());
+            Long budgetId = budget.getId();
+            ExpenseDTO expenseToBeCreated =
+                    ExpenseDTO.builder()
+                            .assetTypeId(0L)
+                            .comdevFraction(-1D)
+                            .comdevCost(-1D)
+                            .unitCost(-1)
+                            .unitCount((short) -1)
+                            .build();
+
+            // WHEN (REST call to budget-service to update expenses for a budget)
+            var exception =
+                    assertThrows(
+                            BudgetClientRequestException.class,
+                            () -> budgetClient.createExpense(budgetId, expenseToBeCreated));
+
+            // THEN (Response from budget-service with updated data for the budget's expenses)
+            assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+            ResponseMessageDTO<?> body = exception.getBody();
+            assertNotNull(body);
+            assertEquals(400, body.getStatusCode());
+            List<ErrorDTO> errors = body.getErrors();
+            assertEquals(5, errors.size());
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("assetTypeId")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevFraction")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevCost")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCost")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCount")));
+        }
+
+        @Test
+        void createExpense() {
+
+            // GIVEN (Budget with expenses already exists in budget-service)
+            var budget = budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build());
+            Long budgetId = budget.getId();
+            ExpenseDTO expenseToBeCreated = minimalExpense();
+
+            // WHEN (REST call to budget-service to update expenses for a budget)
+            var expense = budgetClient.createExpense(budgetId, expenseToBeCreated);
+
+            // THEN (Response from budget-service with updated data for the budget's expenses)
+            assertNotNull(expense);
+            assertNotNull(expense.getId());
+            assertEquals(budgetId, expense.getBudgetId());
+            assertEquals(0.0, expense.getComdevFraction());
+            assertEquals(0.0, expense.getComdevCost());
+            assertEquals(0, expense.getUnitCost());
+            assertEquals((short) MINIMUM_COUNT, expense.getUnitCount());
+            assertEquals((byte) MINIMUM_COUNT, expense.getWeekCount());
+        }
+
+        @Test
+        void createExpenseWithBudgetThatHasExpenses() {
+
+            // GIVEN (Budget with expenses already exists in budget-service)
+            var budget = budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build());
+            Long budgetId = budget.getId();
+            ExpenseDTO expenseToBeCreated = minimalExpense();
+            var firstExpense = budgetClient.createExpense(budgetId, expenseToBeCreated);
+
+            // WHEN (REST call to budget-service to update expenses for a budget)
+            var secondExpense = budgetClient.createExpense(budgetId, expenseToBeCreated);
+
+            // THEN (Response from budget-service with updated data for the budget's expenses)
+            assertNotNull(firstExpense);
+            assertNotNull(secondExpense);
+            assertNotEquals(firstExpense.getId(), secondExpense.getId());
+            assertEquals(budgetId, firstExpense.getBudgetId());
+            assertEquals(budgetId, secondExpense.getBudgetId());
+        }
     }
 
     @Test
