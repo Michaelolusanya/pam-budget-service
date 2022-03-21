@@ -43,11 +43,6 @@
 
     <dependencies>
         <dependency>
-            <groupId>ikea.imc.pam.budget.service</groupId>
-            <artifactId>pam-budget-service-api</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.logging.log4j</groupId>
             <artifactId>log4j-api</artifactId>
             <version>${log4j2.version}</version>

@@ -4,7 +4,6 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<modules>
-		<module>API</module>
 		<module>Application</module>
         <module>ComponentTest</module>
     </modules>
@@ -70,8 +69,23 @@
         </plugins>
     </build>
 
+    <repositories>
+        <repository>
+            <id>ikea</id>
+            <url>https://pkgs.dev.azure.com/orderandcreate/_packaging/ikea/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
+
     <!-- DEFINE COMMON DEPENDENCIES BETWEEN MODULES -->
     <dependencies>
+        <dependency>
+            <groupId>ikea.imc.pam.budget.service</groupId>
+            <artifactId>pam-budget-service-api</artifactId>
+            <version>10</version>
+        </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
             <artifactId>junit-jupiter-engine</artifactId>
