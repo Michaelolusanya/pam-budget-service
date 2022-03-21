@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-import ikea.imc.pam.budget.service.api.dto.*;
+import ikea.imc.pam.budget.service.client.dto.*;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;

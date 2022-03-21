@@ -2,7 +2,7 @@ package ikea.imc.pam.budget.service.controller.dto;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.client.dto.ResponseMessageDTO;
 import ikea.imc.pam.budget.service.exception.BadRequestException;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.exception.RequestException;

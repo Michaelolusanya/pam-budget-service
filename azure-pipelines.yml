@@ -26,13 +26,11 @@ variables:
   value: crbackendrewritestage
 - name: containerConnectionStage
   value: '{"loginServer":"$(containerRegistryNameStage).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameStage)"}'
-- name: feedName
-  value: 'ikea'
 
 steps:
   - task: MavenAuthenticate@0
     inputs:
-      artifactsFeeds: '$(feedName)'
+      artifactsFeeds: 'ikea'
   - task: Maven@3
     inputs:
       mavenPomFile: 'pom.xml'

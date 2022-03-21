@@ -1,11 +1,11 @@
 package ikea.imc.pam.budget.service.component.test.tests;
 
-import static ikea.imc.pam.budget.service.api.dto.Constants.*;
+import static ikea.imc.pam.budget.service.client.dto.Constants.*;
 import static org.junit.jupiter.api.Assertions.*;
 
-import ikea.imc.pam.budget.service.api.client.BudgetClient;
-import ikea.imc.pam.budget.service.api.dto.*;
-import ikea.imc.pam.budget.service.api.exception.BudgetClientRequestException;
+import ikea.imc.pam.budget.service.client.BudgetClient;
+import ikea.imc.pam.budget.service.client.dto.*;
+import ikea.imc.pam.budget.service.client.exception.BudgetClientRequestException;
 import ikea.imc.pam.budget.service.component.test.AbstractBaseTest;
 import java.util.List;
 import org.junit.jupiter.api.Nested;

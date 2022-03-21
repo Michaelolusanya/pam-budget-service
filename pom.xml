@@ -83,8 +83,8 @@
     <dependencies>
         <dependency>
             <groupId>ikea.imc.pam.budget.service</groupId>
-            <artifactId>pam-budget-service-api</artifactId>
-            <version>10</version>
+            <artifactId>pam-budget-service-client</artifactId>
+            <version>1</version>
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>

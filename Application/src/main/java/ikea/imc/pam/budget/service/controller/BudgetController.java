@@ -1,8 +1,8 @@
 package ikea.imc.pam.budget.service.controller;
 
-import ikea.imc.pam.budget.service.api.Paths;
-import ikea.imc.pam.budget.service.api.dto.*;
-import ikea.imc.pam.budget.service.api.dto.ResponseMessageDTO;
+import ikea.imc.pam.budget.service.client.Paths;
+import ikea.imc.pam.budget.service.client.dto.*;
+import ikea.imc.pam.budget.service.client.dto.ResponseMessageDTO;
 import ikea.imc.pam.budget.service.configuration.BudgetMapper;
 import ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
 import ikea.imc.pam.budget.service.repository.model.Budget;

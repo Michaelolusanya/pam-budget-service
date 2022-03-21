@@ -1,9 +1,9 @@
 package ikea.imc.pam.budget.service.configuration;
 
-import ikea.imc.pam.budget.service.api.dto.BudgetDTO;
-import ikea.imc.pam.budget.service.api.dto.ExpenseDTO;
-import ikea.imc.pam.budget.service.api.dto.PatchBudgetDTO;
-import ikea.imc.pam.budget.service.api.dto.PatchExpenseDTO;
+import ikea.imc.pam.budget.service.client.dto.BudgetDTO;
+import ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
+import ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
+import ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
