@@ -17,6 +17,7 @@
             <column name="status" type="VARCHAR(255)" defaultValue="ACTIVE"/>
             <column name="budget_version_id" type="BIGINT"/>
             <column name="last_updated" type="datetime" />
+            <column name="last_updated_by_id" type="VARCHAR(255)" />
         </createTable>
     </changeSet>
 
@@ -48,6 +49,7 @@
             <column name="invoicing_type_option" type="VARCHAR(255)"/>
             <column name="budget_id" type="BIGINT"/>
             <column name="last_updated" type="datetime" />
+            <column name="last_updated_by_id" type="VARCHAR(255)" />
         </createTable>
     </changeSet>
 

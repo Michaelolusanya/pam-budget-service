@@ -5,6 +5,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
 import ikea.imc.pam.budget.service.client.dto.*;
+import ikea.imc.pam.budget.service.configuration.BudgetMapper;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
@@ -12,8 +13,11 @@ import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.service.BudgetService;
 import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,6 +28,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.test.util.ReflectionTestUtils;
 
 @ExtendWith(MockitoExtension.class)
 public class BudgetControllerTest {
@@ -52,7 +57,20 @@ public class BudgetControllerTest {
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_COST = 100_000L;
 
+    private static final String LAST_UPDATED_BY_ID = "username";
+    private static final String LAST_UPDATED_BY_FULL_NAME = "full username";
+
+    private static final Date LAST_UPDATED;
+
+    static {
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2020, Calendar.MARCH, 3, 10, 11, 12);
+        LAST_UPDATED = calendar.getTime();
+    }
+
     @Mock private BudgetService budgetService;
+
+    @Mock private BudgetMapper budgetMapper;
 
     @InjectMocks private BudgetController controller;
 
@@ -83,6 +101,7 @@ public class BudgetControllerTest {
             // Given
             Budget budget = generateBudget(BUDGET_ID);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response = controller.getBudget(BUDGET_ID);
@@ -96,6 +115,7 @@ public class BudgetControllerTest {
 
             BudgetDTO dto = messageDTO.getData();
             assertEquals(BUDGET_ID, dto.getId());
+            assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
@@ -111,6 +131,7 @@ public class BudgetControllerTest {
                     List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2));
             budget.setExpenses(expenses);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID, expenses));
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response = controller.getBudget(BUDGET_ID);
@@ -197,6 +218,8 @@ public class BudgetControllerTest {
             budget.setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
             budget2.setExpenses(List.of(generateExpense(budget2, EXPENSE_ID)));
             when(budgetService.listBudgets(projectIds, fiscalYears)).thenReturn(List.of(budget, budget2));
+            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID, budget.getExpenses()));
+            when(budgetMapper.buildBudgetDTO(budget2)).thenReturn(generateBudgetDTO(2L, budget2.getExpenses()));
 
             // When
             ResponseEntity<ResponseMessageDTO<List<BudgetDTO>>> response =
@@ -243,6 +266,7 @@ public class BudgetControllerTest {
             // Given
             Budget budget = generateBudget(BUDGET_ID);
             when(budgetService.deleteById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response = controller.deleteBudget(BUDGET_ID);
@@ -269,6 +293,7 @@ public class BudgetControllerTest {
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
+            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID));
 
             // When
             controller.createBudget(requestBudgetDTO);
@@ -289,6 +314,7 @@ public class BudgetControllerTest {
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
+            when(budgetMapper.buildBudgetDTO(any())).thenReturn(generateBudgetDTO(BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response = controller.createBudget(requestBudgetDTO);
@@ -305,6 +331,7 @@ public class BudgetControllerTest {
             assertEquals(PROJECT_ID, dto.getProjectId());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(0, dto.getExpenses().size());
         }
     }
@@ -346,6 +373,7 @@ public class BudgetControllerTest {
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID));
 
             // When
             controller.updateBudget(BUDGET_ID, requestBudgetDTO);
@@ -368,6 +396,7 @@ public class BudgetControllerTest {
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(budgetMapper.buildBudgetDTO(any())).thenReturn(generateBudgetDTO(BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response =
@@ -385,6 +414,7 @@ public class BudgetControllerTest {
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(0, dto.getExpenses().size());
         }
     }
@@ -404,7 +434,7 @@ public class BudgetControllerTest {
 
             // When
             ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
-                    controller.createExpense(BUDGET_ID, generateExpenseDTO());
+                    controller.createExpense(BUDGET_ID, generateExpenseDTO(EXPENSE_ID, BUDGET_ID));
 
             // Then
             assertEquals(HttpStatus.NOT_FOUND, response.getStatusCode());
@@ -419,13 +449,15 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-
+            Budget budget = generateBudget(BUDGET_ID);
+            ExpenseDTO expenseDTO = generateExpenseDTO(EXPENSE_ID, BUDGET_ID);
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetService.createExpenses(budgetArgumentCaptor.capture(), expensesArgumentCaptor.capture()))
-                    .thenReturn(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID));
+                    .thenReturn(generateExpense(budget, EXPENSE_ID));
+            when(budgetMapper.buildExpense(expenseDTO)).thenReturn(generateExpense(budget, EXPENSE_ID));
 
             // When
-            controller.createExpense(BUDGET_ID, generateExpenseDTO());
+            controller.createExpense(BUDGET_ID, expenseDTO);
 
             // Then
             assertNotNull(budgetArgumentCaptor.getValue());
@@ -447,12 +479,14 @@ public class BudgetControllerTest {
 
             // Given
             Budget budget = generateBudget(BUDGET_ID);
+            Expenses outputExpense = generateExpense(budget, EXPENSE_ID);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
-            when(budgetService.createExpenses(any(), any())).thenReturn(generateExpense(budget, EXPENSE_ID));
+            when(budgetService.createExpenses(any(), any())).thenReturn(outputExpense);
+            when(budgetMapper.buildExpenseDTO(outputExpense)).thenReturn(generateExpenseDTO(EXPENSE_ID, BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<ExpenseDTO>> response =
-                    controller.createExpense(BUDGET_ID, generateExpenseDTO());
+                    controller.createExpense(BUDGET_ID, generateExpenseDTO(EXPENSE_ID, BUDGET_ID));
 
             // Then
             assertEquals(HttpStatus.CREATED, response.getStatusCode());
@@ -521,12 +555,16 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            Budget budget = generateBudget(BUDGET_ID);
+            Expenses inputExpenses = generateExpense(budget, EXPENSE_ID);
+            ExpenseBatchDTO expenseBatchDTO = generateExpenseBatchDTO();
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetService.patchExpenses(budgetArgumentCaptor.capture(), expensesListsArgumentCaptor.capture()))
-                    .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
+                    .thenReturn(List.of(inputExpenses));
+            when(budgetMapper.buildExpense(expenseBatchDTO.getData().get(0))).thenReturn(inputExpenses);
 
             // When
-            controller.updateExpense(BUDGET_ID, generateExpenseBatchDTO());
+            controller.updateExpense(BUDGET_ID, expenseBatchDTO);
 
             // Then
             assertNotNull(budgetArgumentCaptor.getValue());
@@ -550,6 +588,7 @@ public class BudgetControllerTest {
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
             when(budgetService.patchExpenses(budgetArgumentCaptor.capture(), expensesListsArgumentCaptor.capture()))
                     .thenReturn(List.of(generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID)));
+            when(budgetMapper.buildExpenseDTO(any())).thenReturn(generateExpenseDTO(EXPENSE_ID, BUDGET_ID));
 
             // When
             ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> response =
@@ -594,13 +633,36 @@ public class BudgetControllerTest {
                 .build();
     }
 
+    private static BudgetDTO generateBudgetDTO(Long id, List<Expenses> expenses) {
+        BudgetDTO dto = generateBudgetDTO(id);
+        dto.setExpenses(
+                expenses.stream()
+                        .map((current) -> generateExpenseDTO(current.getExpensesId(), id))
+                        .collect(Collectors.toList()));
+        return dto;
+    }
+
+    private static BudgetDTO generateBudgetDTO(Long id) {
+        return BudgetDTO.builder()
+                .id(id)
+                .projectId(PROJECT_ID)
+                .fiscalYear(FISCAL_YEAR)
+                .estimatedCost(ESTIMATED_COST)
+                .comdevCost(COMDEV_COST)
+                .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
+                .expenses(List.of())
+                .build();
+    }
+
     private static ExpenseBatchDTO generateExpenseBatchDTO() {
         return ExpenseBatchDTO.builder().data(List.of(generatePatchExpenseDTO())).build();
     }
 
-    private static ExpenseDTO generateExpenseDTO() {
+    private static ExpenseDTO generateExpenseDTO(Long id, Long budgetId) {
         return ExpenseDTO.builder()
+                .id(id)
                 .assetTypeId(ASSET_TYPE_ID)
+                .budgetId(budgetId)
                 .comdevFraction(EXPENSE_FRACTION_COMDEV)
                 .comdevCost(EXPENSE_COST_COMDEV)
                 .unitCost(EXPENSE_COST_PER_UNIT)
@@ -624,30 +686,42 @@ public class BudgetControllerTest {
     }
 
     private static Expenses generateExpense(Budget budget, Long id) {
-        return Expenses.builder()
-                .expensesId(id)
-                .assetTypeId(ASSET_TYPE_ID)
-                .comment(EXPENSE_COMMENT)
-                .cost(EXPENSE_COST)
-                .costCOMDEV(EXPENSE_COST_COMDEV)
-                .costPerUnit(EXPENSE_COST_PER_UNIT)
-                .percentCOMDEV(EXPENSE_PERCENT_COMDEV)
-                .units(EXPENSE_UNITS)
-                .weeks(EXPENSE_WEEKS)
-                .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
-                .budget(budget)
-                .build();
+        Expenses expenses =
+                Expenses.builder()
+                        .expensesId(id)
+                        .assetTypeId(ASSET_TYPE_ID)
+                        .comment(EXPENSE_COMMENT)
+                        .cost(EXPENSE_COST)
+                        .costCOMDEV(EXPENSE_COST_COMDEV)
+                        .costPerUnit(EXPENSE_COST_PER_UNIT)
+                        .percentCOMDEV(EXPENSE_PERCENT_COMDEV)
+                        .units(EXPENSE_UNITS)
+                        .weeks(EXPENSE_WEEKS)
+                        .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
+                        .budget(budget)
+                        .build();
+
+        ReflectionTestUtils.setField(expenses, "lastUpdatedById", LAST_UPDATED_BY_ID);
+        ReflectionTestUtils.setField(expenses, "lastUpdated", LAST_UPDATED);
+
+        return expenses;
     }
 
     private static Budget generateBudget(Long id) {
-        return Budget.builder()
-                .budgetId(id)
-                .estimatedBudget(ESTIMATED_BUDGET)
-                .costCOMDEV(COMDEV_COST)
-                .projectId(PROJECT_ID)
-                .budgetVersion(generateBudgetVersion())
-                .expenses(List.of())
-                .build();
+        Budget budget =
+                Budget.builder()
+                        .budgetId(id)
+                        .estimatedBudget(ESTIMATED_BUDGET)
+                        .costCOMDEV(COMDEV_COST)
+                        .projectId(PROJECT_ID)
+                        .budgetVersion(generateBudgetVersion())
+                        .expenses(List.of())
+                        .build();
+
+        ReflectionTestUtils.setField(budget, "lastUpdatedById", LAST_UPDATED_BY_ID);
+        ReflectionTestUtils.setField(budget, "lastUpdated", LAST_UPDATED);
+
+        return budget;
     }
 
     private static BudgetVersion generateBudgetVersion() {
@@ -656,6 +730,7 @@ public class BudgetControllerTest {
         budgetVersion.setBudgetVersionName(BUDGET_VERSION_NAME);
         budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
         budgetVersion.setFiscalYear(FISCAL_YEAR);
+
         return budgetVersion;
     }
 }

@@ -7,25 +7,35 @@ import ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
 import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
+import ikea.imc.pam.budget.service.service.UserService;
 import java.util.stream.Collectors;
 import javax.validation.Valid;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 
+@Component
+@Qualifier()
 public class BudgetMapper {
 
-    private BudgetMapper() {}
+    private final UserService userService;
 
-    public static BudgetDTO buildBudgetDTO(Budget budget) {
+    public BudgetMapper(UserService userService) {
+        this.userService = userService;
+    }
+
+    public BudgetDTO buildBudgetDTO(Budget budget) {
         return BudgetDTO.builder()
                 .id(budget.getBudgetId())
                 .projectId(budget.getProjectId())
                 .fiscalYear(budget.getBudgetVersion().getFiscalYear())
                 .estimatedCost(budget.getEstimatedBudget())
                 .comdevCost(budget.getCostCOMDEV())
-                .expenses(budget.getExpenses().stream().map(BudgetMapper::buildExpenseDTO).collect(Collectors.toList()))
+                .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
+                .expenses(budget.getExpenses().stream().map(this::buildExpenseDTO).collect(Collectors.toList()))
                 .build();
     }
 
-    public static ExpenseDTO buildExpenseDTO(Expenses expenses) {
+    public ExpenseDTO buildExpenseDTO(Expenses expenses) {
         return ExpenseDTO.builder()
                 .id(expenses.getExpensesId())
                 .budgetId(expenses.getBudget().getBudgetId())
@@ -40,7 +50,7 @@ public class BudgetMapper {
                 .build();
     }
 
-    public static Budget buildBudget(@Valid BudgetDTO dto) {
+    public Budget buildBudget(@Valid BudgetDTO dto) {
         Budget budget =
                 Budget.builder()
                         .budgetId(dto.getId())
@@ -59,17 +69,17 @@ public class BudgetMapper {
         return budget;
     }
 
-    public static Budget buildBudget(PatchBudgetDTO dto) {
+    public Budget buildBudget(PatchBudgetDTO dto) {
         return Budget.builder().estimatedBudget(dto.getEstimatedCost()).costCOMDEV(dto.getComdevCost()).build();
     }
 
-    private static Expenses buildExpense(Budget budget, ExpenseDTO dto) {
+    private Expenses buildExpense(Budget budget, ExpenseDTO dto) {
         Expenses expenses = buildExpense(dto);
         expenses.setBudget(budget);
         return expenses;
     }
 
-    public static Expenses buildExpense(@Valid ExpenseDTO dto) {
+    public Expenses buildExpense(@Valid ExpenseDTO dto) {
         return Expenses.builder()
                 .expensesId(dto.getId())
                 .assetTypeId(dto.getAssetTypeId())
@@ -83,7 +93,7 @@ public class BudgetMapper {
                 .build();
     }
 
-    public static Expenses buildExpense(@Valid PatchExpenseDTO dto) {
+    public Expenses buildExpense(@Valid PatchExpenseDTO dto) {
         return Expenses.builder()
                 .expensesId(dto.getId())
                 .comment(dto.getComment())
@@ -93,6 +103,10 @@ public class BudgetMapper {
                 .units(dto.getUnitCount())
                 .weeks(dto.getWeekCount())
                 .build();
+    }
+
+    private String toUserFullName(String userId) {
+        return userService.getUserInformation(userId).getFullName();
     }
 
     public static double toFraction(byte percent) {
