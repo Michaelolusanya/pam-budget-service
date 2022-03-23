@@ -15,7 +15,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 
-	<groupId>ikea.imc.pam</groupId>
+	<groupId>com.ikea.imc.pam</groupId>
 	<artifactId>pam-budget-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
@@ -82,7 +82,7 @@
     <!-- DEFINE COMMON DEPENDENCIES BETWEEN MODULES -->
     <dependencies>
         <dependency>
-            <groupId>ikea.imc.pam</groupId>
+            <groupId>com.ikea.imc.pam</groupId>
             <artifactId>pam-budget-service-client</artifactId>
             <version>1</version>
         </dependency>
