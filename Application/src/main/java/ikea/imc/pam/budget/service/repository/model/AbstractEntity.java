@@ -2,6 +2,8 @@ package ikea.imc.pam.budget.service.repository.model;
 
 import java.util.Date;
 import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
@@ -20,9 +22,9 @@ abstract class AbstractEntity {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdated;
 
-    protected static <T> void setNotNullValue(GetterMethod<T> getterMethod, SetterMethod<T> setterMethod) {
+    protected static <T> void setNotNullValue(Supplier<T> getterMethod, Consumer<T> setterMethod) {
         if (getterMethod.get() != null) {
-            setterMethod.set(getterMethod.get());
+            setterMethod.accept(getterMethod.get());
         }
     }
 
@@ -42,14 +44,14 @@ abstract class AbstractEntity {
 
     protected static class Getter<T> {
 
-        private final GetterMethod<T> left;
-        private final GetterMethod<T> right;
+        private final Supplier<T> left;
+        private final Supplier<T> right;
 
-        static <T> Getter<T> of(GetterMethod<T> left, GetterMethod<T> right) {
+        static <T> Getter<T> of(Supplier<T> left, Supplier<T> right) {
             return new Getter<>(left, right);
         }
 
-        private Getter(GetterMethod<T> left, GetterMethod<T> right) {
+        private Getter(Supplier<T> left, Supplier<T> right) {
             this.left = left;
             this.right = right;
         }
@@ -61,13 +63,5 @@ abstract class AbstractEntity {
 
     public Date getLastUpdated() {
         return lastUpdated;
-    }
-
-    interface GetterMethod<T> {
-        T get();
-    }
-
-    interface SetterMethod<T> {
-        void set(T value);
     }
 }
