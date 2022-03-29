@@ -20,7 +20,7 @@ import org.springframework.core.env.Environment;
 @Configuration
 public class OpenapiConfiguration {
 
-    String title = "boilerplate-java-springboot2-postgresql-api";
+    String title = "pam-budget-service-api";
 
     private final NetworkProperties networkProperties;
     private final OAuthProperties oauthProperties;
@@ -62,7 +62,7 @@ public class OpenapiConfiguration {
                 + activeProfiles
                 + "<br><br>"
                 + "<strong>Description:</strong><br>"
-                + "boilerplate-java-manager: "
+                + "Budget Service API that is used by Hushålla BFF API "
                 + "<br>";
     }
 
