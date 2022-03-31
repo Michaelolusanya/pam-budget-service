@@ -44,8 +44,8 @@ public class BudgetServiceV1Test {
     private static final double COMDEV_COST_2 = 60_000d;
     private static final Long PROJECT_ID = 2L;
 
-    private static final Long ASSET_TYPE_ID = 111L;
-    private static final Long ASSET_TYPE_ID_2 = 222L;
+    private static final Long PRICE_ITEM_ID = 111L;
+    private static final Long PRICE_ITEM_ID_2 = 222L;
     private static final String COMMENT = "comment1";
     private static final String COMMENT_2 = "comment2";
     private static final Integer COST = 123;
@@ -156,7 +156,7 @@ public class BudgetServiceV1Test {
             Expenses expenses = budget.getExpenses().get(0);
             assertEquals(EXPENSE_ID, expenses.getExpensesId());
             assertEquals(EXPENSE_ID_2, budget.getExpenses().get(1).getExpensesId());
-            assertEquals(ASSET_TYPE_ID, expenses.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
             assertEquals(COMMENT, expenses.getComment());
             assertEquals(COST, expenses.getCost());
             assertEquals(COST_PER_UNIT, expenses.getCostPerUnit());
@@ -558,7 +558,7 @@ public class BudgetServiceV1Test {
             // Then
             assertNotNull(expensesArgumentCaptor.getValue());
             Expenses createdExpense = expensesArgumentCaptor.getValue();
-            assertEquals(ASSET_TYPE_ID, createdExpense.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, createdExpense.getPriceItemId());
             assertEquals(COMMENT, createdExpense.getComment());
             assertEquals(COST, createdExpense.getCost());
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
@@ -582,7 +582,7 @@ public class BudgetServiceV1Test {
             // Then
             assertNotNull(createdExpense);
             assertEquals(EXPENSE_ID, createdExpense.getExpensesId());
-            assertEquals(ASSET_TYPE_ID, createdExpense.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, createdExpense.getPriceItemId());
             assertEquals(COMMENT, createdExpense.getComment());
             assertEquals(COST, createdExpense.getCost());
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
@@ -721,7 +721,7 @@ public class BudgetServiceV1Test {
 
             Expenses updatedExpense = expenses.get(1);
             assertEquals(EXPENSE_ID_2, updatedExpense.getExpensesId());
-            assertEquals(ASSET_TYPE_ID_2, updatedExpense.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID_2, updatedExpense.getPriceItemId());
             assertEquals(COMMENT_2, updatedExpense.getComment());
             assertEquals(COST_2, updatedExpense.getCost());
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
@@ -749,7 +749,7 @@ public class BudgetServiceV1Test {
             assertEquals(1, expensesListArgumentCaptor.getValue().size());
             Expenses updatedExpense = expensesListArgumentCaptor.getValue().get(0);
             assertEquals(EXPENSE_ID_2, updatedExpense.getExpensesId());
-            assertEquals(ASSET_TYPE_ID_2, updatedExpense.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID_2, updatedExpense.getPriceItemId());
             assertEquals(COMMENT_2, updatedExpense.getComment());
             assertEquals(COST_2, updatedExpense.getCost());
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
@@ -804,7 +804,7 @@ public class BudgetServiceV1Test {
     private static Expenses generateExpenses(Long id, Budget budget) {
         return Expenses.builder()
                 .expensesId(id)
-                .assetTypeId(ASSET_TYPE_ID)
+                .priceItemId(PRICE_ITEM_ID)
                 .comment(COMMENT)
                 .cost(COST)
                 .costCOMDEV(COMDEV_COST)
@@ -820,7 +820,7 @@ public class BudgetServiceV1Test {
     private static Expenses generateExpenses2(Long id, Budget budget) {
         return Expenses.builder()
                 .expensesId(id)
-                .assetTypeId(ASSET_TYPE_ID_2)
+                .priceItemId(PRICE_ITEM_ID_2)
                 .comment(COMMENT_2)
                 .cost(COST_2)
                 .costCOMDEV(COMDEV_COST_2)

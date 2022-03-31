@@ -37,7 +37,7 @@ public class BudgetControllerTest {
     private static final Long BUDGET_VERSION_ID = 3L;
     private static final Long PROJECT_ID = 2L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
-    private static final Long ASSET_TYPE_ID = 5L;
+    private static final Long PRICE_ITEM_ID = 5L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
@@ -149,7 +149,7 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_ID, expenses1.getId());
             assertEquals(EXPENSE_ID_2, dto.getExpenses().get(1).getId());
             assertEquals(BUDGET_ID, expenses1.getBudgetId());
-            assertEquals(ASSET_TYPE_ID, expenses1.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, expenses1.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, expenses1.getComment());
             assertEquals(EXPENSE_COST_COMDEV, expenses1.getComdevCost());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses1.getUnitCost());
@@ -464,7 +464,7 @@ public class BudgetControllerTest {
             assertNotNull(expensesArgumentCaptor.getValue());
             assertEquals(BUDGET_ID, budgetArgumentCaptor.getValue().getBudgetId());
             Expenses expenses = expensesArgumentCaptor.getValue();
-            assertEquals(ASSET_TYPE_ID, expenses.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
             assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
             assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
@@ -498,7 +498,7 @@ public class BudgetControllerTest {
             ExpenseDTO dto = messageDTO.getData();
             assertEquals(EXPENSE_ID, dto.getId());
             assertEquals(BUDGET_ID, dto.getBudgetId());
-            assertEquals(ASSET_TYPE_ID, dto.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, dto.getComment());
             assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
@@ -606,7 +606,7 @@ public class BudgetControllerTest {
             ExpenseDTO dto = dtos.get(0);
             assertEquals(EXPENSE_ID, dto.getId());
             assertEquals(BUDGET_ID, dto.getBudgetId());
-            assertEquals(ASSET_TYPE_ID, dto.getAssetTypeId());
+            assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, dto.getComment());
             assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
@@ -661,7 +661,7 @@ public class BudgetControllerTest {
     private static ExpenseDTO generateExpenseDTO(Long id, Long budgetId) {
         return ExpenseDTO.builder()
                 .id(id)
-                .assetTypeId(ASSET_TYPE_ID)
+                .priceItemId(PRICE_ITEM_ID)
                 .budgetId(budgetId)
                 .comdevFraction(EXPENSE_FRACTION_COMDEV)
                 .comdevCost(EXPENSE_COST_COMDEV)
@@ -689,7 +689,7 @@ public class BudgetControllerTest {
         Expenses expenses =
                 Expenses.builder()
                         .expensesId(id)
-                        .assetTypeId(ASSET_TYPE_ID)
+                        .priceItemId(PRICE_ITEM_ID)
                         .comment(EXPENSE_COMMENT)
                         .cost(EXPENSE_COST)
                         .costCOMDEV(EXPENSE_COST_COMDEV)

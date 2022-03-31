@@ -39,7 +39,7 @@ public class BudgetMapper {
         return ExpenseDTO.builder()
                 .id(expenses.getExpensesId())
                 .budgetId(expenses.getBudget().getBudgetId())
-                .assetTypeId(expenses.getAssetTypeId())
+                .priceItemId(expenses.getPriceItemId())
                 .comdevFraction(toFraction(expenses.getPercentCOMDEV()))
                 .comdevCost(expenses.getCostCOMDEV())
                 .unitCost(expenses.getCostPerUnit())
@@ -82,7 +82,7 @@ public class BudgetMapper {
     public Expenses buildExpense(@Valid ExpenseDTO dto) {
         return Expenses.builder()
                 .expensesId(dto.getId())
-                .assetTypeId(dto.getAssetTypeId())
+                .priceItemId(dto.getPriceItemId())
                 .comment(dto.getComment())
                 .costCOMDEV(dto.getComdevCost())
                 .costPerUnit(dto.getUnitCost())

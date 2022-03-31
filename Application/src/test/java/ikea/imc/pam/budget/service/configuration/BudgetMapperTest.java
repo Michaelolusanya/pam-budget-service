@@ -32,7 +32,7 @@ class BudgetMapperTest {
     private static final Long BUDGET_VERSION_ID = 3L;
     private static final Long PROJECT_ID = 2L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
-    private static final Long ASSET_TYPE_ID = 5L;
+    private static final Long PRICE_ITEM_ID = 5L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
@@ -105,7 +105,7 @@ class BudgetMapperTest {
         assertNotNull(dto);
         assertEquals(EXPENSE_ID, dto.getId());
         assertEquals(BUDGET_ID, dto.getBudgetId());
-        assertEquals(ASSET_TYPE_ID, dto.getAssetTypeId());
+        assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
         assertEquals(EXPENSE_FRACTION_COMDEV, dto.getComdevFraction());
         assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
@@ -176,7 +176,7 @@ class BudgetMapperTest {
 
         // Then
         assertEquals(EXPENSE_ID, expenses.getExpensesId());
-        assertEquals(ASSET_TYPE_ID, expenses.getAssetTypeId());
+        assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
         assertEquals(EXPENSE_COMMENT, expenses.getComment());
         assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
@@ -236,7 +236,7 @@ class BudgetMapperTest {
         Expenses expenses =
                 Expenses.builder()
                         .expensesId(id)
-                        .assetTypeId(ASSET_TYPE_ID)
+                        .priceItemId(PRICE_ITEM_ID)
                         .comment(EXPENSE_COMMENT)
                         .cost(EXPENSE_COST)
                         .costCOMDEV(EXPENSE_COST_COMDEV)
@@ -269,7 +269,7 @@ class BudgetMapperTest {
     private static ExpenseDTO generateExpenseDTO() {
         return ExpenseDTO.builder()
                 .id(EXPENSE_ID)
-                .assetTypeId(ASSET_TYPE_ID)
+                .priceItemId(PRICE_ITEM_ID)
                 .budgetId(BUDGET_ID)
                 .comdevFraction(EXPENSE_FRACTION_COMDEV)
                 .comdevCost(EXPENSE_COST_COMDEV)

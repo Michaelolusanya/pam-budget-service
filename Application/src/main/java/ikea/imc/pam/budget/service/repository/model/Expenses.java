@@ -16,7 +16,7 @@ public class Expenses extends AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expensesId;
 
-    private Long assetTypeId;
+    private Long priceItemId;
 
     private String comment;
 
@@ -47,7 +47,7 @@ public class Expenses extends AbstractEntity {
 
         ExpensesBuilder mergedBuilder = masterExpenses.toBuilder();
 
-        setNotNullValue(mergeExpenses::getAssetTypeId, mergedBuilder::assetTypeId);
+        setNotNullValue(mergeExpenses::getPriceItemId, mergedBuilder::priceItemId);
         setNotNullValue(mergeExpenses::getComment, mergedBuilder::comment);
         setNotNullValue(mergeExpenses::getCost, mergedBuilder::cost);
         setNotNullValue(mergeExpenses::getCostCOMDEV, mergedBuilder::costCOMDEV);
@@ -65,7 +65,7 @@ public class Expenses extends AbstractEntity {
         if (compareTo == null) return false;
 
         return isEqual(
-                Getter.of(this::getAssetTypeId, compareTo::getAssetTypeId),
+                Getter.of(this::getPriceItemId, compareTo::getPriceItemId),
                 Getter.of(this::getComment, compareTo::getComment),
                 Getter.of(this::getCost, compareTo::getCost),
                 Getter.of(this::getCostPerUnit, compareTo::getCostPerUnit),

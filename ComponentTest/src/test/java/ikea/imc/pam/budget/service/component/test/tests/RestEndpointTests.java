@@ -257,7 +257,7 @@ class RestEndpointTests extends AbstractBaseTest {
             Long budgetId = budget.getId();
             ExpenseDTO expenseToBeCreated =
                     ExpenseDTO.builder()
-                            .assetTypeId(0L)
+                            .priceItemId(0L)
                             .comdevFraction(-1D)
                             .comdevCost(-1D)
                             .unitCost(-1)
@@ -277,7 +277,7 @@ class RestEndpointTests extends AbstractBaseTest {
             assertEquals(400, body.getStatusCode());
             List<ErrorDTO> errors = body.getErrors();
             assertEquals(5, errors.size());
-            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("assetTypeId")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("priceItemId")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevFraction")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevCost")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCost")));
@@ -376,14 +376,14 @@ class RestEndpointTests extends AbstractBaseTest {
     }
 
     private ExpenseDTO.ExpenseDTOBuilder minimalExpenseBuilder(
-            Long assetTypeId,
+            Long priceItemId,
             Double comdevFraction,
             Double comdevCost,
             Integer unitCost,
             Short unitCount,
             Byte weekCount) {
         return ExpenseDTO.builder()
-                .assetTypeId(assetTypeId)
+                .priceItemId(priceItemId)
                 .comdevFraction(comdevFraction)
                 .comdevCost(comdevCost)
                 .unitCost(unitCost)

@@ -38,7 +38,7 @@
             <column name="expenses_id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_expenses"/>
             </column>
-            <column name="asset_type_id" type="BIGINT"/>
+            <column name="price_item_id" type="BIGINT"/>
             <column name="comment" type="VARCHAR(255)"/>
             <column name="cost" type="INT"/>
             <column name="costcomdev" type="DOUBLE"/>
