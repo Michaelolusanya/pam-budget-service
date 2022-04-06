@@ -1,11 +1,8 @@
 package ikea.imc.pam.budget.service.component.test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
-import java.io.File;
-import javax.annotation.PostConstruct;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Bean;
@@ -18,10 +15,13 @@ import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
+import javax.annotation.PostConstruct;
+import java.io.File;
+
+@Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)
 @ContextConfiguration(classes = AbstractBaseTest.TestConfig.class)
 public abstract class AbstractBaseTest {
-    private static final Logger log = LoggerFactory.getLogger(AbstractBaseTest.class);
 
     protected TestData testData;
 

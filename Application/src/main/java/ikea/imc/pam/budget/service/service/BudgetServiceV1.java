@@ -8,17 +8,22 @@ import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.stream.Collectors;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Slf4j
 @Service
 public class BudgetServiceV1 implements BudgetService {
 
-    private static final Logger log = LogManager.getLogger(BudgetServiceV1.class);
     private final BudgetRepository repository;
     private final BudgetVersionRepository budgetVersionRepository;
     private final ExpensesRepository expensesRepository;

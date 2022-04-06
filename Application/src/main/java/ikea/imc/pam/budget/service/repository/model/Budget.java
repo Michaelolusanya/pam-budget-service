@@ -1,9 +1,15 @@
 package ikea.imc.pam.budget.service.repository.model;
 
 import ikea.imc.pam.budget.service.repository.model.utils.Status;
-import java.util.List;
+import lombok.AccessLevel;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
 import javax.persistence.*;
-import lombok.*;
+import java.util.List;
 
 @Entity
 @Getter

@@ -1,9 +1,5 @@
 package ikea.imc.pam.budget.service.configuration;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
-
 import ikea.imc.pam.budget.service.client.dto.BudgetDTO;
 import ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
 import ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
@@ -14,16 +10,21 @@ import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.UserInformation;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.service.UserService;
-import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
+
+import java.time.LocalDate;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.List;
+
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BudgetMapperTest {

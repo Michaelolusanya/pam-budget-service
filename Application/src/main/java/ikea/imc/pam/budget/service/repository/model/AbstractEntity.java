@@ -1,16 +1,17 @@
 package ikea.imc.pam.budget.service.repository.model;
 
-import java.util.Date;
-import java.util.Objects;
-import java.util.function.Consumer;
-import java.util.function.Supplier;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.annotation.LastModifiedDate;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+
 import javax.persistence.EntityListeners;
 import javax.persistence.MappedSuperclass;
 import javax.persistence.Temporal;
 import javax.persistence.TemporalType;
-import org.springframework.data.annotation.LastModifiedBy;
-import org.springframework.data.annotation.LastModifiedDate;
-import org.springframework.data.jpa.domain.support.AuditingEntityListener;
+import java.util.Date;
+import java.util.Objects;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)

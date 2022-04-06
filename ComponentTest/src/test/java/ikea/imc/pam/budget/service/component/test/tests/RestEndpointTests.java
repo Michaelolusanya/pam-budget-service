@@ -1,17 +1,34 @@
 package ikea.imc.pam.budget.service.component.test.tests;
 
-import static ikea.imc.pam.budget.service.client.dto.Constants.*;
-import static org.junit.jupiter.api.Assertions.*;
-
 import ikea.imc.pam.budget.service.client.BudgetClient;
-import ikea.imc.pam.budget.service.client.dto.*;
+import ikea.imc.pam.budget.service.client.dto.BudgetDTO;
+import ikea.imc.pam.budget.service.client.dto.ErrorDTO;
+import ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
+import ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
+import ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
+import ikea.imc.pam.budget.service.client.dto.ResponseMessageDTO;
 import ikea.imc.pam.budget.service.client.exception.BudgetClientRequestException;
 import ikea.imc.pam.budget.service.component.test.AbstractBaseTest;
-import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+
+import java.util.List;
+
+import static ikea.imc.pam.budget.service.client.dto.Constants.MAXIMUM_COST;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MAXIMUM_YEAR;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MINIMUM_COST;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MINIMUM_COUNT;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MINIMUM_FRACTION;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MINIMUM_ID;
+import static ikea.imc.pam.budget.service.client.dto.Constants.MINIMUM_YEAR;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class RestEndpointTests extends AbstractBaseTest {
 
