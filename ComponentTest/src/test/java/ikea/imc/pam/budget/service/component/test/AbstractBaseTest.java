@@ -1,6 +1,8 @@
 package ikea.imc.pam.budget.service.component.test;
 
 import com.github.tomakehurst.wiremock.client.WireMock;
+import java.io.File;
+import javax.annotation.PostConstruct;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Value;
@@ -14,9 +16,6 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
-
-import javax.annotation.PostConstruct;
-import java.io.File;
 
 @Slf4j
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.NONE)

@@ -6,14 +6,13 @@ import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.http.GraphServiceException;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.GraphServiceClient;
+import java.util.List;
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
-
-import java.util.List;
 
 @Slf4j
 @Component

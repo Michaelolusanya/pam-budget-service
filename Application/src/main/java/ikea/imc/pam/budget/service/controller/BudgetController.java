@@ -12,6 +12,10 @@ import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.service.BudgetService;
 import io.swagger.v3.oas.annotations.Operation;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -24,11 +28,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.validation.Valid;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Slf4j
 @RestController
@@ -78,8 +77,10 @@ public class BudgetController {
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> deleteBudget(@PathVariable Long id) {
         return budgetService
                 .deleteById(id)
-                .map(budget -> ResponseEntityFactory.generateResponse(HttpStatus.OK,
-                                                                      budgetMapper.buildBudgetDTO(budget)))
+                .map(
+                        budget ->
+                                ResponseEntityFactory.generateResponse(
+                                        HttpStatus.OK, budgetMapper.buildBudgetDTO(budget)))
                 .orElseGet(() -> ResponseEntityFactory.generateResponse(HttpStatus.NO_CONTENT));
     }
 
@@ -99,8 +100,10 @@ public class BudgetController {
         Budget budget = budgetMapper.buildBudget(dto);
         return budgetService
                 .patchBudget(id, dto.getFiscalYear(), budget)
-                .map(updatedBudget -> ResponseEntityFactory.generateResponse(HttpStatus.OK,
-                                                                             budgetMapper.buildBudgetDTO(updatedBudget)))
+                .map(
+                        updatedBudget ->
+                                ResponseEntityFactory.generateResponse(
+                                        HttpStatus.OK, budgetMapper.buildBudgetDTO(updatedBudget)))
                 .orElseGet(
                         () -> {
                             log.warn("Could not update budget with id {}", id);
@@ -110,8 +113,8 @@ public class BudgetController {
 
     @Operation(summary = "Create an expense for budget with id {id}")
     @PostMapping("/{id}/expenses")
-    public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> createExpense(@PathVariable Long id,
-                                                                        @Valid @RequestBody ExpenseDTO dto) {
+    public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> createExpense(
+            @PathVariable Long id, @Valid @RequestBody ExpenseDTO dto) {
         Optional<Budget> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
             log.warn("Could not create expenses, could not find budget with id {}", id);

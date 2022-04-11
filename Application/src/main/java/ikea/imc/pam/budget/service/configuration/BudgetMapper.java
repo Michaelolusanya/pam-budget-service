@@ -8,11 +8,10 @@ import ikea.imc.pam.budget.service.repository.model.Budget;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.service.UserService;
+import java.util.stream.Collectors;
+import javax.validation.Valid;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
-
-import javax.validation.Valid;
-import java.util.stream.Collectors;
 
 @Component
 @Qualifier()
@@ -32,6 +31,7 @@ public class BudgetMapper {
                 .estimatedCost(budget.getEstimatedBudget())
                 .comdevCost(budget.getCostCOMDEV())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
+                .lastUpdatedAt(budget.getLastUpdated())
                 .expenses(budget.getExpenses().stream().map(this::buildExpenseDTO).collect(Collectors.toList()))
                 .build();
     }

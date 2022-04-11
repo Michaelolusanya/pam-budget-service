@@ -1,9 +1,8 @@
 package ikea.imc.pam.budget.service.repository;
 
 import ikea.imc.pam.budget.service.service.SecurityContextService;
-import org.springframework.data.domain.AuditorAware;
-
 import java.util.Optional;
+import org.springframework.data.domain.AuditorAware;
 
 public class AuditorAwareImpl implements AuditorAware<String> {
 

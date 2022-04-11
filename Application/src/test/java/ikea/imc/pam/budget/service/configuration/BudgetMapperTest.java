@@ -1,5 +1,9 @@
 package ikea.imc.pam.budget.service.configuration;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.mockito.Mockito.when;
+
 import ikea.imc.pam.budget.service.client.dto.BudgetDTO;
 import ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
 import ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
@@ -10,21 +14,16 @@ import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.UserInformation;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.service.UserService;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 class BudgetMapperTest {
@@ -58,13 +57,11 @@ class BudgetMapperTest {
     private static final String LAST_UPDATED_BY_SURNAME = "surname";
     private static final String LAST_UPDATED_BY_FULL_NAME = LAST_UPDATED_BY_FIRST_NAME + " " + LAST_UPDATED_BY_SURNAME;
 
-    private static final Date LAST_UPDATED;
-
-    static {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2020, Calendar.MARCH, 3, 10, 11, 12);
-        LAST_UPDATED = calendar.getTime();
-    }
+    // String with date and time with max precision = nano
+    private static final String LAST_UPDATED_AT_INPUT_DATE_STRING = "2020-03-03T10:11:12.123456789Z";
+    // Instant max precision = nano
+    private static final Instant LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION =
+            Instant.parse(LAST_UPDATED_AT_INPUT_DATE_STRING);
 
     @Mock private UserService userService;
 
@@ -89,6 +86,8 @@ class BudgetMapperTest {
         assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
         assertEquals(COMDEV_COST, dto.getComdevCost());
         assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
+        assertEquals(
+                LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS), dto.getLastUpdatedAt());
         assertNotNull(dto.getExpenses());
         assertEquals(2, dto.getExpenses().size());
     }
@@ -228,7 +227,8 @@ class BudgetMapperTest {
                         .build();
 
         ReflectionTestUtils.setField(budget, "lastUpdatedById", LAST_UPDATED_BY_ID);
-        ReflectionTestUtils.setField(budget, "lastUpdated", LAST_UPDATED);
+        ReflectionTestUtils.setField(
+                budget, "lastUpdated", LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS));
 
         return budget;
     }
@@ -250,7 +250,8 @@ class BudgetMapperTest {
                         .build();
 
         ReflectionTestUtils.setField(expenses, "lastUpdatedById", LAST_UPDATED_BY_ID);
-        ReflectionTestUtils.setField(expenses, "lastUpdated", LAST_UPDATED);
+        ReflectionTestUtils.setField(
+                expenses, "lastUpdated", LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS));
 
         return expenses;
     }
@@ -262,6 +263,7 @@ class BudgetMapperTest {
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
                 .comdevCost(COMDEV_COST)
+                .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())
                 .build();

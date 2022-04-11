@@ -1,11 +1,10 @@
 package ikea.imc.pam.budget.service.controller;
 
-import ikea.imc.pam.budget.service.client.dto.BudgetDTO;
-import ikea.imc.pam.budget.service.client.dto.ExpenseBatchDTO;
-import ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
-import ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
-import ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
-import ikea.imc.pam.budget.service.client.dto.ResponseMessageDTO;
+import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.when;
+
+import ikea.imc.pam.budget.service.client.dto.*;
 import ikea.imc.pam.budget.service.configuration.BudgetMapper;
 import ikea.imc.pam.budget.service.exception.NotFoundException;
 import ikea.imc.pam.budget.service.repository.model.Budget;
@@ -13,6 +12,12 @@ import ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import ikea.imc.pam.budget.service.repository.model.Expenses;
 import ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
 import ikea.imc.pam.budget.service.service.BudgetService;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -24,22 +29,6 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.util.ReflectionTestUtils;
-
-import java.time.LocalDate;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertThrows;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
 public class BudgetControllerTest {
@@ -71,14 +60,11 @@ public class BudgetControllerTest {
     private static final String LAST_UPDATED_BY_ID = "username";
     private static final String LAST_UPDATED_BY_FULL_NAME = "full username";
 
-    private static final Date LAST_UPDATED;
-
-    static {
-        Calendar calendar = Calendar.getInstance();
-        calendar.set(2020, Calendar.MARCH, 3, 10, 11, 12);
-        LAST_UPDATED = calendar.getTime();
-    }
-
+    // String with date and time with max precision = nano
+    private static final String LAST_UPDATED_AT_INPUT_DATE_STRING = "2020-03-03T10:11:12.123456789Z";
+    // Instant max precision = nano
+    private static final Instant LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION =
+            Instant.parse(LAST_UPDATED_AT_INPUT_DATE_STRING);
     @Mock private BudgetService budgetService;
 
     @Mock private BudgetMapper budgetMapper;
@@ -126,6 +112,9 @@ public class BudgetControllerTest {
 
             BudgetDTO dto = messageDTO.getData();
             assertEquals(BUDGET_ID, dto.getId());
+            assertEquals(
+                    LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS),
+                    dto.getLastUpdatedAt());
             assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
@@ -342,6 +331,9 @@ public class BudgetControllerTest {
             assertEquals(PROJECT_ID, dto.getProjectId());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(
+                    LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS),
+                    dto.getLastUpdatedAt());
             assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(0, dto.getExpenses().size());
         }
@@ -425,6 +417,9 @@ public class BudgetControllerTest {
             assertEquals(COMDEV_COST, dto.getComdevCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
+            assertEquals(
+                    LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS),
+                    dto.getLastUpdatedAt());
             assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
             assertEquals(0, dto.getExpenses().size());
         }
@@ -489,9 +484,8 @@ public class BudgetControllerTest {
         void outputValues() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            Expenses outputExpense = generateExpense(budget, EXPENSE_ID);
-            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            Expenses outputExpense = generateExpense(generateBudget(BUDGET_ID), EXPENSE_ID);
+            when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
             when(budgetService.createExpenses(any(), any())).thenReturn(outputExpense);
             when(budgetMapper.buildExpenseDTO(outputExpense)).thenReturn(generateExpenseDTO(EXPENSE_ID, BUDGET_ID));
 
@@ -660,6 +654,7 @@ public class BudgetControllerTest {
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
                 .comdevCost(COMDEV_COST)
+                .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())
                 .build();
@@ -713,7 +708,8 @@ public class BudgetControllerTest {
                         .build();
 
         ReflectionTestUtils.setField(expenses, "lastUpdatedById", LAST_UPDATED_BY_ID);
-        ReflectionTestUtils.setField(expenses, "lastUpdated", LAST_UPDATED);
+        ReflectionTestUtils.setField(
+                expenses, "lastUpdated", LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS));
 
         return expenses;
     }
@@ -730,7 +726,8 @@ public class BudgetControllerTest {
                         .build();
 
         ReflectionTestUtils.setField(budget, "lastUpdatedById", LAST_UPDATED_BY_ID);
-        ReflectionTestUtils.setField(budget, "lastUpdated", LAST_UPDATED);
+        ReflectionTestUtils.setField(
+                budget, "lastUpdated", LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS));
 
         return budget;
     }

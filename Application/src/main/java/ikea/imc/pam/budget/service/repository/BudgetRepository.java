@@ -1,10 +1,9 @@
 package ikea.imc.pam.budget.service.repository;
 
 import ikea.imc.pam.budget.service.repository.model.Budget;
+import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
-
-import java.util.List;
 
 public interface BudgetRepository extends JpaRepository<Budget, Long> {
 
