@@ -18,7 +18,7 @@
             <plugin>
                 <groupId>org.liquibase</groupId>
                 <artifactId>liquibase-maven-plugin</artifactId>
-                <version>3.9.0</version>
+                <version>4.9.1</version>
                 <configuration>
                     <propertyFile>src/main/resources/liquibase/liquibase.properties</propertyFile>
                 </configuration>
@@ -149,6 +149,11 @@
             <groupId>org.liquibase</groupId>
             <artifactId>liquibase-core</artifactId>
             <version>4.7.1</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.blagerweij</groupId>
+            <artifactId>liquibase-sessionlock</artifactId>
+            <version>1.5.1</version>
         </dependency>
     </dependencies>
 </project>
