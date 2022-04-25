@@ -1,0 +1,25 @@
+name: Check PR Title
+
+on:
+  pull_request:
+    types: [opened, synchronize, edited]
+    branches: [ main ]
+
+jobs:
+  check-pr-title:
+    name: Check PR Title
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Check PR Title
+        id: check-pr
+        uses: actions-ecosystem/action-regex-match@v2
+        with:
+          text: ${{ github.event.pull_request.title }}
+          regex: '^.{4}-\d{1,99}:.*$'
+          
+      - if: ${{ steps.check-pr.outputs.match == '' }}
+        run: |
+          echo 'ERROR: Invalid titel, must be on form AAAA-DDDD: <Message>, example: HUSH-100: My Commit, your title: ${{ github.event.pull_request.title }}'
+          exit 1
