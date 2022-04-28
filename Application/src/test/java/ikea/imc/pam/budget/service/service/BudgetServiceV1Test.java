@@ -44,8 +44,8 @@ public class BudgetServiceV1Test {
 
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_BUDGET_2 = 200_000L;
-    private static final double COMDEV_COST = 50_000d;
-    private static final double COMDEV_COST_2 = 60_000d;
+    private static final double INTERNAL_COST = 50_000d;
+    private static final double INTERNAL_COST_2 = 60_000d;
     private static final Long PROJECT_ID = 2L;
 
     private static final Long PRICE_ITEM_ID = 111L;
@@ -56,8 +56,8 @@ public class BudgetServiceV1Test {
     private static final Integer COST_2 = 234;
     private static final Integer COST_PER_UNIT = 23;
     private static final Integer COST_PER_UNIT_2 = 34;
-    private static final Byte PERCENT_COMDEV = 10;
-    private static final Byte PERCENT_COMDEV_2 = 11;
+    private static final Byte PERCENT_INTERNAL = 10;
+    private static final Byte PERCENT_INTERNAL_2 = 11;
     private static final Short UNITS = 2;
     private static final Short UNITS_2 = 4;
     private static final Byte WEEKS = 3;
@@ -113,7 +113,7 @@ public class BudgetServiceV1Test {
             assertNull(budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
             assertNotNull(budget.getBudgetVersion());
             assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
@@ -133,7 +133,7 @@ public class BudgetServiceV1Test {
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
             assertNotNull(budget.getBudgetVersion());
             assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
@@ -164,7 +164,7 @@ public class BudgetServiceV1Test {
             assertEquals(COMMENT, expenses.getComment());
             assertEquals(COST, expenses.getCost());
             assertEquals(COST_PER_UNIT, expenses.getCostPerUnit());
-            assertEquals(PERCENT_COMDEV, expenses.getPercentCOMDEV());
+            assertEquals(PERCENT_INTERNAL, expenses.getInternalPercent());
             assertEquals(UNITS, expenses.getUnits());
             assertEquals(WEEKS, expenses.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, expenses.getInvoicingTypeOption());
@@ -201,7 +201,7 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(PROJECT_ID, budget.getProjectId());
         }
     }
@@ -406,7 +406,7 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
-            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -425,7 +425,7 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
-            assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -469,7 +469,7 @@ public class BudgetServiceV1Test {
             // Given
             Budget inputBudget = generateBudget(BUDGET_ID);
             inputBudget.setEstimatedBudget(ESTIMATED_BUDGET_2);
-            inputBudget.setCostCOMDEV(COMDEV_COST_2);
+            inputBudget.setInternalCost(INTERNAL_COST_2);
 
             ArgumentCaptor<Budget> budgetVersionCapture = ArgumentCaptor.forClass(Budget.class);
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
@@ -484,7 +484,7 @@ public class BudgetServiceV1Test {
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET_2, budget.getEstimatedBudget());
-            assertEquals(COMDEV_COST_2, budget.getCostCOMDEV());
+            assertEquals(INTERNAL_COST_2, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -566,7 +566,7 @@ public class BudgetServiceV1Test {
             assertEquals(COMMENT, createdExpense.getComment());
             assertEquals(COST, createdExpense.getCost());
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
-            assertEquals(PERCENT_COMDEV, createdExpense.getPercentCOMDEV());
+            assertEquals(PERCENT_INTERNAL, createdExpense.getInternalPercent());
             assertEquals(UNITS, createdExpense.getUnits());
             assertEquals(WEEKS, createdExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
@@ -590,7 +590,7 @@ public class BudgetServiceV1Test {
             assertEquals(COMMENT, createdExpense.getComment());
             assertEquals(COST, createdExpense.getCost());
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
-            assertEquals(PERCENT_COMDEV, createdExpense.getPercentCOMDEV());
+            assertEquals(PERCENT_INTERNAL, createdExpense.getInternalPercent());
             assertEquals(UNITS, createdExpense.getUnits());
             assertEquals(WEEKS, createdExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
@@ -729,7 +729,7 @@ public class BudgetServiceV1Test {
             assertEquals(COMMENT_2, updatedExpense.getComment());
             assertEquals(COST_2, updatedExpense.getCost());
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
-            assertEquals(PERCENT_COMDEV_2, updatedExpense.getPercentCOMDEV());
+            assertEquals(PERCENT_INTERNAL_2, updatedExpense.getInternalPercent());
             assertEquals(UNITS_2, updatedExpense.getUnits());
             assertEquals(WEEKS_2, updatedExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
@@ -757,7 +757,7 @@ public class BudgetServiceV1Test {
             assertEquals(COMMENT_2, updatedExpense.getComment());
             assertEquals(COST_2, updatedExpense.getCost());
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
-            assertEquals(PERCENT_COMDEV_2, updatedExpense.getPercentCOMDEV());
+            assertEquals(PERCENT_INTERNAL_2, updatedExpense.getInternalPercent());
             assertEquals(UNITS_2, updatedExpense.getUnits());
             assertEquals(WEEKS_2, updatedExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
@@ -788,7 +788,7 @@ public class BudgetServiceV1Test {
         return Budget.builder()
                 .budgetId(id)
                 .estimatedBudget(ESTIMATED_BUDGET)
-                .costCOMDEV(COMDEV_COST)
+                .internalCost(INTERNAL_COST)
                 .projectId(PROJECT_ID)
                 .status(Status.ACTIVE)
                 .budgetVersion(generateBudgetVersion())
@@ -811,9 +811,9 @@ public class BudgetServiceV1Test {
                 .priceItemId(PRICE_ITEM_ID)
                 .comment(COMMENT)
                 .cost(COST)
-                .costCOMDEV(COMDEV_COST)
+                .internalCost(INTERNAL_COST)
                 .costPerUnit(COST_PER_UNIT)
-                .percentCOMDEV(PERCENT_COMDEV)
+                .internalPercent(PERCENT_INTERNAL)
                 .units(UNITS)
                 .weeks(WEEKS)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION)
@@ -827,9 +827,9 @@ public class BudgetServiceV1Test {
                 .priceItemId(PRICE_ITEM_ID_2)
                 .comment(COMMENT_2)
                 .cost(COST_2)
-                .costCOMDEV(COMDEV_COST_2)
+                .internalCost(INTERNAL_COST_2)
                 .costPerUnit(COST_PER_UNIT_2)
-                .percentCOMDEV(PERCENT_COMDEV_2)
+                .internalPercent(PERCENT_INTERNAL_2)
                 .units(UNITS_2)
                 .weeks(WEEKS_2)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION_2)

@@ -34,11 +34,11 @@ public class Expenses extends AbstractEntity {
 
     private Integer cost;
 
-    private Double costCOMDEV;
+    private Double internalCost;
 
     private Integer costPerUnit;
 
-    private Byte percentCOMDEV;
+    private Byte internalPercent;
 
     private Short units;
 
@@ -62,9 +62,9 @@ public class Expenses extends AbstractEntity {
         setNotNullValue(mergeExpenses::getPriceItemId, mergedBuilder::priceItemId);
         setNotNullValue(mergeExpenses::getComment, mergedBuilder::comment);
         setNotNullValue(mergeExpenses::getCost, mergedBuilder::cost);
-        setNotNullValue(mergeExpenses::getCostCOMDEV, mergedBuilder::costCOMDEV);
+        setNotNullValue(mergeExpenses::getInternalCost, mergedBuilder::internalCost);
         setNotNullValue(mergeExpenses::getCostPerUnit, mergedBuilder::costPerUnit);
-        setNotNullValue(mergeExpenses::getPercentCOMDEV, mergedBuilder::percentCOMDEV);
+        setNotNullValue(mergeExpenses::getInternalPercent, mergedBuilder::internalPercent);
         setNotNullValue(mergeExpenses::getUnits, mergedBuilder::units);
         setNotNullValue(mergeExpenses::getWeeks, mergedBuilder::weeks);
         setNotNullValue(mergeExpenses::getInvoicingTypeOption, mergedBuilder::invoicingTypeOption);
@@ -81,7 +81,7 @@ public class Expenses extends AbstractEntity {
                 Getter.of(this::getComment, compareTo::getComment),
                 Getter.of(this::getCost, compareTo::getCost),
                 Getter.of(this::getCostPerUnit, compareTo::getCostPerUnit),
-                Getter.of(this::getPercentCOMDEV, compareTo::getPercentCOMDEV),
+                Getter.of(this::getInternalPercent, compareTo::getInternalPercent),
                 Getter.of(this::getUnits, compareTo::getUnits),
                 Getter.of(this::getWeeks, compareTo::getWeeks),
                 Getter.of(this::getInvoicingTypeOption, compareTo::getInvoicingTypeOption));

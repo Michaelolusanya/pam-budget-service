@@ -36,14 +36,14 @@ class BudgetMapperTest {
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
-    private static final double COMDEV_COST = 50_000d;
+    private static final double INTERNAL_COST = 50_000d;
 
     private static final String EXPENSE_COMMENT = "EXPENSE_COMMENT123";
     private static final int EXPENSE_COST = 450;
-    private static final double EXPENSE_COST_COMDEV = 400d;
+    private static final double EXPENSE_COST_INTERNAL = 400d;
     private static final int EXPENSE_COST_PER_UNIT = 40;
-    private static final byte EXPENSE_PERCENT_COMDEV = 80;
-    private static final double EXPENSE_FRACTION_COMDEV = EXPENSE_PERCENT_COMDEV / 100d;
+    private static final byte EXPENSE_PERCENT_INTERNAL = 80;
+    private static final double EXPENSE_FRACTION_INTERNAL = EXPENSE_PERCENT_INTERNAL / 100d;
     private static final short EXPENSE_UNITS = 41;
     private static final byte EXPENSE_WEEKS = 42;
     private static final InvoicingTypeOption EXPENSES_INVOICINGTYPEOPTION = InvoicingTypeOption.FIXED_PRICE;
@@ -84,7 +84,7 @@ class BudgetMapperTest {
         assertEquals(PROJECT_ID, dto.getProjectId());
         assertEquals(FISCAL_YEAR, dto.getFiscalYear());
         assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
-        assertEquals(COMDEV_COST, dto.getComdevCost());
+        assertEquals(INTERNAL_COST, dto.getInternalCost());
         assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
         assertEquals(
                 LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS), dto.getLastUpdatedAt());
@@ -106,8 +106,8 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_ID, dto.getId());
         assertEquals(BUDGET_ID, dto.getBudgetId());
         assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
-        assertEquals(EXPENSE_FRACTION_COMDEV, dto.getComdevFraction());
-        assertEquals(EXPENSE_COST_COMDEV, dto.getComdevCost());
+        assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
+        assertEquals(EXPENSE_COST_INTERNAL, dto.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_UNITS, dto.getUnitCount());
         assertEquals(EXPENSE_WEEKS, dto.getWeekCount());
@@ -128,7 +128,7 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, budget.getBudgetId());
         assertEquals(PROJECT_ID, budget.getProjectId());
         assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-        assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+        assertEquals(INTERNAL_COST, budget.getInternalCost());
     }
 
     @Test
@@ -145,7 +145,7 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, budget.getBudgetId());
         assertEquals(PROJECT_ID, budget.getProjectId());
         assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-        assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+        assertEquals(INTERNAL_COST, budget.getInternalCost());
         assertNotNull(budget.getExpenses());
         assertEquals(1, budget.getExpenses().size());
         assertEquals(EXPENSE_ID, budget.getExpenses().get(0).getExpensesId());
@@ -162,7 +162,7 @@ class BudgetMapperTest {
 
         // Then
         assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
-        assertEquals(COMDEV_COST, budget.getCostCOMDEV());
+        assertEquals(INTERNAL_COST, budget.getInternalCost());
     }
 
     @Test
@@ -178,9 +178,9 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_ID, expenses.getExpensesId());
         assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
         assertEquals(EXPENSE_COMMENT, expenses.getComment());
-        assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
+        assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
-        assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
+        assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
         assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
         assertEquals(EXPENSES_INVOICINGTYPEOPTION, expenses.getInvoicingTypeOption());
@@ -198,9 +198,9 @@ class BudgetMapperTest {
         // Then
         assertEquals(EXPENSE_ID, expenses.getExpensesId());
         assertEquals(EXPENSE_COMMENT, expenses.getComment());
-        assertEquals(EXPENSE_COST_COMDEV, expenses.getCostCOMDEV());
+        assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
-        assertEquals(EXPENSE_PERCENT_COMDEV, expenses.getPercentCOMDEV());
+        assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
         assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
     }
@@ -220,7 +220,7 @@ class BudgetMapperTest {
                 Budget.builder()
                         .budgetId(BUDGET_ID)
                         .estimatedBudget(ESTIMATED_BUDGET)
-                        .costCOMDEV(COMDEV_COST)
+                        .internalCost(INTERNAL_COST)
                         .projectId(PROJECT_ID)
                         .budgetVersion(generateBudgetVersion())
                         .expenses(List.of())
@@ -240,9 +240,9 @@ class BudgetMapperTest {
                         .priceItemId(PRICE_ITEM_ID)
                         .comment(EXPENSE_COMMENT)
                         .cost(EXPENSE_COST)
-                        .costCOMDEV(EXPENSE_COST_COMDEV)
+                        .internalCost(EXPENSE_COST_INTERNAL)
                         .costPerUnit(EXPENSE_COST_PER_UNIT)
-                        .percentCOMDEV(EXPENSE_PERCENT_COMDEV)
+                        .internalPercent(EXPENSE_PERCENT_INTERNAL)
                         .units(EXPENSE_UNITS)
                         .weeks(EXPENSE_WEEKS)
                         .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
@@ -262,7 +262,7 @@ class BudgetMapperTest {
                 .projectId(PROJECT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
-                .comdevCost(COMDEV_COST)
+                .internalCost(INTERNAL_COST)
                 .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())
@@ -274,8 +274,8 @@ class BudgetMapperTest {
                 .id(EXPENSE_ID)
                 .priceItemId(PRICE_ITEM_ID)
                 .budgetId(BUDGET_ID)
-                .comdevFraction(EXPENSE_FRACTION_COMDEV)
-                .comdevCost(EXPENSE_COST_COMDEV)
+                .internalFraction(EXPENSE_FRACTION_INTERNAL)
+                .internalCost(EXPENSE_COST_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .unitCount(EXPENSE_UNITS)
                 .weekCount(EXPENSE_WEEKS)
@@ -288,16 +288,16 @@ class BudgetMapperTest {
         return PatchBudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
                 .fiscalYear(FISCAL_YEAR)
-                .comdevCost(COMDEV_COST)
+                .internalCost(INTERNAL_COST)
                 .build();
     }
 
     private static PatchExpenseDTO generatePatchExpenseDTO() {
         return PatchExpenseDTO.builder()
                 .id(EXPENSE_ID)
-                .comdevFraction(EXPENSE_FRACTION_COMDEV)
+                .internalFraction(EXPENSE_FRACTION_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
-                .comdevCost(EXPENSE_COST_COMDEV)
+                .internalCost(EXPENSE_COST_INTERNAL)
                 .weekCount(EXPENSE_WEEKS)
                 .comment(EXPENSE_COMMENT)
                 .unitCount(EXPENSE_UNITS)

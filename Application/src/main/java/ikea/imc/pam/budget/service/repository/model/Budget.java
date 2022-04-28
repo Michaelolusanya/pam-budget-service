@@ -41,7 +41,7 @@ public class Budget extends AbstractEntity {
 
     private Long estimatedBudget;
 
-    private Double costCOMDEV;
+    private Double internalCost;
 
     @Enumerated(EnumType.STRING)
     private Status status;
@@ -59,7 +59,7 @@ public class Budget extends AbstractEntity {
 
         setNotNullValue(toBudget::getProjectId, mergedBudget::projectId);
         setNotNullValue(toBudget::getEstimatedBudget, mergedBudget::estimatedBudget);
-        setNotNullValue(toBudget::getCostCOMDEV, mergedBudget::costCOMDEV);
+        setNotNullValue(toBudget::getInternalCost, mergedBudget::internalCost);
         setNotNullValue(toBudget::getStatus, mergedBudget::status);
 
         return mergedBudget.build();
@@ -74,7 +74,7 @@ public class Budget extends AbstractEntity {
         return isEqual(
                 Getter.of(this::getProjectId, compareTo::getProjectId),
                 Getter.of(this::getEstimatedBudget, compareTo::getEstimatedBudget),
-                Getter.of(this::getCostCOMDEV, compareTo::getCostCOMDEV),
+                Getter.of(this::getInternalCost, compareTo::getInternalCost),
                 Getter.of(this::getStatus, compareTo::getStatus));
     }
 }

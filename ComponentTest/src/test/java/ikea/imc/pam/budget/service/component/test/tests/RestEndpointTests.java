@@ -171,7 +171,7 @@ class RestEndpointTests extends AbstractBaseTest {
                 PatchBudgetDTO.builder()
                         .fiscalYear(MAXIMUM_YEAR)
                         .estimatedCost(MAXIMUM_COST)
-                        .comdevCost(MINIMUM_COST + 1.0)
+                        .internalCost(MINIMUM_COST + 1.0)
                         .build();
 
         var res = budgetClient.updateBudget(budgetId, patchBudgetDTO);
@@ -180,7 +180,7 @@ class RestEndpointTests extends AbstractBaseTest {
         assertNotNull(res);
         assertEquals(testData.projectId, res.getProjectId());
         assertEquals(MAXIMUM_YEAR, res.getFiscalYear());
-        assertEquals(MINIMUM_COST + 1.0, res.getComdevCost());
+        assertEquals(MINIMUM_COST + 1.0, res.getInternalCost());
     }
 
     @Test
@@ -190,7 +190,7 @@ class RestEndpointTests extends AbstractBaseTest {
                 PatchBudgetDTO.builder()
                         .fiscalYear(MAXIMUM_YEAR)
                         .estimatedCost(MAXIMUM_COST)
-                        .comdevCost(MINIMUM_COST + 1.0)
+                        .internalCost(MINIMUM_COST + 1.0)
                         .build();
 
         // WHEN (REST call to budget-service to get nonexistent budget)
@@ -209,14 +209,14 @@ class RestEndpointTests extends AbstractBaseTest {
 
         // WHEN (REST call to budget-service to update expenses for a budget)
         PatchExpenseDTO patchExpenseDTO =
-                PatchExpenseDTO.builder().id(expenseId).comdevFraction(MINIMUM_FRACTION + 1.0).build();
+                PatchExpenseDTO.builder().id(expenseId).internalFraction(MINIMUM_FRACTION + 1.0).build();
 
         var res = budgetClient.updateExpense(budgetId, List.of(patchExpenseDTO));
 
         // THEN (Response from budget-service with updated data for the budget's expenses)
         assertNotNull(res);
         assertEquals(1, res.size());
-        assertEquals(MINIMUM_FRACTION + 1.0, res.get(0).getComdevFraction());
+        assertEquals(MINIMUM_FRACTION + 1.0, res.get(0).getInternalFraction());
     }
 
     @Nested
@@ -274,8 +274,8 @@ class RestEndpointTests extends AbstractBaseTest {
             ExpenseDTO expenseToBeCreated =
                     ExpenseDTO.builder()
                             .priceItemId(0L)
-                            .comdevFraction(-1D)
-                            .comdevCost(-1D)
+                            .internalFraction(-1D)
+                            .internalCost(-1D)
                             .unitCost(-1)
                             .unitCount((short) -1)
                             .build();
@@ -294,8 +294,8 @@ class RestEndpointTests extends AbstractBaseTest {
             List<ErrorDTO> errors = body.getErrors();
             assertEquals(5, errors.size());
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("priceItemId")));
-            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevFraction")));
-            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("comdevCost")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("internalFraction")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("internalCost")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCost")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCount")));
         }
@@ -315,8 +315,8 @@ class RestEndpointTests extends AbstractBaseTest {
             assertNotNull(expense);
             assertNotNull(expense.getId());
             assertEquals(budgetId, expense.getBudgetId());
-            assertEquals(0.0, expense.getComdevFraction());
-            assertEquals(0.0, expense.getComdevCost());
+            assertEquals(0.0, expense.getInternalFraction());
+            assertEquals(0.0, expense.getInternalCost());
             assertEquals(0, expense.getUnitCost());
             assertEquals((short) MINIMUM_COUNT, expense.getUnitCount());
             assertEquals((byte) MINIMUM_COUNT, expense.getWeekCount());
@@ -356,7 +356,7 @@ class RestEndpointTests extends AbstractBaseTest {
 
         // WHEN (REST call to budget-service to update expenses for a budget)
         PatchExpenseDTO patchExpenseDTO1 =
-                PatchExpenseDTO.builder().id(expenseId1).comdevFraction(MINIMUM_FRACTION + 1.0).build();
+                PatchExpenseDTO.builder().id(expenseId1).internalFraction(MINIMUM_FRACTION + 1.0).build();
         PatchExpenseDTO patchExpenseDTO2 = PatchExpenseDTO.builder().id(expenseId2).unitCost(Integer.MAX_VALUE).build();
 
         var res = budgetClient.updateExpense(budgetId, List.of(patchExpenseDTO1, patchExpenseDTO2));
@@ -364,7 +364,7 @@ class RestEndpointTests extends AbstractBaseTest {
         // THEN (Response from budget-service with updated data for the budget's expenses)
         assertNotNull(res);
         assertEquals(2, res.size());
-        assertEquals(MINIMUM_FRACTION + 1.0, res.get(0).getComdevFraction());
+        assertEquals(MINIMUM_FRACTION + 1.0, res.get(0).getInternalFraction());
         assertEquals(Integer.MAX_VALUE, res.get(1).getUnitCost());
     }
 
@@ -372,7 +372,7 @@ class RestEndpointTests extends AbstractBaseTest {
     void updateMissingBudgetWithExpense() {
         // GIVEN (Budget doesn't exist in budget-service)
         PatchExpenseDTO patchExpenseDTO =
-                PatchExpenseDTO.builder().id(1L).comdevFraction(MINIMUM_FRACTION + 1.0).build();
+                PatchExpenseDTO.builder().id(1L).internalFraction(MINIMUM_FRACTION + 1.0).build();
         List<PatchExpenseDTO> expenses = List.of(patchExpenseDTO);
 
         // WHEN (REST call to budget-service to update expenses for nonexistent budget)
@@ -393,15 +393,15 @@ class RestEndpointTests extends AbstractBaseTest {
 
     private ExpenseDTO.ExpenseDTOBuilder minimalExpenseBuilder(
             Long priceItemId,
-            Double comdevFraction,
-            Double comdevCost,
+            Double internalFraction,
+            Double internalCost,
             Integer unitCost,
             Short unitCount,
             Byte weekCount) {
         return ExpenseDTO.builder()
                 .priceItemId(priceItemId)
-                .comdevFraction(comdevFraction)
-                .comdevCost(comdevCost)
+                .internalFraction(internalFraction)
+                .internalCost(internalCost)
                 .unitCost(unitCost)
                 .unitCount(unitCount)
                 .weekCount(weekCount);

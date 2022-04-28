@@ -29,7 +29,7 @@ public class BudgetMapper {
                 .projectId(budget.getProjectId())
                 .fiscalYear(budget.getBudgetVersion().getFiscalYear())
                 .estimatedCost(budget.getEstimatedBudget())
-                .comdevCost(budget.getCostCOMDEV())
+                .internalCost(budget.getInternalCost())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
                 .lastUpdatedAt(budget.getLastUpdated())
                 .expenses(budget.getExpenses().stream().map(this::buildExpenseDTO).collect(Collectors.toList()))
@@ -41,8 +41,8 @@ public class BudgetMapper {
                 .id(expenses.getExpensesId())
                 .budgetId(expenses.getBudget().getBudgetId())
                 .priceItemId(expenses.getPriceItemId())
-                .comdevFraction(toFraction(expenses.getPercentCOMDEV()))
-                .comdevCost(expenses.getCostCOMDEV())
+                .internalFraction(toFraction(expenses.getInternalPercent()))
+                .internalCost(expenses.getInternalCost())
                 .unitCost(expenses.getCostPerUnit())
                 .unitCount(expenses.getUnits())
                 .weekCount(expenses.getWeeks())
@@ -57,7 +57,7 @@ public class BudgetMapper {
                         .budgetId(dto.getId())
                         .projectId(dto.getProjectId())
                         .estimatedBudget(dto.getEstimatedCost())
-                        .costCOMDEV(dto.getComdevCost())
+                        .internalCost(dto.getInternalCost())
                         .build();
 
         if (dto.getExpenses() != null) {
@@ -71,7 +71,7 @@ public class BudgetMapper {
     }
 
     public Budget buildBudget(PatchBudgetDTO dto) {
-        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).costCOMDEV(dto.getComdevCost()).build();
+        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).internalCost(dto.getInternalCost()).build();
     }
 
     private Expenses buildExpense(Budget budget, ExpenseDTO dto) {
@@ -85,9 +85,9 @@ public class BudgetMapper {
                 .expensesId(dto.getId())
                 .priceItemId(dto.getPriceItemId())
                 .comment(dto.getComment())
-                .costCOMDEV(dto.getComdevCost())
+                .internalCost(dto.getInternalCost())
                 .costPerUnit(dto.getUnitCost())
-                .percentCOMDEV(toPercent(dto.getComdevFraction()))
+                .internalPercent(toPercent(dto.getInternalFraction()))
                 .units(dto.getUnitCount())
                 .weeks(dto.getWeekCount())
                 .invoicingTypeOption(InvoicingTypeOption.get(dto.getPriceModel()))
@@ -98,9 +98,9 @@ public class BudgetMapper {
         return Expenses.builder()
                 .expensesId(dto.getId())
                 .comment(dto.getComment())
-                .costCOMDEV(dto.getComdevCost())
+                .internalCost(dto.getInternalCost())
                 .costPerUnit(dto.getUnitCost())
-                .percentCOMDEV(toPercent(dto.getComdevFraction()))
+                .internalPercent(toPercent(dto.getInternalFraction()))
                 .units(dto.getUnitCount())
                 .weeks(dto.getWeekCount())
                 .build();
