@@ -45,7 +45,6 @@ class BudgetMapperTest {
     private static final byte EXPENSE_PERCENT_INTERNAL = 80;
     private static final double EXPENSE_FRACTION_INTERNAL = EXPENSE_PERCENT_INTERNAL / 100d;
     private static final short EXPENSE_UNITS = 41;
-    private static final byte EXPENSE_WEEKS = 42;
     private static final InvoicingTypeOption EXPENSES_INVOICINGTYPEOPTION = InvoicingTypeOption.FIXED_PRICE;
 
     private static final Integer FISCAL_YEAR = 2020;
@@ -110,7 +109,6 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_COST_INTERNAL, dto.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_UNITS, dto.getUnitCount());
-        assertEquals(EXPENSE_WEEKS, dto.getWeekCount());
         assertEquals(EXPENSE_COMMENT, dto.getComment());
         assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), dto.getPriceModel());
     }
@@ -182,7 +180,6 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
-        assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
         assertEquals(EXPENSES_INVOICINGTYPEOPTION, expenses.getInvoicingTypeOption());
     }
 
@@ -202,7 +199,6 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
-        assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
     }
 
     private static BudgetVersion generateBudgetVersion() {
@@ -244,7 +240,6 @@ class BudgetMapperTest {
                         .costPerUnit(EXPENSE_COST_PER_UNIT)
                         .internalPercent(EXPENSE_PERCENT_INTERNAL)
                         .units(EXPENSE_UNITS)
-                        .weeks(EXPENSE_WEEKS)
                         .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
                         .budget(budget)
                         .build();
@@ -278,7 +273,6 @@ class BudgetMapperTest {
                 .internalCost(EXPENSE_COST_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .unitCount(EXPENSE_UNITS)
-                .weekCount(EXPENSE_WEEKS)
                 .comment(EXPENSE_COMMENT)
                 .priceModel(EXPENSES_INVOICINGTYPEOPTION.getDescription())
                 .build();
@@ -298,7 +292,6 @@ class BudgetMapperTest {
                 .internalFraction(EXPENSE_FRACTION_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .internalCost(EXPENSE_COST_INTERNAL)
-                .weekCount(EXPENSE_WEEKS)
                 .comment(EXPENSE_COMMENT)
                 .unitCount(EXPENSE_UNITS)
                 .build();

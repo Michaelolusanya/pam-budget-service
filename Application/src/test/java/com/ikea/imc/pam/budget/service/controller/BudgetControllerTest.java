@@ -52,7 +52,6 @@ public class BudgetControllerTest {
     private static final byte EXPENSE_PERCENT_INTERNAL = 80;
     private static final double EXPENSE_FRACTION_INTERNAL = EXPENSE_PERCENT_INTERNAL / 100d;
     private static final short EXPENSE_UNITS = 41;
-    private static final byte EXPENSE_WEEKS = 42;
     private static final InvoicingTypeOption EXPENSES_INVOICINGTYPEOPTION = InvoicingTypeOption.FIXED_PRICE;
 
     private static final Integer FISCAL_YEAR = 2020;
@@ -157,7 +156,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_COST_PER_UNIT, expenses1.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, expenses1.getInternalFraction());
             assertEquals(EXPENSE_UNITS, expenses1.getUnitCount());
-            assertEquals(EXPENSE_WEEKS, expenses1.getWeekCount());
             assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), expenses1.getPriceModel());
         }
     }
@@ -477,7 +475,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
             assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
             assertEquals(EXPENSE_COMMENT, expenses.getComment());
-            assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
             assertEquals(EXPENSE_UNITS, expenses.getUnits());
             assertEquals(EXPENSES_INVOICINGTYPEOPTION, expenses.getInvoicingTypeOption());
         }
@@ -511,7 +508,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
             assertEquals(EXPENSE_UNITS, dto.getUnitCount());
-            assertEquals(EXPENSE_WEEKS, dto.getWeekCount());
             assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), dto.getPriceModel());
         }
     }
@@ -584,7 +580,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
             assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
             assertEquals(EXPENSE_COMMENT, expenses.getComment());
-            assertEquals(EXPENSE_WEEKS, expenses.getWeeks());
             assertEquals(EXPENSE_UNITS, expenses.getUnits());
         }
 
@@ -619,7 +614,6 @@ public class BudgetControllerTest {
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
             assertEquals(EXPENSE_UNITS, dto.getUnitCount());
-            assertEquals(EXPENSE_WEEKS, dto.getWeekCount());
             assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), dto.getPriceModel());
         }
     }
@@ -675,7 +669,6 @@ public class BudgetControllerTest {
                 .internalCost(EXPENSE_COST_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .unitCount(EXPENSE_UNITS)
-                .weekCount(EXPENSE_WEEKS)
                 .comment(EXPENSE_COMMENT)
                 .priceModel(EXPENSES_INVOICINGTYPEOPTION.getDescription())
                 .build();
@@ -687,7 +680,6 @@ public class BudgetControllerTest {
                 .internalFraction(EXPENSE_FRACTION_INTERNAL)
                 .unitCost(EXPENSE_COST_PER_UNIT)
                 .internalCost(EXPENSE_COST_INTERNAL)
-                .weekCount(EXPENSE_WEEKS)
                 .comment(EXPENSE_COMMENT)
                 .unitCount(EXPENSE_UNITS)
                 .build();
@@ -704,7 +696,6 @@ public class BudgetControllerTest {
                         .costPerUnit(EXPENSE_COST_PER_UNIT)
                         .internalPercent(EXPENSE_PERCENT_INTERNAL)
                         .units(EXPENSE_UNITS)
-                        .weeks(EXPENSE_WEEKS)
                         .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
                         .budget(budget)
                         .build();

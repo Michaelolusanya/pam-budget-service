@@ -320,7 +320,6 @@ class RestEndpointTests extends AbstractBaseTest {
             assertEquals(0.0, expense.getInternalCost());
             assertEquals(0, expense.getUnitCost());
             assertEquals((short) MINIMUM_COUNT, expense.getUnitCount());
-            assertEquals((byte) MINIMUM_COUNT, expense.getWeekCount());
         }
 
         @Test
@@ -389,7 +388,7 @@ class RestEndpointTests extends AbstractBaseTest {
     }
 
     private ExpenseDTO minimalExpense() {
-        return minimalExpenseBuilder(MINIMUM_ID, 0.0, 0.0, 0, (short) MINIMUM_COUNT, (byte) MINIMUM_COUNT).build();
+        return minimalExpenseBuilder(MINIMUM_ID, 0.0, 0.0, 0, (short) MINIMUM_COUNT).build();
     }
 
     private ExpenseDTO.ExpenseDTOBuilder minimalExpenseBuilder(
@@ -397,14 +396,12 @@ class RestEndpointTests extends AbstractBaseTest {
             Double internalFraction,
             Double internalCost,
             Integer unitCost,
-            Short unitCount,
-            Byte weekCount) {
+            Short unitCount) {
         return ExpenseDTO.builder()
                 .priceItemId(priceItemId)
                 .internalFraction(internalFraction)
                 .internalCost(internalCost)
                 .unitCost(unitCost)
-                .unitCount(unitCount)
-                .weekCount(weekCount);
+                .unitCount(unitCount);
     }
 }

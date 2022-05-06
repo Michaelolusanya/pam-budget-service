@@ -46,7 +46,6 @@ public class BudgetMapper {
                 .internalCost(expenses.getInternalCost())
                 .unitCost(expenses.getCostPerUnit())
                 .unitCount(expenses.getUnits())
-                .weekCount(expenses.getWeeks())
                 .comment(expenses.getComment())
                 .priceModel(expenses.toInvoicingTypeName())
                 .build();
@@ -90,7 +89,6 @@ public class BudgetMapper {
                 .costPerUnit(dto.getUnitCost())
                 .internalPercent(toPercent(dto.getInternalFraction()))
                 .units(dto.getUnitCount())
-                .weeks(dto.getWeekCount())
                 .invoicingTypeOption(InvoicingTypeOption.get(dto.getPriceModel()))
                 .build();
     }
@@ -103,7 +101,6 @@ public class BudgetMapper {
                 .costPerUnit(dto.getUnitCost())
                 .internalPercent(toPercent(dto.getInternalFraction()))
                 .units(dto.getUnitCount())
-                .weeks(dto.getWeekCount())
                 .build();
     }
 

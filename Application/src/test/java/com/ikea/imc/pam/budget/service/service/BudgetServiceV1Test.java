@@ -61,8 +61,6 @@ public class BudgetServiceV1Test {
     private static final Byte PERCENT_INTERNAL_2 = 11;
     private static final Short UNITS = 2;
     private static final Short UNITS_2 = 4;
-    private static final Byte WEEKS = 3;
-    private static final Byte WEEKS_2 = 5;
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION = InvoicingTypeOption.FIXED_PRICE;
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION_2 = InvoicingTypeOption.HOURLY_PRICE;
 
@@ -167,7 +165,6 @@ public class BudgetServiceV1Test {
             assertEquals(COST_PER_UNIT, expenses.getCostPerUnit());
             assertEquals(PERCENT_INTERNAL, expenses.getInternalPercent());
             assertEquals(UNITS, expenses.getUnits());
-            assertEquals(WEEKS, expenses.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, expenses.getInvoicingTypeOption());
         }
     }
@@ -569,7 +566,6 @@ public class BudgetServiceV1Test {
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
             assertEquals(PERCENT_INTERNAL, createdExpense.getInternalPercent());
             assertEquals(UNITS, createdExpense.getUnits());
-            assertEquals(WEEKS, createdExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
         }
 
@@ -593,7 +589,6 @@ public class BudgetServiceV1Test {
             assertEquals(COST_PER_UNIT, createdExpense.getCostPerUnit());
             assertEquals(PERCENT_INTERNAL, createdExpense.getInternalPercent());
             assertEquals(UNITS, createdExpense.getUnits());
-            assertEquals(WEEKS, createdExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION, createdExpense.getInvoicingTypeOption());
             assertNotNull(createdExpense.getBudget());
             assertEquals(BUDGET_ID, createdExpense.getBudget().getBudgetId());
@@ -732,7 +727,6 @@ public class BudgetServiceV1Test {
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
             assertEquals(PERCENT_INTERNAL_2, updatedExpense.getInternalPercent());
             assertEquals(UNITS_2, updatedExpense.getUnits());
-            assertEquals(WEEKS_2, updatedExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
         }
 
@@ -760,7 +754,6 @@ public class BudgetServiceV1Test {
             assertEquals(COST_PER_UNIT_2, updatedExpense.getCostPerUnit());
             assertEquals(PERCENT_INTERNAL_2, updatedExpense.getInternalPercent());
             assertEquals(UNITS_2, updatedExpense.getUnits());
-            assertEquals(WEEKS_2, updatedExpense.getWeeks());
             assertEquals(INVOICING_TYPE_OPTION_2, updatedExpense.getInvoicingTypeOption());
         }
 
@@ -816,7 +809,6 @@ public class BudgetServiceV1Test {
                 .costPerUnit(COST_PER_UNIT)
                 .internalPercent(PERCENT_INTERNAL)
                 .units(UNITS)
-                .weeks(WEEKS)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION)
                 .budget(budget)
                 .build();
@@ -832,7 +824,6 @@ public class BudgetServiceV1Test {
                 .costPerUnit(COST_PER_UNIT_2)
                 .internalPercent(PERCENT_INTERNAL_2)
                 .units(UNITS_2)
-                .weeks(WEEKS_2)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION_2)
                 .budget(budget)
                 .build();
