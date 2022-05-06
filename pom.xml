@@ -8,90 +8,54 @@
         <module>ComponentTest</module>
     </modules>
 
-	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.6.2</version>
-		<relativePath/> <!-- lookup parent from repository -->
-	</parent>
+    <parent>
+        <groupId>com.ikea.imc.pam</groupId>
+        <artifactId>pam-parent</artifactId>
+        <version>3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
 
-	<groupId>com.ikea.imc.pam</groupId>
 	<artifactId>pam-budget-service</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Pam-Budget-Service::Parent</name>
 	<description>Budget Service</description>
 
-	<properties>
-		<java.version>11</java.version>
-		<log4j2.version>2.17.1</log4j2.version>
-		<maven-compiler.version>3.8.1</maven-compiler.version>
-		<spotless.version>2.20.0</spotless.version>
-		<maven.compiler.source>${java.version}</maven.compiler.source>
-		<maven.compiler.target>${java.version}</maven.compiler.target>
-	</properties>
-
     <build>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
-                <version>2.6.2</version>
+                <version>${spring.boot.version}</version>
                 <configuration>
                     <classifier>exec</classifier>
-                    <mainClass>ikea.imc.pam.budget.service.StartSpringbootApi</mainClass>
+                    <mainClass>com.ikea.imc.pam.budget.service.StartSpringbootApi</mainClass>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.theoryinpractise</groupId>
-                <artifactId>googleformatter-maven-plugin</artifactId>
-                <version>1.7.4</version>
-                <executions>
-                    <execution>
-                        <id>reformat-sources</id>
-                        <configuration>
-                            <includeStale>true</includeStale>
-                            <style>AOSP</style>
-                            <formatMain>true</formatMain>
-                            <formatTest>true</formatTest>
-                            <filterModified>false</filterModified>
-                            <skip>false</skip>
-                            <fixImports>true</fixImports>
-                            <maxLineLength>120</maxLineLength>
-                        </configuration>
-                        <goals>
-                            <goal>format</goal>
-                        </goals>
-                        <phase>process-sources</phase>
-                    </execution>
-                </executions>
-            </plugin>
         </plugins>
+        <finalName>
+            pam-budget-service
+        </finalName>
     </build>
-
-    <repositories>
-        <repository>
-            <id>ikea</id>
-            <url>https://pkgs.dev.azure.com/orderandcreate/_packaging/ikea/maven/v1</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-        </repository>
-    </repositories>
 
     <!-- DEFINE COMMON DEPENDENCIES BETWEEN MODULES -->
     <dependencies>
+
+        <!-- Clients -->
         <dependency>
             <groupId>com.ikea.imc.pam</groupId>
             <artifactId>pam-budget-service-client</artifactId>
-            <version>6</version>
+            <version>8</version>
         </dependency>
+
+        <!-- Common -->
         <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-engine</artifactId>
-            <version>5.8.2</version>
-            <scope>test</scope>
+            <groupId>com.ikea.imc.pam</groupId>
+            <artifactId>pam-common</artifactId>
+            <version>4</version>
         </dependency>
+
+        <!-- Json -->
         <dependency>
             <groupId>com.fasterxml.jackson.core</groupId>
             <artifactId>jackson-databind</artifactId>
@@ -102,10 +66,15 @@
             <artifactId>jackson-datatype-jsr310</artifactId>
             <version>2.13.1</version>
         </dependency>
+
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter-engine</artifactId>
+            <version>5.8.2</version>
+            <scope>test</scope>
         </dependency>
+
+        <!-- Lombok -->
         <dependency>
             <groupId>org.projectlombok</groupId>
             <artifactId>lombok</artifactId>
@@ -114,4 +83,13 @@
         </dependency>
     </dependencies>
 
+    <repositories>
+        <repository>
+            <id>ikea</id>
+            <url>https://pkgs.dev.azure.com/orderandcreate/_packaging/ikea/maven/v1</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+        </repository>
+    </repositories>
 </project>
