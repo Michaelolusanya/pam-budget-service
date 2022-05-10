@@ -1,10 +1,8 @@
 package com.ikea.imc.pam.budget.service.repository.model;
 
 import java.time.LocalDate;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
+import javax.persistence.*;
+
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -24,9 +22,13 @@ public class BudgetVersion {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetVersionId;
 
-    private String budgetVersionName;
+    @ManyToOne
+    @JoinColumn(name = "budgetAreaId")
+    private BudgetArea budgetArea;
 
-    private int fiscalYear;
+    private Integer fiscalYear; // TODO TO BE REMOVED! But is kept until service logic can be updated
+
+    private String budgetVersionName;
 
     private LocalDate budgetVersionDate;
 }

@@ -25,6 +25,7 @@
             <column name="budget_version_id" type="BIGINT" autoIncrement="true">
                 <constraints nullable="false" primaryKey="true" primaryKeyName="pk_budgetversion"/>
             </column>
+            <column name="budget_area_id" type="BIGINT"/>
             <column name="budget_version_name" type="VARCHAR(255)"/>
             <column name="fiscal_year" type="INT"/>
             <column name="budget_version_date" type="DATE"/>
@@ -58,6 +59,24 @@
         <addForeignKeyConstraint baseColumnNames="budget_id" baseTableName="expenses"
                                  constraintName="FK_EXPENSES_ON_BUDGETID" referencedColumnNames="budget_id"
                                  referencedTableName="budget"/>
+    </changeSet>
+    <changeSet id="1651844436891-1" author="carl-henrik laulaja (generated)">
+        <createTable tableName="budget_area">
+            <column name="budget_area_id" type="BIGINT" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_budget_area"/>
+            </column>
+            <column name="parent_type" type="VARCHAR(20)"/>
+            <column name="parent_id" type="BIGINT"/>
+            <column name="cost_limit" type="BIGINT"/>
+            <column name="fiscal_year" type="INT"/>
+            <column name="last_updated_by_id" type="VARCHAR(255)"/>
+            <column name="last_updated" type="DATETIME"/>
+        </createTable>
+    </changeSet>
+    <changeSet id="1651844436891-2" author="carl-henrik laulaja (generated)">
+        <addForeignKeyConstraint baseColumnNames="budget_area_id" baseTableName="budget_version"
+                                 constraintName="FK_BUDGET_AREA_ON_BUDGET_VERSION" referencedColumnNames="budget_area_id"
+                                 referencedTableName="budget_area"/>
     </changeSet>
 
 </databaseChangeLog>

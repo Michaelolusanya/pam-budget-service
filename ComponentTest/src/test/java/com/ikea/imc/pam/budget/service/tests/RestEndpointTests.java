@@ -15,10 +15,7 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import com.ikea.imc.pam.budget.service.client.BudgetClient;
-import com.ikea.imc.pam.budget.service.client.dto.BudgetDTO;
-import com.ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
-import com.ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
-import com.ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
+import com.ikea.imc.pam.budget.service.client.dto.*;
 import com.ikea.imc.pam.budget.service.AbstractBaseTest;
 import java.util.List;
 
@@ -384,7 +381,13 @@ class RestEndpointTests extends AbstractBaseTest {
     }
 
     private BudgetDTO.BudgetDTOBuilder minimalBudgetBuilder(Long projectId, Integer fiscalYear) {
-        return BudgetDTO.builder().projectId(projectId).fiscalYear(fiscalYear).expenses(List.of());
+        return BudgetDTO
+                .builder()
+                .parentType(BudgetParentType.BUSINESS_AREA)
+                .parentId(MINIMUM_ID)
+                .projectId(projectId)
+                .fiscalYear(fiscalYear)
+                .expenses(List.of());
     }
 
     private ExpenseDTO minimalExpense() {
