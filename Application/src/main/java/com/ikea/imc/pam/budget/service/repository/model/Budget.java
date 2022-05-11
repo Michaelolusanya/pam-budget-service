@@ -23,13 +23,13 @@ import lombok.Setter;
 @NamedQuery(
         name = "Budget.getBudgetByFiscalYear",
         query =
-                "select b from Budget b join fetch b.budgetVersion bv "
-                        + "where bv.fiscalYear in :fiscalYears AND b.status <> 'ARCHIVED'")
+                "select b from Budget b join fetch b.budgetVersion bv join fetch bv.budgetArea ba "
+                        + "where ba.fiscalYear in :fiscalYears AND b.status <> 'ARCHIVED'")
 @NamedQuery(
         name = "Budget.getBudgetByProjectIdAndFiscalYear",
         query =
-                "select b from Budget b join fetch b.budgetVersion bv "
-                        + "where b.projectId in :projectIds AND bv.fiscalYear in :fiscalYears "
+                "select b from Budget b join fetch b.budgetVersion bv join fetch bv.budgetArea ba "
+                        + "where b.projectId in :projectIds AND ba.fiscalYear in :fiscalYears "
                         + "AND b.status <> 'ARCHIVED'")
 @NamedQuery(name = "Budget.getAllActive", query = "select b from Budget b where b.status <> 'ARCHIVED'")
 public class Budget extends AbstractEntity {

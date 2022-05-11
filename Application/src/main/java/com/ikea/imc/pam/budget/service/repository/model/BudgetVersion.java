@@ -26,8 +26,6 @@ public class BudgetVersion {
     @JoinColumn(name = "budgetAreaId")
     private BudgetArea budgetArea;
 
-    private Integer fiscalYear; // TODO TO BE REMOVED! But is kept until service logic can be updated
-
     private String budgetVersionName;
 
     private LocalDate budgetVersionDate;

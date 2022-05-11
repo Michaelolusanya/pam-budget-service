@@ -8,11 +8,13 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
+import com.ikea.imc.pam.budget.service.client.dto.BudgetParentType;
 import com.ikea.imc.pam.budget.service.exception.NotFoundException;
 import com.ikea.imc.pam.budget.service.repository.BudgetRepository;
 import com.ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
 import com.ikea.imc.pam.budget.service.repository.ExpensesRepository;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
+import com.ikea.imc.pam.budget.service.repository.model.BudgetArea;
 import com.ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import com.ikea.imc.pam.budget.service.repository.model.Expenses;
 import com.ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
@@ -21,6 +23,7 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
+import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -38,10 +41,15 @@ public class BudgetServiceV1Test {
     private static final Long BUDGET_VERSION_ID = 3L;
     private static final Long EXPENSE_ID = 5L;
     private static final Long EXPENSE_ID_2 = 6L;
+    private static final Long BUDGET_AREA_ID = 123L;
+    private static final Long BUDGET_AREA_ID_2 = 124L;
+    private static final BudgetParentType BUDGET_AREA_PARENT_TYPE = BudgetParentType.BUSINESS_AREA;
+    private static final Long BUDGET_AREA_PARENT_ID = 1234L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
     private static final Integer FISCAL_YEAR = 2020;
+    private static final Integer FISCAL_YEAR_2 = 2222;
 
     private static final Long ESTIMATED_BUDGET = 100_000L;
     private static final Long ESTIMATED_BUDGET_2 = 200_000L;
@@ -64,6 +72,8 @@ public class BudgetServiceV1Test {
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION = InvoicingTypeOption.FIXED_PRICE;
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION_2 = InvoicingTypeOption.HOURLY_PRICE;
 
+    @Mock private BudgetAreaService budgetAreaService;
+
     @Mock private BudgetRepository repository;
 
     @Mock private BudgetVersionRepository budgetVersionRepository;
@@ -75,36 +85,65 @@ public class BudgetServiceV1Test {
     @Nested
     class CreateBudgetTest {
 
+        @Captor ArgumentCaptor<BudgetArea> budgetAreaCaptor;
         @Captor ArgumentCaptor<BudgetVersion> budgetVersionCaptor;
         @Captor ArgumentCaptor<Budget> budgetCaptor;
+
+        @Test
+        void validateSavedBudgetArea() {
+
+            // Given
+            BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
+            Budget budget = generateBudget(BUDGET_ID);
+            when(budgetAreaService.putBudgetArea(budgetAreaCaptor.capture())).thenReturn(generateBudgetArea());
+            when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
+            when(repository.saveAndFlush(any())).thenReturn(budget);
+
+            // When
+            service.createBudget(budgetAreaParameters, budget);
+
+            // Then
+            assertNotNull(budgetAreaCaptor.getValue());
+            BudgetArea budgetArea = budgetAreaCaptor.getValue();
+            assertEquals(BUDGET_AREA_PARENT_TYPE, budgetArea.getParentType());
+            assertEquals(BUDGET_AREA_PARENT_ID, budgetArea.getParentId());
+            assertEquals(FISCAL_YEAR, budgetArea.getFiscalYear());
+        }
 
         @Test
         void validateSavedBudgetVersion() {
 
             // Given
+            BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
             Budget budget = generateBudget(BUDGET_ID);
+            when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(budgetVersionCaptor.capture()))
                     .thenReturn(generateBudgetVersion());
             when(repository.saveAndFlush(any())).thenReturn(budget);
 
             // When
-            service.createBudget(FISCAL_YEAR, budget);
+            service.createBudget(budgetAreaParameters, budget);
 
             // Then
             assertNotNull(budgetVersionCaptor.getValue());
             BudgetVersion version = budgetVersionCaptor.getValue();
-            assertEquals(FISCAL_YEAR, version.getFiscalYear());
+            assertNotNull(version.getBudgetArea());
+            assertEquals(FISCAL_YEAR.toString(), version.getBudgetVersionName());
+            assertEquals(LocalDate.of(FISCAL_YEAR, 1, 1), version.getBudgetVersionDate());
+            assertEquals(BUDGET_AREA_ID, version.getBudgetArea().getBudgetAreaId());
         }
 
         @Test
         void validateSavedBudget() {
 
             // Given
+            BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
+            when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
             when(repository.saveAndFlush(budgetCaptor.capture())).thenReturn(generateBudget(BUDGET_ID));
 
             // When
-            service.createBudget(FISCAL_YEAR, generateBudget(null));
+            service.createBudget(budgetAreaParameters, generateBudget(null));
 
             // Then
             assertNotNull(budgetCaptor.getValue());
@@ -122,11 +161,13 @@ public class BudgetServiceV1Test {
         void createBudgetWithoutExpenses() {
 
             // Given
+            BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
+            when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
             when(repository.saveAndFlush(any())).thenReturn(generateBudget(BUDGET_ID));
 
             // When
-            Budget budget = service.createBudget(FISCAL_YEAR, generateBudget(null));
+            Budget budget = service.createBudget(budgetAreaParameters, generateBudget(null));
 
             // Then
             assertEquals(BUDGET_ID, budget.getBudgetId());
@@ -143,16 +184,18 @@ public class BudgetServiceV1Test {
         void createBudgetWithExpenses() {
 
             // Given
+            BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
             Budget inputBudget = generateBudget(BUDGET_ID);
             inputBudget.setExpenses(List.of(generateExpenses(null, inputBudget), generateExpenses2(null, inputBudget)));
             Budget outputBudget = generateBudget(BUDGET_ID);
             outputBudget.setExpenses(
                     List.of(generateExpenses(EXPENSE_ID, outputBudget), generateExpenses2(EXPENSE_ID_2, outputBudget)));
+            when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
             when(repository.saveAndFlush(any())).thenReturn(outputBudget);
 
             // When
-            Budget budget = service.createBudget(FISCAL_YEAR, generateBudget(null));
+            Budget budget = service.createBudget(budgetAreaParameters, generateBudget(null));
 
             // Then
             assertEquals(2, budget.getExpenses().size());
@@ -375,6 +418,13 @@ public class BudgetServiceV1Test {
     @Nested
     class PatchBudgetTest {
 
+        @Captor
+        ArgumentCaptor<BudgetArea> budgetAreaCapture;
+        @Captor
+        ArgumentCaptor<BudgetVersion> budgetVersionCapture;
+        @Captor
+        ArgumentCaptor<Budget> budgetCapture;
+
         @Test
         void budgetNotFound() {
 
@@ -441,7 +491,8 @@ public class BudgetServiceV1Test {
             assertTrue(optionalBudget.isPresent());
             Budget budget = optionalBudget.get();
             assertNotNull(budget.getBudgetVersion());
-            assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getFiscalYear());
+            assertNotNull(budget.getBudgetVersion().getBudgetArea());
+            assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
         }
 
         @Test
@@ -458,7 +509,8 @@ public class BudgetServiceV1Test {
             assertTrue(optionalBudget.isPresent());
             Budget budget = optionalBudget.get();
             assertNotNull(budget.getBudgetVersion());
-            assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getFiscalYear());
+            assertNotNull(budget.getBudgetVersion().getBudgetArea());
+            assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
         }
 
         @Test
@@ -469,9 +521,8 @@ public class BudgetServiceV1Test {
             inputBudget.setEstimatedBudget(ESTIMATED_BUDGET_2);
             inputBudget.setInternalCost(INTERNAL_COST_2);
 
-            ArgumentCaptor<Budget> budgetVersionCapture = ArgumentCaptor.forClass(Budget.class);
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(repository.saveAndFlush(budgetVersionCapture.capture())).thenReturn(inputBudget);
+            when(repository.saveAndFlush(budgetCapture.capture())).thenReturn(inputBudget);
 
             // When
             Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
@@ -491,22 +542,30 @@ public class BudgetServiceV1Test {
 
             // Given
             Budget inputBudget = generateBudget(BUDGET_ID);
-            Integer newFiscalYear = 2100;
             BudgetVersion updatedBudgetVersion = generateBudgetVersion();
-            updatedBudgetVersion.setFiscalYear(newFiscalYear);
-            ArgumentCaptor<BudgetVersion> budgetVersionCapture = ArgumentCaptor.forClass(BudgetVersion.class);
+            updatedBudgetVersion.setBudgetArea(generateBudgetArea2());
+
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(inputBudget));
+            when(budgetAreaService.putBudgetArea(budgetAreaCapture.capture())).thenReturn(generateBudgetArea2());
             when(budgetVersionRepository.saveAndFlush(budgetVersionCapture.capture())).thenReturn(updatedBudgetVersion);
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, newFiscalYear, inputBudget);
+            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR_2, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
             Budget budget = optionalBudget.get();
             assertNotNull(budget.getBudgetVersion());
-            assertEquals(newFiscalYear, budget.getBudgetVersion().getFiscalYear());
-            assertEquals(newFiscalYear, budgetVersionCapture.getValue().getFiscalYear());
+            assertEquals(FISCAL_YEAR_2, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
+
+            // Input
+            BudgetArea savedBudgetArea = budgetAreaCapture.getValue();
+            assertNull(savedBudgetArea.getBudgetAreaId());
+            assertEquals(BUDGET_AREA_PARENT_TYPE, savedBudgetArea.getParentType());
+            assertEquals(BUDGET_AREA_PARENT_ID, savedBudgetArea.getParentId());
+            assertEquals(FISCAL_YEAR_2, savedBudgetArea.getFiscalYear());
+
+            assertEquals(BUDGET_AREA_ID_2, budgetVersionCapture.getValue().getBudgetArea().getBudgetAreaId());
         }
     }
 
@@ -778,6 +837,10 @@ public class BudgetServiceV1Test {
         }
     }
 
+    private static BudgetAreaParameters generateBudgetAreaParameters() {
+        return new BudgetAreaParameters(BUDGET_AREA_PARENT_TYPE, BUDGET_AREA_PARENT_ID, FISCAL_YEAR);
+    }
+
     private static Budget generateBudget(Long id) {
         return Budget.builder()
                 .budgetId(id)
@@ -791,12 +854,33 @@ public class BudgetServiceV1Test {
     }
 
     private static BudgetVersion generateBudgetVersion() {
-        BudgetVersion budgetVersion = new BudgetVersion();
-        budgetVersion.setBudgetVersionId(BUDGET_VERSION_ID);
-        budgetVersion.setBudgetVersionName(BUDGET_VERSION_NAME);
-        budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
-        budgetVersion.setFiscalYear(FISCAL_YEAR);
-        return budgetVersion;
+        return BudgetVersion
+                .builder()
+                .budgetVersionId(BUDGET_VERSION_ID)
+                .budgetVersionName(BUDGET_VERSION_NAME)
+                .budgetVersionDate(BUDGET_VERSION_DATE)
+                .budgetArea(generateBudgetArea())
+                .build();
+    }
+
+    private static BudgetArea generateBudgetArea() {
+        return BudgetArea
+                .builder()
+                .budgetAreaId(BUDGET_AREA_ID)
+                .parentType(BUDGET_AREA_PARENT_TYPE)
+                .parentId(BUDGET_AREA_PARENT_ID)
+                .fiscalYear(FISCAL_YEAR)
+                .build();
+    }
+
+    private static BudgetArea generateBudgetArea2() {
+        return BudgetArea
+                .builder()
+                .budgetAreaId(BUDGET_AREA_ID_2)
+                .parentType(BUDGET_AREA_PARENT_TYPE)
+                .parentId(BUDGET_AREA_PARENT_ID)
+                .fiscalYear(FISCAL_YEAR_2)
+                .build();
     }
 
     private static Expenses generateExpenses(Long id, Budget budget) {

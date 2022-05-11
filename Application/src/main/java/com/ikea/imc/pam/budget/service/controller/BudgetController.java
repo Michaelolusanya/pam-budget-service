@@ -89,7 +89,7 @@ public class BudgetController {
     @PostMapping
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> createBudget(@Valid @RequestBody BudgetDTO dto) {
 
-        Budget budget = budgetService.createBudget(dto.getFiscalYear(), budgetMapper.buildBudget(dto));
+        Budget budget = budgetService.createBudget(budgetMapper.buildBudgetAreaParameters(dto), budgetMapper.buildBudget(dto));
 
         return ResponseEntityFactory.generateResponse(HttpStatus.CREATED, budgetMapper.buildBudgetDTO(budget));
     }

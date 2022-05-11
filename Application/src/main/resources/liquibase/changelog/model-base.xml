@@ -27,7 +27,6 @@
             </column>
             <column name="budget_area_id" type="BIGINT"/>
             <column name="budget_version_name" type="VARCHAR(255)"/>
-            <column name="fiscal_year" type="INT"/>
             <column name="budget_version_date" type="DATE"/>
         </createTable>
     </changeSet>

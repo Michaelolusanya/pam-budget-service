@@ -4,10 +4,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.Mockito.when;
 
-import com.ikea.imc.pam.budget.service.client.dto.BudgetDTO;
-import com.ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
-import com.ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
-import com.ikea.imc.pam.budget.service.client.dto.PatchExpenseDTO;
+import com.ikea.imc.pam.budget.service.client.dto.*;
+import com.ikea.imc.pam.budget.service.repository.model.BudgetArea;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
 import com.ikea.imc.pam.common.repository.model.UserInformation;
 import com.ikea.imc.pam.common.service.UserService;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
@@ -30,9 +29,14 @@ class BudgetMapperTest {
 
     private static final Long BUDGET_ID = 1L;
     private static final Long BUDGET_VERSION_ID = 3L;
+    private static final Long BUDGET_AREA_ID = 300L;
     private static final Long PROJECT_ID = 2L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
     private static final Long PRICE_ITEM_ID = 5L;
+
+    private static final BudgetParentType BUDGET_PARENT_TYPE = BudgetParentType.BUSINESS_AREA;
+
+    private static final Long BUDGET_AREA_PARENT_ID = 3456L;
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
@@ -111,6 +115,21 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_UNITS, dto.getUnitCount());
         assertEquals(EXPENSE_COMMENT, dto.getComment());
         assertEquals(EXPENSES_INVOICINGTYPEOPTION.getDescription(), dto.getPriceModel());
+    }
+
+    @Test
+    void buildBudgetAreaParameters() {
+
+        // Given
+        BudgetDTO dto = generateBudgetDTO();
+
+        // When
+        BudgetAreaParameters budgetAreaParameters = budgetMapper.buildBudgetAreaParameters(dto);
+
+        // Then
+        assertEquals(BUDGET_PARENT_TYPE, budgetAreaParameters.parentType());
+        assertEquals(BUDGET_AREA_PARENT_ID, budgetAreaParameters.parentId());
+        assertEquals(FISCAL_YEAR, budgetAreaParameters.fiscalYear());
     }
 
     @Test
@@ -201,14 +220,24 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
     }
 
-    private static BudgetVersion generateBudgetVersion() {
-        BudgetVersion budgetVersion = new BudgetVersion();
-        budgetVersion.setBudgetVersionId(BUDGET_VERSION_ID);
-        budgetVersion.setBudgetVersionName(BUDGET_VERSION_NAME);
-        budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
-        budgetVersion.setFiscalYear(FISCAL_YEAR);
+    private static BudgetArea generateBudgetArea() {
+        return BudgetArea
+                .builder()
+                .budgetAreaId(BUDGET_AREA_ID)
+                .parentType(BUDGET_PARENT_TYPE)
+                .parentId(BUDGET_AREA_PARENT_ID)
+                .fiscalYear(FISCAL_YEAR)
+                .build();
+    }
 
-        return budgetVersion;
+    private static BudgetVersion generateBudgetVersion() {
+        return BudgetVersion
+                .builder()
+                .budgetVersionId(BUDGET_VERSION_ID)
+                .budgetVersionName(BUDGET_VERSION_NAME)
+                .budgetVersionDate(BUDGET_VERSION_DATE)
+                .budgetArea(generateBudgetArea())
+                .build();
     }
 
     private static Budget generateBudget() {
@@ -254,6 +283,8 @@ class BudgetMapperTest {
     private static BudgetDTO generateBudgetDTO() {
         return BudgetDTO.builder()
                 .id(BUDGET_ID)
+                .parentType(BUDGET_PARENT_TYPE)
+                .parentId(BUDGET_AREA_PARENT_ID)
                 .projectId(PROJECT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)

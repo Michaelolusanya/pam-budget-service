@@ -5,6 +5,7 @@ import com.ikea.imc.pam.budget.service.repository.BudgetRepository;
 import com.ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
 import com.ikea.imc.pam.budget.service.repository.ExpensesRepository;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
+import com.ikea.imc.pam.budget.service.repository.model.BudgetArea;
 import com.ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import com.ikea.imc.pam.budget.service.repository.model.Expenses;
 import com.ikea.imc.pam.budget.service.repository.model.utils.Status;
@@ -16,6 +17,8 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -23,27 +26,32 @@ import org.springframework.stereotype.Service;
 @Service
 public class BudgetServiceV1 implements BudgetService {
 
+    private final BudgetAreaService budgetAreaService;
     private final BudgetRepository repository;
     private final BudgetVersionRepository budgetVersionRepository;
     private final ExpensesRepository expensesRepository;
 
     public BudgetServiceV1(
+            BudgetAreaService budgetAreaService,
             BudgetRepository repository,
             BudgetVersionRepository budgetVersionRepository,
             ExpensesRepository expensesRepository) {
+        this.budgetAreaService = budgetAreaService;
         this.repository = repository;
         this.budgetVersionRepository = budgetVersionRepository;
         this.expensesRepository = expensesRepository;
     }
 
     @Override
-    public Budget createBudget(Integer fiscalYear, Budget budget) {
+    public Budget createBudget(BudgetAreaParameters budgetAreaParameters, Budget budget) {
+
+        BudgetArea budgetArea = budgetAreaService.putBudgetArea(BudgetArea.toBudgetArea(budgetAreaParameters));
 
         BudgetVersion budgetVersion =
                 BudgetVersion.builder()
-                        .fiscalYear(fiscalYear)
-                        .budgetVersionName(fiscalYear.toString())
-                        .budgetVersionDate(LocalDate.of(fiscalYear, 1, 1))
+                        .budgetArea(budgetArea)
+                        .budgetVersionName(budgetAreaParameters.fiscalYear().toString())
+                        .budgetVersionDate(LocalDate.of(budgetAreaParameters.fiscalYear(), 1, 1))
                         .build();
         budgetVersion = budgetVersionRepository.saveAndFlush(budgetVersion);
 
@@ -98,17 +106,30 @@ public class BudgetServiceV1 implements BudgetService {
             budget = repository.saveAndFlush(budget);
         }
 
-        if (fiscalYear != null
-                && fiscalYear != 0
-                && optionalBudget.get().getBudgetVersion().getFiscalYear() != fiscalYear) {
+        if (isBudgetAreaChanged(optionalBudget.get(), fiscalYear)) {
             // Implemented with the assumption that one budget version only has one budget connected to it
             log.debug("Fiscal year is changed and the budget version is updated for budget with id {}", budgetId);
             BudgetVersion budgetVersion = optionalBudget.get().getBudgetVersion();
-            budgetVersion.setFiscalYear(fiscalYear);
+
+            BudgetAreaParameters budgetAreaParameters = new BudgetAreaParameters(
+                    budgetVersion.getBudgetArea().getParentType(),
+                    budgetVersion.getBudgetArea().getParentId(),
+                    fiscalYear);
+            BudgetArea budgetArea = budgetAreaService.putBudgetArea(BudgetArea.toBudgetArea(budgetAreaParameters));
+
+            budgetVersion.setBudgetArea(budgetArea);
             budgetVersionRepository.saveAndFlush(budgetVersion);
         }
 
         return Optional.of(budget);
+    }
+
+    private boolean isBudgetAreaChanged(Budget budget, Integer fiscalYear) {
+        if (fiscalYear == null ||fiscalYear == 0) {
+            return false;
+        }
+
+        return !Objects.equals(budget.getBudgetVersion().getBudgetArea().getFiscalYear(), fiscalYear);
     }
 
     @Override

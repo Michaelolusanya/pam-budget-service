@@ -44,9 +44,8 @@ public class BudgetAreaServiceV1 implements BudgetAreaService {
                 budgetArea.getFiscalYear());
         Optional<BudgetArea> currentBudgetAreaOptional = findBudgetArea(budgetAreaParameters);
 
-        BudgetArea currentBudgetArea = currentBudgetAreaOptional.isPresent() ?
-                BudgetArea.merge(currentBudgetAreaOptional.get(), budgetArea) :
-                budgetArea;
+        BudgetArea currentBudgetArea = currentBudgetAreaOptional.isPresent()
+                ? BudgetArea.merge(currentBudgetAreaOptional.get(), budgetArea) : budgetArea;
 
         log.debug("Save BudgetArea {}", currentBudgetArea);
 

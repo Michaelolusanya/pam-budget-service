@@ -10,6 +10,7 @@ import com.ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOptio
 
 import javax.validation.Valid;
 
+import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
 import com.ikea.imc.pam.common.service.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -27,8 +28,10 @@ public class BudgetMapper {
     public BudgetDTO buildBudgetDTO(Budget budget) {
         return BudgetDTO.builder()
                 .id(budget.getBudgetId())
+                .parentType(budget.getBudgetVersion().getBudgetArea().getParentType())
+                .parentId(budget.getBudgetVersion().getBudgetArea().getParentId())
                 .projectId(budget.getProjectId())
-                .fiscalYear(budget.getBudgetVersion().getFiscalYear())
+                .fiscalYear(budget.getBudgetVersion().getBudgetArea().getFiscalYear())
                 .estimatedCost(budget.getEstimatedBudget())
                 .internalCost(budget.getInternalCost())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
@@ -49,6 +52,10 @@ public class BudgetMapper {
                 .comment(expenses.getComment())
                 .priceModel(expenses.toInvoicingTypeName())
                 .build();
+    }
+
+    public BudgetAreaParameters buildBudgetAreaParameters(@Valid BudgetDTO budgetDTO) {
+        return new BudgetAreaParameters(budgetDTO.getParentType(), budgetDTO.getParentId(), budgetDTO.getFiscalYear());
     }
 
     public Budget buildBudget(@Valid BudgetDTO dto) {

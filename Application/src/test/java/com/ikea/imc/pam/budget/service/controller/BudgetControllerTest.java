@@ -8,6 +8,7 @@ import com.ikea.imc.pam.budget.service.client.dto.*;
 import com.ikea.imc.pam.budget.service.configuration.BudgetMapper;
 import com.ikea.imc.pam.budget.service.exception.NotFoundException;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
+import com.ikea.imc.pam.budget.service.repository.model.BudgetArea;
 import com.ikea.imc.pam.budget.service.repository.model.BudgetVersion;
 import com.ikea.imc.pam.budget.service.repository.model.Expenses;
 import com.ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
 import com.ikea.imc.pam.common.dto.ResponseMessageDTO;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -37,7 +39,10 @@ public class BudgetControllerTest {
 
     private static final Long BUDGET_ID = 1L;
     private static final Long BUDGET_VERSION_ID = 3L;
+    private static final Long BUDGET_AREA_ID = 1234L;
     private static final Long PROJECT_ID = 2L;
+    private static final BudgetParentType BUDGET_PARENT_TYPE = BudgetParentType.BUSINESS_AREA;
+    private static final Long BUDGET_PARENT_ID = 123L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
     private static final Long PRICE_ITEM_ID = 5L;
 
@@ -284,24 +289,32 @@ public class BudgetControllerTest {
     @Nested
     class CreateBudgetTest {
 
+        @Captor
+        private ArgumentCaptor<BudgetAreaParameters> budgetAreaParametersCaptor;
+        @Captor
+        private ArgumentCaptor<Budget> budgetCaptor;
+
         @Test
         void createBudgetInputTest() {
 
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
-            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
-            ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
+            when(budgetService.createBudget(budgetAreaParametersCaptor.capture(), budgetCaptor.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
             when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID));
+            when(budgetMapper.buildBudgetAreaParameters(requestBudgetDTO)).thenReturn(generateBudgetAreaParameters());
 
             // When
             controller.createBudget(requestBudgetDTO);
 
             // Then
-            assertNotNull(inputBudget.getValue());
-            Budget budget = inputBudget.getValue();
-            assertEquals(FISCAL_YEAR, inputFiscalYear.getValue());
+            BudgetAreaParameters budgetAreaParameters = budgetAreaParametersCaptor.getValue();
+            assertNotNull(budgetAreaParameters);
+            assertEquals(BUDGET_PARENT_TYPE, budgetAreaParameters.parentType());
+            assertEquals(BUDGET_PARENT_ID, budgetAreaParameters.parentId());
+
+            assertNotNull(budgetCaptor.getValue());
+            Budget budget = budgetCaptor.getValue();
             assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
         }
 
@@ -310,11 +323,10 @@ public class BudgetControllerTest {
 
             // Given
             BudgetDTO requestBudgetDTO = generateRequestBudget();
-            ArgumentCaptor<Integer> inputFiscalYear = ArgumentCaptor.forClass(Integer.class);
-            ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
-            when(budgetService.createBudget(inputFiscalYear.capture(), inputBudget.capture()))
+            when(budgetService.createBudget(any(), any()))
                     .thenReturn(generateBudget(BUDGET_ID));
             when(budgetMapper.buildBudgetDTO(any())).thenReturn(generateBudgetDTO(BUDGET_ID));
+            when(budgetMapper.buildBudgetAreaParameters(requestBudgetDTO)).thenReturn(generateBudgetAreaParameters());
 
             // When
             ResponseEntity<ResponseMessageDTO<BudgetDTO>> response = controller.createBudget(requestBudgetDTO);
@@ -618,6 +630,10 @@ public class BudgetControllerTest {
         }
     }
 
+    private static BudgetAreaParameters generateBudgetAreaParameters() {
+        return new BudgetAreaParameters(BUDGET_PARENT_TYPE, BUDGET_PARENT_ID, FISCAL_YEAR);
+    }
+
     private static PatchBudgetDTO generateRequestPatchBudget() {
         return PatchBudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
@@ -647,6 +663,8 @@ public class BudgetControllerTest {
         return BudgetDTO.builder()
                 .id(id)
                 .projectId(PROJECT_ID)
+                .parentType(BUDGET_PARENT_TYPE)
+                .parentId(BUDGET_PARENT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
                 .internalCost(INTERNAL_COST)
@@ -726,12 +744,22 @@ public class BudgetControllerTest {
     }
 
     private static BudgetVersion generateBudgetVersion() {
-        BudgetVersion budgetVersion = new BudgetVersion();
-        budgetVersion.setBudgetVersionId(BUDGET_VERSION_ID);
-        budgetVersion.setBudgetVersionName(BUDGET_VERSION_NAME);
-        budgetVersion.setBudgetVersionDate(BUDGET_VERSION_DATE);
-        budgetVersion.setFiscalYear(FISCAL_YEAR);
+        return BudgetVersion
+                .builder()
+                .budgetVersionId(BUDGET_VERSION_ID)
+                .budgetVersionName(BUDGET_VERSION_NAME)
+                .budgetVersionDate(BUDGET_VERSION_DATE)
+                .budgetArea(generateBudgetArea())
+                .build();
+    }
 
-        return budgetVersion;
+    private static BudgetArea generateBudgetArea() {
+        return BudgetArea
+                .builder()
+                .budgetAreaId(BUDGET_AREA_ID)
+                .parentType(BUDGET_PARENT_TYPE)
+                .parentId(BUDGET_PARENT_ID)
+                .fiscalYear(FISCAL_YEAR)
+                .build();
     }
 }
