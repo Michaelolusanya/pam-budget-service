@@ -18,6 +18,7 @@ import com.ikea.imc.pam.budget.service.client.BudgetClient;
 import com.ikea.imc.pam.budget.service.client.dto.*;
 import com.ikea.imc.pam.budget.service.AbstractBaseTest;
 import java.util.List;
+import java.util.Optional;
 
 import com.ikea.imc.pam.common.dto.ErrorDTO;
 import com.ikea.imc.pam.common.dto.ResponseMessageDTO;
@@ -378,6 +379,172 @@ class RestEndpointTests extends AbstractBaseTest {
 
         // Then
         assertEquals(HttpStatus.NOT_FOUND, exception.getStatusCode());
+    }
+
+    @Nested
+    class BudgetAreaRestEndpointTests extends AbstractBaseTest {
+
+        @Nested
+        class GetBudgetAreaTest {
+
+            @Test
+            void existingBudgetArea() {
+
+                // Given
+                BudgetAreaDTO existingDTO = budgetClient.putBudgetArea(generateMinimalBudgetDTO());
+
+                // When
+                Optional<BudgetAreaDTO> optionalBudgetArea = budgetClient.getBudgetArea(existingDTO.budgetAreaId());
+
+                // Then
+                assertTrue(optionalBudgetArea.isPresent());
+                assertEquals(existingDTO.budgetAreaId(), optionalBudgetArea.get().budgetAreaId());
+            }
+
+            @Test
+            void notFoundBudgetArea() {
+
+                // Given
+                Long budgetAreaId = Long.MAX_VALUE;
+
+                // When
+                ClientRequestException requestException = assertThrows(ClientRequestException.class, () -> budgetClient.getBudgetArea(budgetAreaId));
+
+                // Then
+                assertEquals(HttpStatus.NOT_FOUND, requestException.getStatusCode());
+            }
+        }
+
+        @Nested
+        class FindBudgetAreaTest {
+
+            @Test
+            void existingBudgetArea() {
+
+                // Given
+                BudgetAreaDTO existingDTO = budgetClient.putBudgetArea(generateMinimalBudgetDTO());
+
+                // When
+                Optional<BudgetAreaDTO> optionalBudgetArea = budgetClient.findBudgetArea(existingDTO.parentType(), existingDTO.parentId(), existingDTO.fiscalYear());
+
+                // Then
+                assertTrue(optionalBudgetArea.isPresent());
+                assertEquals(existingDTO.budgetAreaId(), optionalBudgetArea.get().budgetAreaId());
+            }
+
+            @Test
+            void notFoundBudgetArea() {
+
+                // Given
+                BudgetParentType parentType = BudgetParentType.DEPARTMENT;
+                Long parentId = Long.MAX_VALUE;
+                Integer fiscalYear = MAXIMUM_YEAR;
+
+                // When
+                ClientRequestException requestException = assertThrows(ClientRequestException.class, () -> budgetClient.findBudgetArea(parentType, parentId, fiscalYear));
+
+                // Then
+                assertEquals(HttpStatus.NOT_FOUND, requestException.getStatusCode());
+            }
+
+            @Test
+            void invalidSearchParameters() {
+
+                // Given
+                BudgetParentType parentType = BudgetParentType.DEPARTMENT;
+                Long parentId = -1L;
+                Integer fiscalYear = 1000;
+
+                // When
+                ClientRequestException requestException = assertThrows(ClientRequestException.class, () -> budgetClient.findBudgetArea(parentType, parentId, fiscalYear));
+
+                // Then
+                assertEquals(HttpStatus.BAD_REQUEST, requestException.getStatusCode());
+                var responseMessage = requestException.getBody();
+                assertNotNull(responseMessage);
+                assertEquals(2, responseMessage.getErrors().size());
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "fiscalYear".equals(error.getPointer())));
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "parentId".equals(error.getPointer())));
+            }
+        }
+
+        @Nested
+        class PutBudgetAreaTest {
+
+            @Test
+            void newBudgetArea() {
+
+                // Given
+                BudgetAreaDTO toCreateDto = BudgetAreaDTO
+                        .builder()
+                        .parentId(1234L)
+                        .parentType(BudgetParentType.DEPARTMENT)
+                        .fiscalYear(2000)
+                        .costLimit(MINIMUM_COST)
+                        .build();
+
+                // When
+                BudgetAreaDTO dto = budgetClient.putBudgetArea(toCreateDto);
+
+                // Then
+                assertEquals(1234L, dto.parentId());
+                assertEquals(BudgetParentType.DEPARTMENT, dto.parentType());
+                assertEquals(2000, dto.fiscalYear());
+                assertEquals(MINIMUM_COST, dto.costLimit());
+            }
+
+            @Test
+            void updateBudgetArea() {
+
+                // Given
+                BudgetAreaDTO createdDTO = budgetClient.putBudgetArea(generateMinimalBudgetDTO());
+                BudgetAreaDTO updatedDTO = createdDTO.toBuilder().costLimit(300000L).build();
+
+                // When
+                BudgetAreaDTO dto = budgetClient.putBudgetArea(updatedDTO);
+
+                // Then
+                assertEquals(MINIMUM_ID, dto.parentId());
+                assertEquals(MINIMUM_YEAR, dto.fiscalYear());
+                assertEquals(300000L, dto.costLimit());
+            }
+
+            @Test
+            void invalidBudgetArea() {
+
+                // Given
+                BudgetAreaDTO dto = BudgetAreaDTO
+                        .builder()
+                        .parentType(null)
+                        .parentId(-1L)
+                        .fiscalYear(-1)
+                        .costLimit(-1L)
+                        .build();
+
+                // When
+                ClientRequestException exception = assertThrows(ClientRequestException.class, () -> budgetClient.putBudgetArea(dto));
+
+                // Then
+                assertEquals(HttpStatus.BAD_REQUEST, exception.getStatusCode());
+                var responseMessage = exception.getBody();
+                assertNotNull(responseMessage);
+                assertEquals(4, responseMessage.getErrors().size());
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "parentType".equals(error.getPointer())));
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "parentId".equals(error.getPointer())));
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "fiscalYear".equals(error.getPointer())));
+                assertTrue(responseMessage.getErrors().stream().anyMatch(error -> "costLimit".equals(error.getPointer())));
+            }
+        }
+
+        private static BudgetAreaDTO generateMinimalBudgetDTO() {
+            return BudgetAreaDTO
+                    .builder()
+                    .parentId(MINIMUM_ID)
+                    .parentType(BudgetParentType.BUSINESS_AREA)
+                    .fiscalYear(MINIMUM_YEAR)
+                    .costLimit(MINIMUM_COST)
+                    .build();
+        }
     }
 
     private BudgetDTO.BudgetDTOBuilder minimalBudgetBuilder(Long projectId, Integer fiscalYear) {
