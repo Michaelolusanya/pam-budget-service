@@ -23,6 +23,7 @@ public class BudgetArea extends AbstractEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long budgetAreaId;
 
+    @Enumerated(EnumType.STRING)
     private BudgetParentType parentType;
 
     private Long parentId;
