@@ -33,7 +33,6 @@ public class BudgetMapper {
                 .projectId(budget.getProjectId())
                 .fiscalYear(budget.getBudgetVersion().getBudgetArea().getFiscalYear())
                 .estimatedCost(budget.getEstimatedBudget())
-                .internalCost(budget.getInternalCost())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
                 .lastUpdatedAt(budget.getLastUpdated())
                 .expenses(budget.getExpenses().stream().map(this::buildExpenseDTO).toList())
@@ -64,7 +63,6 @@ public class BudgetMapper {
                         .budgetId(dto.getId())
                         .projectId(dto.getProjectId())
                         .estimatedBudget(dto.getEstimatedCost())
-                        .internalCost(dto.getInternalCost())
                         .build();
 
         if (dto.getExpenses() != null) {
@@ -78,7 +76,7 @@ public class BudgetMapper {
     }
 
     public Budget buildBudget(PatchBudgetDTO dto) {
-        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).internalCost(dto.getInternalCost()).build();
+        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).build();
     }
 
     private Expenses buildExpense(Budget budget, ExpenseDTO dto) {

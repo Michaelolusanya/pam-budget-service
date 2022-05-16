@@ -170,7 +170,6 @@ class RestEndpointTests extends AbstractBaseTest {
                 PatchBudgetDTO.builder()
                         .fiscalYear(MAXIMUM_YEAR)
                         .estimatedCost(MAXIMUM_COST)
-                        .internalCost(MINIMUM_COST + 1.0)
                         .build();
 
         var res = budgetClient.updateBudget(budgetId, patchBudgetDTO);
@@ -179,7 +178,6 @@ class RestEndpointTests extends AbstractBaseTest {
         assertNotNull(res);
         assertEquals(testData.projectId, res.getProjectId());
         assertEquals(MAXIMUM_YEAR, res.getFiscalYear());
-        assertEquals(MINIMUM_COST + 1.0, res.getInternalCost());
     }
 
     @Test
@@ -189,7 +187,6 @@ class RestEndpointTests extends AbstractBaseTest {
                 PatchBudgetDTO.builder()
                         .fiscalYear(MAXIMUM_YEAR)
                         .estimatedCost(MAXIMUM_COST)
-                        .internalCost(MINIMUM_COST + 1.0)
                         .build();
 
         // WHEN (REST call to budget-service to get nonexistent budget)

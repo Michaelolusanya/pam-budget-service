@@ -122,7 +122,6 @@ public class BudgetControllerTest {
                     LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS),
                     dto.getLastUpdatedAt());
             assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
-            assertEquals(INTERNAL_COST, dto.getInternalCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
             assertEquals(0, dto.getExpenses().size());
@@ -399,7 +398,6 @@ public class BudgetControllerTest {
             assertEquals(FISCAL_YEAR, inputFiscalYear.getValue());
             assertNotNull(budget);
             assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
         }
 
         @Test
@@ -426,7 +424,6 @@ public class BudgetControllerTest {
             assertNotNull(dto);
 
             assertEquals(BUDGET_ID, dto.getId());
-            assertEquals(INTERNAL_COST, dto.getInternalCost());
             assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
             assertEquals(FISCAL_YEAR, dto.getFiscalYear());
             assertEquals(
@@ -638,7 +635,6 @@ public class BudgetControllerTest {
         return PatchBudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
                 .fiscalYear(FISCAL_YEAR)
-                .internalCost(INTERNAL_COST)
                 .build();
     }
 
@@ -646,7 +642,6 @@ public class BudgetControllerTest {
         return BudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
                 .fiscalYear(FISCAL_YEAR)
-                .internalCost(INTERNAL_COST)
                 .build();
     }
 
@@ -667,7 +662,6 @@ public class BudgetControllerTest {
                 .parentId(BUDGET_PARENT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
-                .internalCost(INTERNAL_COST)
                 .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())
@@ -730,7 +724,6 @@ public class BudgetControllerTest {
                 Budget.builder()
                         .budgetId(id)
                         .estimatedBudget(ESTIMATED_BUDGET)
-                        .internalCost(INTERNAL_COST)
                         .projectId(PROJECT_ID)
                         .budgetVersion(generateBudgetVersion())
                         .expenses(List.of())

@@ -151,7 +151,6 @@ public class BudgetServiceV1Test {
             assertNull(budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
             assertNotNull(budget.getBudgetVersion());
             assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
@@ -173,7 +172,6 @@ public class BudgetServiceV1Test {
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
             assertNotNull(budget.getBudgetVersion());
             assertEquals(BUDGET_VERSION_ID, budget.getBudgetVersion().getBudgetVersionId());
@@ -242,7 +240,6 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(PROJECT_ID, budget.getProjectId());
         }
     }
@@ -454,7 +451,6 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -473,7 +469,6 @@ public class BudgetServiceV1Test {
             Budget budget = optionalBudget.get();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
-            assertEquals(INTERNAL_COST, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -519,7 +514,6 @@ public class BudgetServiceV1Test {
             // Given
             Budget inputBudget = generateBudget(BUDGET_ID);
             inputBudget.setEstimatedBudget(ESTIMATED_BUDGET_2);
-            inputBudget.setInternalCost(INTERNAL_COST_2);
 
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
             when(repository.saveAndFlush(budgetCapture.capture())).thenReturn(inputBudget);
@@ -533,7 +527,6 @@ public class BudgetServiceV1Test {
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET_2, budget.getEstimatedBudget());
-            assertEquals(INTERNAL_COST_2, budget.getInternalCost());
             assertEquals(Status.ACTIVE, budget.getStatus());
         }
 
@@ -845,7 +838,6 @@ public class BudgetServiceV1Test {
         return Budget.builder()
                 .budgetId(id)
                 .estimatedBudget(ESTIMATED_BUDGET)
-                .internalCost(INTERNAL_COST)
                 .projectId(PROJECT_ID)
                 .status(Status.ACTIVE)
                 .budgetVersion(generateBudgetVersion())

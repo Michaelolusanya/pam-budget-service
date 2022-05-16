@@ -87,7 +87,6 @@ class BudgetMapperTest {
         assertEquals(PROJECT_ID, dto.getProjectId());
         assertEquals(FISCAL_YEAR, dto.getFiscalYear());
         assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
-        assertEquals(INTERNAL_COST, dto.getInternalCost());
         assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
         assertEquals(
                 LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS), dto.getLastUpdatedAt());
@@ -145,7 +144,6 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, budget.getBudgetId());
         assertEquals(PROJECT_ID, budget.getProjectId());
         assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-        assertEquals(INTERNAL_COST, budget.getInternalCost());
     }
 
     @Test
@@ -162,7 +160,6 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, budget.getBudgetId());
         assertEquals(PROJECT_ID, budget.getProjectId());
         assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
-        assertEquals(INTERNAL_COST, budget.getInternalCost());
         assertNotNull(budget.getExpenses());
         assertEquals(1, budget.getExpenses().size());
         assertEquals(EXPENSE_ID, budget.getExpenses().get(0).getExpensesId());
@@ -179,7 +176,6 @@ class BudgetMapperTest {
 
         // Then
         assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
-        assertEquals(INTERNAL_COST, budget.getInternalCost());
     }
 
     @Test
@@ -245,7 +241,6 @@ class BudgetMapperTest {
                 Budget.builder()
                         .budgetId(BUDGET_ID)
                         .estimatedBudget(ESTIMATED_BUDGET)
-                        .internalCost(INTERNAL_COST)
                         .projectId(PROJECT_ID)
                         .budgetVersion(generateBudgetVersion())
                         .expenses(List.of())
@@ -288,7 +283,6 @@ class BudgetMapperTest {
                 .projectId(PROJECT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
-                .internalCost(INTERNAL_COST)
                 .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())
@@ -313,7 +307,6 @@ class BudgetMapperTest {
         return PatchBudgetDTO.builder()
                 .estimatedCost(ESTIMATED_COST)
                 .fiscalYear(FISCAL_YEAR)
-                .internalCost(INTERNAL_COST)
                 .build();
     }
 
