@@ -6,6 +6,6 @@
                       http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.9.xsd">
 
         <changeSet id="drop-column-internal-cost-from-budget" author="martin">
-            <dropColumn columnName="internal_cost" schemaName="public" tableName="budget" />
+            <dropColumn columnName="internal_cost" tableName="budget" />
         </changeSet>
 </databaseChangeLog>
