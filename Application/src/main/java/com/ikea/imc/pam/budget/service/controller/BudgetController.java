@@ -5,6 +5,7 @@ import com.ikea.imc.pam.budget.service.client.dto.BudgetDTO;
 import com.ikea.imc.pam.budget.service.client.dto.ExpenseBatchDTO;
 import com.ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
 import com.ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import com.ikea.imc.pam.common.dto.ResponseMessageDTO;
 
 
@@ -89,7 +90,7 @@ public class BudgetController {
     @PostMapping
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> createBudget(@Valid @RequestBody BudgetDTO dto) {
 
-        Budget budget = budgetService.createBudget(budgetMapper.buildBudgetAreaParameters(dto), budgetMapper.buildBudget(dto));
+        BudgetContent budget = budgetService.createBudget(budgetMapper.buildBudgetAreaParameters(dto), budgetMapper.buildBudget(dto));
 
         return ResponseEntityFactory.generateResponse(HttpStatus.CREATED, budgetMapper.buildBudgetDTO(budget));
     }
@@ -116,16 +117,16 @@ public class BudgetController {
     @PostMapping("/{id}/expenses")
     public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> createExpense(
             @PathVariable Long id, @Valid @RequestBody ExpenseDTO dto) {
-        Optional<Budget> optionalBudget = budgetService.getById(id);
+        Optional<BudgetContent> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
             log.warn("Could not create expenses, could not find budget with id {}", id);
             return getBudgetNotFoundResponse(id);
         }
 
-        Expenses expenses = budgetMapper.buildExpense(dto);
-        var budgetDTO = budgetMapper.buildExpenseDTO(budgetService.createExpenses(optionalBudget.get(), expenses));
+        Expenses expenses = budgetService.createExpenses(optionalBudget.get().budget(), budgetMapper.buildExpense(dto));
+        ExpenseDTO expenseDTO = budgetMapper.buildExpenseDTO(expenses);
 
-        return ResponseEntityFactory.generateResponse(HttpStatus.CREATED, budgetDTO);
+        return ResponseEntityFactory.generateResponse(HttpStatus.CREATED, expenseDTO);
     }
 
     @Operation(summary = "Update a set of budget expenses by budgetId")
@@ -133,7 +134,7 @@ public class BudgetController {
     public ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> updateExpense(
             @PathVariable Long id, @Valid @RequestBody ExpenseBatchDTO dto) {
 
-        Optional<Budget> optionalBudget = budgetService.getById(id);
+        Optional<BudgetContent> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
             log.warn("Could not update expenses, could not find budget with id {}", id);
             return getBudgetNotFoundResponse(id);
@@ -141,10 +142,10 @@ public class BudgetController {
 
         List<Expenses> expenses = dto.getData().stream().map(budgetMapper::buildExpense).toList();
 
-        Budget budget = optionalBudget.get();
+        BudgetContent budget = optionalBudget.get();
         return ResponseEntityFactory.generateResponse(
                 HttpStatus.OK,
-                budgetService.patchExpenses(budget, expenses).stream()
+                budgetService.patchExpenses(budget.budget(), expenses).stream()
                         .map(budgetMapper::buildExpenseDTO)
                         .toList());
     }

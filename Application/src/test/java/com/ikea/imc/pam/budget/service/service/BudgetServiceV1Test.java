@@ -24,6 +24,7 @@ import java.util.List;
 import java.util.Optional;
 
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -94,13 +95,13 @@ public class BudgetServiceV1Test {
 
             // Given
             BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             when(budgetAreaService.putBudgetArea(budgetAreaCaptor.capture())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
-            when(repository.saveAndFlush(any())).thenReturn(budget);
+            when(repository.saveAndFlush(any())).thenReturn(budget.budget());
 
             // When
-            service.createBudget(budgetAreaParameters, budget);
+            service.createBudget(budgetAreaParameters, budget.budget());
 
             // Then
             assertNotNull(budgetAreaCaptor.getValue());
@@ -115,14 +116,14 @@ public class BudgetServiceV1Test {
 
             // Given
             BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(budgetVersionCaptor.capture()))
                     .thenReturn(generateBudgetVersion());
-            when(repository.saveAndFlush(any())).thenReturn(budget);
+            when(repository.saveAndFlush(any())).thenReturn(budget.budget());
 
             // When
-            service.createBudget(budgetAreaParameters, budget);
+            service.createBudget(budgetAreaParameters, budget.budget());
 
             // Then
             assertNotNull(budgetVersionCaptor.getValue());
@@ -140,10 +141,10 @@ public class BudgetServiceV1Test {
             BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
             when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
-            when(repository.saveAndFlush(budgetCaptor.capture())).thenReturn(generateBudget(BUDGET_ID));
+            when(repository.saveAndFlush(budgetCaptor.capture())).thenReturn(generateBudget(BUDGET_ID).budget());
 
             // When
-            service.createBudget(budgetAreaParameters, generateBudget(null));
+            service.createBudget(budgetAreaParameters, generateBudget(null).budget());
 
             // Then
             assertNotNull(budgetCaptor.getValue());
@@ -163,12 +164,13 @@ public class BudgetServiceV1Test {
             BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
             when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
-            when(repository.saveAndFlush(any())).thenReturn(generateBudget(BUDGET_ID));
+            when(repository.saveAndFlush(any())).thenReturn(generateBudget(BUDGET_ID).budget());
 
             // When
-            Budget budget = service.createBudget(budgetAreaParameters, generateBudget(null));
+            BudgetContent budgetContent = service.createBudget(budgetAreaParameters, generateBudget(null).budget());
 
             // Then
+            Budget budget = budgetContent.budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
@@ -183,19 +185,20 @@ public class BudgetServiceV1Test {
 
             // Given
             BudgetAreaParameters budgetAreaParameters = generateBudgetAreaParameters();
-            Budget inputBudget = generateBudget(BUDGET_ID);
-            inputBudget.setExpenses(List.of(generateExpenses(null, inputBudget), generateExpenses2(null, inputBudget)));
-            Budget outputBudget = generateBudget(BUDGET_ID);
-            outputBudget.setExpenses(
+            BudgetContent inputBudget = generateBudget(BUDGET_ID);
+            inputBudget.budget().setExpenses(List.of(generateExpenses(null, inputBudget), generateExpenses2(null, inputBudget)));
+            BudgetContent outputBudget = generateBudget(BUDGET_ID);
+            outputBudget.budget().setExpenses(
                     List.of(generateExpenses(EXPENSE_ID, outputBudget), generateExpenses2(EXPENSE_ID_2, outputBudget)));
             when(budgetAreaService.putBudgetArea(any())).thenReturn(generateBudgetArea());
             when(budgetVersionRepository.saveAndFlush(any())).thenReturn(generateBudgetVersion());
-            when(repository.saveAndFlush(any())).thenReturn(outputBudget);
+            when(repository.saveAndFlush(any())).thenReturn(outputBudget.budget());
 
             // When
-            Budget budget = service.createBudget(budgetAreaParameters, generateBudget(null));
+            BudgetContent budgetContent = service.createBudget(budgetAreaParameters, generateBudget(null).budget());
 
             // Then
+            Budget budget = budgetContent.budget();
             assertEquals(2, budget.getExpenses().size());
             Expenses expenses = budget.getExpenses().get(0);
             assertEquals(EXPENSE_ID, expenses.getExpensesId());
@@ -220,7 +223,7 @@ public class BudgetServiceV1Test {
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.empty());
 
             // When
-            Optional<Budget> optionalBudget = service.getById(BUDGET_ID);
+            Optional<BudgetContent> optionalBudget = service.getById(BUDGET_ID);
 
             // Then
             assertTrue(optionalBudget.isEmpty());
@@ -230,14 +233,14 @@ public class BudgetServiceV1Test {
         void oneFound() {
 
             // Given
-            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID).budget()));
 
             // When
-            Optional<Budget> optionalBudget = service.getById(BUDGET_ID);
+            Optional<BudgetContent> optionalBudget = service.getById(BUDGET_ID);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
             assertEquals(PROJECT_ID, budget.getProjectId());
@@ -251,10 +254,12 @@ public class BudgetServiceV1Test {
         void nullInput() {
 
             // Given
-            when(repository.getAllActive()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+            when(repository.getAllActive()).thenReturn(List.of(
+                    generateBudget(BUDGET_ID).budget(),
+                    generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(null, null);
+            List<BudgetContent> budgets = service.listBudgets(null, null);
 
             // Then
             assertEquals(2, budgets.size());
@@ -266,10 +271,12 @@ public class BudgetServiceV1Test {
         void emptyInput() {
 
             // Given
-            when(repository.getAllActive()).thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+            when(repository.getAllActive()).thenReturn(List.of(
+                    generateBudget(BUDGET_ID).budget(),
+                    generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(List.of(), List.of());
+            List<BudgetContent> budgets = service.listBudgets(List.of(), List.of());
 
             // Then
             assertEquals(2, budgets.size());
@@ -283,10 +290,12 @@ public class BudgetServiceV1Test {
             // Given
             List<Long> projectIds = List.of(PROJECT_ID);
             when(repository.getBudgetByProjectId(projectIds))
-                    .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+                    .thenReturn(List.of(
+                            generateBudget(BUDGET_ID).budget(),
+                            generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(projectIds, null);
+            List<BudgetContent> budgets = service.listBudgets(projectIds, null);
 
             // Then
             assertEquals(2, budgets.size());
@@ -300,10 +309,12 @@ public class BudgetServiceV1Test {
             // Given
             List<Integer> fiscalYears = List.of(FISCAL_YEAR);
             when(repository.getBudgetByFiscalYear(List.of(FISCAL_YEAR)))
-                    .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+                    .thenReturn(List.of(
+                            generateBudget(BUDGET_ID).budget(),
+                            generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(null, fiscalYears);
+            List<BudgetContent> budgets = service.listBudgets(null, fiscalYears);
 
             // Then
             assertEquals(2, budgets.size());
@@ -317,10 +328,12 @@ public class BudgetServiceV1Test {
             // Given
             List<Long> projectIds = List.of(PROJECT_ID);
             when(repository.getBudgetByProjectId(projectIds))
-                    .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+                    .thenReturn(List.of(
+                            generateBudget(BUDGET_ID).budget(),
+                            generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(projectIds, List.of());
+            List<BudgetContent> budgets = service.listBudgets(projectIds, List.of());
 
             // Then
             assertEquals(2, budgets.size());
@@ -334,10 +347,12 @@ public class BudgetServiceV1Test {
             // Given
             List<Integer> fiscalYears = List.of(FISCAL_YEAR);
             when(repository.getBudgetByFiscalYear(List.of(FISCAL_YEAR)))
-                    .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+                    .thenReturn(List.of(
+                            generateBudget(BUDGET_ID).budget(),
+                            generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(List.of(), fiscalYears);
+            List<BudgetContent> budgets = service.listBudgets(List.of(), fiscalYears);
 
             // Then
             assertEquals(2, budgets.size());
@@ -352,10 +367,12 @@ public class BudgetServiceV1Test {
             List<Long> projectIds = List.of(PROJECT_ID);
             List<Integer> fiscalYears = List.of(FISCAL_YEAR);
             when(repository.getBudgetByProjectIdAndFiscalYear(projectIds, List.of(FISCAL_YEAR)))
-                    .thenReturn(List.of(generateBudget(BUDGET_ID), generateBudget(BUDGET_ID_2)));
+                    .thenReturn(List.of(
+                            generateBudget(BUDGET_ID).budget(),
+                            generateBudget(BUDGET_ID_2).budget()));
 
             // When
-            List<Budget> budgets = service.listBudgets(projectIds, fiscalYears);
+            List<BudgetContent> budgets = service.listBudgets(projectIds, fiscalYears);
 
             // Then
             assertEquals(2, budgets.size());
@@ -374,7 +391,7 @@ public class BudgetServiceV1Test {
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.empty());
 
             // When
-            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+            Optional<BudgetContent> optionalBudget = service.deleteById(BUDGET_ID);
 
             // Then
             assertTrue(optionalBudget.isEmpty());
@@ -384,12 +401,12 @@ public class BudgetServiceV1Test {
         void deleteAlreadyDeleted() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            budget.setStatus(Status.ARCHIVED);
-            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(budget));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            budget.budget().setStatus(Status.ARCHIVED);
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(budget.budget()));
 
             // When
-            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+            Optional<BudgetContent> optionalBudget = service.deleteById(BUDGET_ID);
 
             // Then
             assertTrue(optionalBudget.isEmpty());
@@ -399,14 +416,14 @@ public class BudgetServiceV1Test {
         void deleteAsExpected() {
 
             // Given
-            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID).budget()));
 
             // When
-            Optional<Budget> optionalBudget = service.deleteById(BUDGET_ID);
+            Optional<BudgetContent> optionalBudget = service.deleteById(BUDGET_ID);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(Status.ARCHIVED, budget.getStatus());
         }
@@ -426,11 +443,11 @@ public class BudgetServiceV1Test {
         void budgetNotFound() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            BudgetContent inputBudget = generateBudget(BUDGET_ID);
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.empty());
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget.budget());
 
             // Then
             assertTrue(optionalBudget.isEmpty());
@@ -441,14 +458,14 @@ public class BudgetServiceV1Test {
 
             // Given
             Budget inputBudget = Budget.builder().build();
-            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID).budget()));
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(Status.ACTIVE, budget.getStatus());
@@ -458,15 +475,15 @@ public class BudgetServiceV1Test {
         void budgetContainsNoUpdate() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            Budget inputBudget = generateBudget(BUDGET_ID).budget();
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(inputBudget));
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(Status.ACTIVE, budget.getStatus());
@@ -476,15 +493,15 @@ public class BudgetServiceV1Test {
         void fiscalYearIsNull() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            Budget inputBudget = generateBudget(BUDGET_ID).budget();
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(inputBudget));
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, null, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, null, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertNotNull(budget.getBudgetVersion());
             assertNotNull(budget.getBudgetVersion().getBudgetArea());
             assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
@@ -494,15 +511,15 @@ public class BudgetServiceV1Test {
         void fiscalYearIsZero() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            Budget inputBudget = generateBudget(BUDGET_ID).budget();
             when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(inputBudget));
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, 0, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, 0, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertNotNull(budget.getBudgetVersion());
             assertNotNull(budget.getBudgetVersion().getBudgetArea());
             assertEquals(FISCAL_YEAR, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
@@ -512,18 +529,18 @@ public class BudgetServiceV1Test {
         void budgetIsChanged() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            Budget inputBudget = generateBudget(BUDGET_ID).budget();
             inputBudget.setEstimatedBudget(ESTIMATED_BUDGET_2);
 
-            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID)));
+            when(repository.findById(BUDGET_ID)).thenReturn(Optional.of(generateBudget(BUDGET_ID).budget()));
             when(repository.saveAndFlush(budgetCapture.capture())).thenReturn(inputBudget);
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertEquals(BUDGET_ID, budget.getBudgetId());
             assertEquals(PROJECT_ID, budget.getProjectId());
             assertEquals(ESTIMATED_BUDGET_2, budget.getEstimatedBudget());
@@ -534,7 +551,7 @@ public class BudgetServiceV1Test {
         void fiscalYearIsChanged() {
 
             // Given
-            Budget inputBudget = generateBudget(BUDGET_ID);
+            Budget inputBudget = generateBudget(BUDGET_ID).budget();
             BudgetVersion updatedBudgetVersion = generateBudgetVersion();
             updatedBudgetVersion.setBudgetArea(generateBudgetArea2());
 
@@ -543,11 +560,11 @@ public class BudgetServiceV1Test {
             when(budgetVersionRepository.saveAndFlush(budgetVersionCapture.capture())).thenReturn(updatedBudgetVersion);
 
             // When
-            Optional<Budget> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR_2, inputBudget);
+            Optional<BudgetContent> optionalBudget = service.patchBudget(BUDGET_ID, FISCAL_YEAR_2, inputBudget);
 
             // Then
             assertTrue(optionalBudget.isPresent());
-            Budget budget = optionalBudget.get();
+            Budget budget = optionalBudget.get().budget();
             assertNotNull(budget.getBudgetVersion());
             assertEquals(FISCAL_YEAR_2, budget.getBudgetVersion().getBudgetArea().getFiscalYear());
 
@@ -571,7 +588,7 @@ public class BudgetServiceV1Test {
         void budgetIsNull() {
 
             // Given
-            Expenses inputExpenses = generateExpenses(null, null);
+            Expenses inputExpenses = generateExpenses(null, new BudgetContent(null));
 
             // When
             NotFoundException notFoundException =
@@ -585,9 +602,10 @@ public class BudgetServiceV1Test {
         void budgetIsDeleted() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budgetContent = generateBudget(BUDGET_ID);
+            Budget budget = budgetContent.budget();
             budget.setStatus(Status.ARCHIVED);
-            Expenses inputExpenses = generateExpenses(null, null);
+            Expenses inputExpenses = generateExpenses(null, budgetContent);
 
             // When
             NotFoundException notFoundException =
@@ -601,13 +619,13 @@ public class BudgetServiceV1Test {
         void createExpenses_SavedValuesValidation() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            Expenses inputExpenses = generateExpenses(null, null);
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            Expenses inputExpenses = generateExpenses(null, budget);
             when(expensesRepository.saveAndFlush(expensesArgumentCaptor.capture()))
                     .thenReturn(generateExpenses(EXPENSE_ID, budget));
 
             // When
-            service.createExpenses(budget, inputExpenses);
+            service.createExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertNotNull(expensesArgumentCaptor.getValue());
@@ -625,12 +643,12 @@ public class BudgetServiceV1Test {
         void createExpenses() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            Expenses inputExpenses = generateExpenses(null, null);
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            Expenses inputExpenses = generateExpenses(null, budget);
             when(expensesRepository.saveAndFlush(any())).thenReturn(generateExpenses(EXPENSE_ID, budget));
 
             // When
-            Expenses createdExpense = service.createExpenses(budget, inputExpenses);
+            Expenses createdExpense = service.createExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertNotNull(createdExpense);
@@ -670,7 +688,7 @@ public class BudgetServiceV1Test {
         void budgetIsDeleted() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            Budget budget = generateBudget(BUDGET_ID).budget();
             budget.setStatus(Status.ARCHIVED);
             List<Expenses> inputExpenses = List.of();
 
@@ -686,9 +704,11 @@ public class BudgetServiceV1Test {
         void expenseIsNotFound() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budgetContent = generateBudget(BUDGET_ID);
+            Budget budget = budgetContent.budget();
             budget.setExpenses(List.of());
-            List<Expenses> inputExpenses = List.of(generateExpenses(EXPENSE_ID, budget));
+            List<Expenses> inputExpenses = List.of(generateExpenses(EXPENSE_ID, budgetContent));
+
 
             // When
             NotFoundException exception =
@@ -702,7 +722,7 @@ public class BudgetServiceV1Test {
         void updatedExpensesIsEmptyAndBudgetHasNoExpenses() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            Budget budget = generateBudget(BUDGET_ID).budget();
             List<Expenses> inputExpenses = List.of();
             when(expensesRepository.saveAllAndFlush(any())).thenReturn(List.of());
 
@@ -717,13 +737,13 @@ public class BudgetServiceV1Test {
         void updatedExpensesIsEmpty() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            budget.budget().setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
             List<Expenses> inputExpenses = List.of();
             when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(List.of());
 
             // When
-            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+            List<Expenses> expenses = service.patchExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertEquals(2, expenses.size());
@@ -736,14 +756,14 @@ public class BudgetServiceV1Test {
         void expensesContainsNoUpdate() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             List<Expenses> inputExpenses =
                     List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget));
-            budget.setExpenses(inputExpenses);
+            budget.budget().setExpenses(inputExpenses);
             when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(List.of());
 
             // When
-            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+            List<Expenses> expenses = service.patchExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertEquals(2, expenses.size());
@@ -756,15 +776,15 @@ public class BudgetServiceV1Test {
         void oneExpenseIsChanged() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            budget.budget().setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
             List<Expenses> inputExpenses =
                     List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
             when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture()))
                     .thenReturn(List.of(generateExpenses2(EXPENSE_ID_2, budget)));
 
             // When
-            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+            List<Expenses> expenses = service.patchExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertEquals(2, expenses.size());
@@ -786,15 +806,15 @@ public class BudgetServiceV1Test {
         void oneExpenseIsChangedSaveValidation() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            budget.budget().setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
             List<Expenses> inputExpenses =
                     List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
             when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture()))
                     .thenReturn(List.of(generateExpenses2(EXPENSE_ID_2, budget)));
 
             // When
-            service.patchExpenses(budget, inputExpenses);
+            service.patchExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertEquals(1, expensesListArgumentCaptor.getValue().size());
@@ -813,14 +833,14 @@ public class BudgetServiceV1Test {
         void allExpensesAreChanged() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
-            budget.setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            budget.budget().setExpenses(List.of(generateExpenses(EXPENSE_ID, budget), generateExpenses(EXPENSE_ID_2, budget)));
             List<Expenses> inputExpenses =
                     List.of(generateExpenses2(EXPENSE_ID, budget), generateExpenses2(EXPENSE_ID_2, budget));
             when(expensesRepository.saveAllAndFlush(expensesListArgumentCaptor.capture())).thenReturn(inputExpenses);
 
             // When
-            List<Expenses> expenses = service.patchExpenses(budget, inputExpenses);
+            List<Expenses> expenses = service.patchExpenses(budget.budget(), inputExpenses);
 
             // Then
             assertEquals(2, expenses.size());
@@ -834,15 +854,16 @@ public class BudgetServiceV1Test {
         return new BudgetAreaParameters(BUDGET_AREA_PARENT_TYPE, BUDGET_AREA_PARENT_ID, FISCAL_YEAR);
     }
 
-    private static Budget generateBudget(Long id) {
-        return Budget.builder()
-                .budgetId(id)
-                .estimatedBudget(ESTIMATED_BUDGET)
-                .projectId(PROJECT_ID)
-                .status(Status.ACTIVE)
-                .budgetVersion(generateBudgetVersion())
-                .expenses(List.of())
-                .build();
+    private static BudgetContent generateBudget(Long id) {
+        return new BudgetContent(
+                Budget.builder()
+                        .budgetId(id)
+                        .estimatedBudget(ESTIMATED_BUDGET)
+                        .projectId(PROJECT_ID)
+                        .status(Status.ACTIVE)
+                        .budgetVersion(generateBudgetVersion())
+                        .expenses(List.of())
+                        .build());
     }
 
     private static BudgetVersion generateBudgetVersion() {
@@ -875,7 +896,7 @@ public class BudgetServiceV1Test {
                 .build();
     }
 
-    private static Expenses generateExpenses(Long id, Budget budget) {
+    private static Expenses generateExpenses(Long id, BudgetContent budget) {
         return Expenses.builder()
                 .expensesId(id)
                 .priceItemId(PRICE_ITEM_ID)
@@ -886,11 +907,11 @@ public class BudgetServiceV1Test {
                 .internalPercent(PERCENT_INTERNAL)
                 .units(UNITS)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION)
-                .budget(budget)
+                .budget(budget.budget())
                 .build();
     }
 
-    private static Expenses generateExpenses2(Long id, Budget budget) {
+    private static Expenses generateExpenses2(Long id, BudgetContent budget) {
         return Expenses.builder()
                 .expensesId(id)
                 .priceItemId(PRICE_ITEM_ID_2)
@@ -901,7 +922,7 @@ public class BudgetServiceV1Test {
                 .internalPercent(PERCENT_INTERNAL_2)
                 .units(UNITS_2)
                 .invoicingTypeOption(INVOICING_TYPE_OPTION_2)
-                .budget(budget)
+                .budget(budget.budget())
                 .build();
     }
 }

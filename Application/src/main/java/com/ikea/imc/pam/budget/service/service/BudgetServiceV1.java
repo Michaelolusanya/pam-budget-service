@@ -19,6 +19,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
@@ -43,7 +44,7 @@ public class BudgetServiceV1 implements BudgetService {
     }
 
     @Override
-    public Budget createBudget(BudgetAreaParameters budgetAreaParameters, Budget budget) {
+    public BudgetContent createBudget(BudgetAreaParameters budgetAreaParameters, Budget budget) {
 
         BudgetArea budgetArea = budgetAreaService.putBudgetArea(BudgetArea.toBudgetArea(budgetAreaParameters));
 
@@ -58,39 +59,51 @@ public class BudgetServiceV1 implements BudgetService {
         budget.setBudgetVersion(budgetVersion);
         budget.setStatus(Status.ACTIVE);
 
-        return repository.saveAndFlush(budget);
+        return new BudgetContent(repository.saveAndFlush(budget));
     }
 
     @Override
-    public Optional<Budget> getById(Long budgetId) {
+    public Optional<BudgetContent> getById(Long budgetId) {
         log.debug("Get budget with id {}", budgetId);
-        return repository.findById(budgetId);
+        return repository.findById(budgetId).map(BudgetContent::new);
     }
 
     @Override
-    public List<Budget> listBudgets(List<Long> projectIds, List<Integer> fiscalYears) {
+    public List<BudgetContent> listBudgets(List<Long> projectIds, List<Integer> fiscalYears) {
 
         if ((projectIds == null || projectIds.isEmpty()) && (fiscalYears == null || fiscalYears.isEmpty())) {
             log.debug("List all budgets due to no filters were applied");
-            return repository.getAllActive();
+            return repository.getAllActive()
+                    .stream()
+                    .map(BudgetContent::new)
+                    .toList();
         }
 
         if (projectIds == null || projectIds.isEmpty()) {
             log.debug("List all budgets with fiscalYears {}", fiscalYears);
-            return repository.getBudgetByFiscalYear(fiscalYears);
+            return repository.getBudgetByFiscalYear(fiscalYears)
+                    .stream()
+                    .map(BudgetContent::new)
+                    .toList();
         }
 
         if (fiscalYears == null || fiscalYears.isEmpty()) {
             log.debug("List all budgets with projectIds {}", projectIds);
-            return repository.getBudgetByProjectId(projectIds);
+            return repository.getBudgetByProjectId(projectIds)
+                    .stream()
+                    .map(BudgetContent::new)
+                    .toList();
         }
 
         log.debug("List all budgets with projectIds {} and fiscalYears {}", projectIds, fiscalYears);
-        return repository.getBudgetByProjectIdAndFiscalYear(projectIds, fiscalYears);
+        return repository.getBudgetByProjectIdAndFiscalYear(projectIds, fiscalYears)
+                .stream()
+                .map(BudgetContent::new)
+                .toList();
     }
 
     @Override
-    public Optional<Budget> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget) {
+    public Optional<BudgetContent> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget) {
 
         // Implemented with the assumption that the expenses are not included in the updatedBudget
 
@@ -121,7 +134,7 @@ public class BudgetServiceV1 implements BudgetService {
             budgetVersionRepository.saveAndFlush(budgetVersion);
         }
 
-        return Optional.of(budget);
+        return Optional.of(new BudgetContent(budget));
     }
 
     private boolean isBudgetAreaChanged(Budget budget, Integer fiscalYear) {
@@ -201,7 +214,7 @@ public class BudgetServiceV1 implements BudgetService {
     }
 
     @Override
-    public Optional<Budget> deleteById(Long budgetId) {
+    public Optional<BudgetContent> deleteById(Long budgetId) {
 
         log.debug("Delete budget with id {}", budgetId);
         Optional<Budget> optionalBudget = repository.findById(budgetId);
@@ -218,6 +231,6 @@ public class BudgetServiceV1 implements BudgetService {
         budget.setStatus(Status.ARCHIVED);
         repository.saveAndFlush(budget);
 
-        return optionalBudget;
+        return Optional.of(new BudgetContent(budget));
     }
 }

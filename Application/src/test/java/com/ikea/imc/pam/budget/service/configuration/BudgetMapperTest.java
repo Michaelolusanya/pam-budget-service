@@ -7,6 +7,7 @@ import static org.mockito.Mockito.when;
 import com.ikea.imc.pam.budget.service.client.dto.*;
 import com.ikea.imc.pam.budget.service.repository.model.BudgetArea;
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import com.ikea.imc.pam.common.repository.model.UserInformation;
 import com.ikea.imc.pam.common.service.UserService;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
@@ -40,7 +41,6 @@ class BudgetMapperTest {
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
-    private static final double INTERNAL_COST = 50_000d;
 
     private static final String EXPENSE_COMMENT = "EXPENSE_COMMENT123";
     private static final int EXPENSE_COST = 450;
@@ -77,9 +77,10 @@ class BudgetMapperTest {
         Budget budget = generateBudget();
         budget.setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
         when(userService.getUserInformation(LAST_UPDATED_BY_ID)).thenReturn(generateUserInformation());
+        BudgetContent budgetContent = new BudgetContent(budget);
 
         // When
-        BudgetDTO dto = budgetMapper.buildBudgetDTO(budget);
+        BudgetDTO dto = budgetMapper.buildBudgetDTO(budgetContent);
 
         // Then
         assertNotNull(dto);

@@ -12,7 +12,7 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 @MappedSuperclass
 @EntityListeners(AuditingEntityListener.class)
-abstract class AbstractEntity {
+public abstract class AbstractEntity {
 
     @LastModifiedBy private String lastUpdatedById;
 

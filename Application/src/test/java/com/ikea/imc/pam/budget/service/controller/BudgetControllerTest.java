@@ -21,6 +21,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import com.ikea.imc.pam.common.dto.ResponseMessageDTO;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -48,7 +49,6 @@ public class BudgetControllerTest {
 
     private static final String BUDGET_VERSION_NAME = "budname";
     private static final LocalDate BUDGET_VERSION_DATE = LocalDate.of(2020, 3, 1);
-    private static final double INTERNAL_COST = 50_000d;
 
     private static final String EXPENSE_COMMENT = "EXPENSE_COMMENT123";
     private static final int EXPENSE_COST = 450;
@@ -102,7 +102,7 @@ public class BudgetControllerTest {
         void getBudgetWithoutExpenses() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID));
 
@@ -131,10 +131,10 @@ public class BudgetControllerTest {
         void getBudgetWithExpenses() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             List<Expenses> expenses =
                     List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2));
-            budget.setExpenses(expenses);
+            budget.budget().setExpenses(expenses);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID, expenses));
 
@@ -217,13 +217,13 @@ public class BudgetControllerTest {
             // Given
             List<Long> projectIds = List.of();
             List<Integer> fiscalYears = List.of();
-            Budget budget = generateBudget(BUDGET_ID);
-            Budget budget2 = generateBudget(2L);
-            budget.setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
-            budget2.setExpenses(List.of(generateExpense(budget2, EXPENSE_ID)));
+            BudgetContent budget = generateBudget(BUDGET_ID);
+            BudgetContent budget2 = generateBudget(2L);
+            budget.budget().setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
+            budget2.budget().setExpenses(List.of(generateExpense(budget2, EXPENSE_ID)));
             when(budgetService.listBudgets(projectIds, fiscalYears)).thenReturn(List.of(budget, budget2));
-            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID, budget.getExpenses()));
-            when(budgetMapper.buildBudgetDTO(budget2)).thenReturn(generateBudgetDTO(2L, budget2.getExpenses()));
+            when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID, budget.budget().getExpenses()));
+            when(budgetMapper.buildBudgetDTO(budget2)).thenReturn(generateBudgetDTO(2L, budget2.budget().getExpenses()));
 
             // When
             ResponseEntity<ResponseMessageDTO<List<BudgetDTO>>> response =
@@ -268,7 +268,7 @@ public class BudgetControllerTest {
         void deleteBudget() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             when(budgetService.deleteById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetMapper.buildBudgetDTO(budget)).thenReturn(generateBudgetDTO(BUDGET_ID));
 
@@ -300,7 +300,7 @@ public class BudgetControllerTest {
             BudgetDTO requestBudgetDTO = generateRequestBudget();
             when(budgetService.createBudget(budgetAreaParametersCaptor.capture(), budgetCaptor.capture()))
                     .thenReturn(generateBudget(BUDGET_ID));
-            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID));
+            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID).budget());
             when(budgetMapper.buildBudgetAreaParameters(requestBudgetDTO)).thenReturn(generateBudgetAreaParameters());
 
             // When
@@ -387,7 +387,7 @@ public class BudgetControllerTest {
             ArgumentCaptor<Budget> inputBudget = ArgumentCaptor.forClass(Budget.class);
             when(budgetService.patchBudget(inputBudgetId.capture(), inputFiscalYear.capture(), inputBudget.capture()))
                     .thenReturn(Optional.of(generateBudget(BUDGET_ID)));
-            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID));
+            when(budgetMapper.buildBudget(requestBudgetDTO)).thenReturn(generateBudget(BUDGET_ID).budget());
 
             // When
             controller.updateBudget(BUDGET_ID, requestBudgetDTO);
@@ -464,7 +464,7 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             ExpenseDTO expenseDTO = generateExpenseDTO(EXPENSE_ID, BUDGET_ID);
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetService.createExpenses(budgetArgumentCaptor.capture(), expensesArgumentCaptor.capture()))
@@ -550,7 +550,7 @@ public class BudgetControllerTest {
         void notFoundExpense() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             ExpenseBatchDTO expenseBatchDTO = generateExpenseBatchDTO();
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
             when(budgetService.patchExpenses(any(), any())).thenThrow(new NotFoundException("Expense 4 not found"));
@@ -567,7 +567,7 @@ public class BudgetControllerTest {
         void inputValues() {
 
             // Given
-            Budget budget = generateBudget(BUDGET_ID);
+            BudgetContent budget = generateBudget(BUDGET_ID);
             Expenses inputExpenses = generateExpense(budget, EXPENSE_ID);
             ExpenseBatchDTO expenseBatchDTO = generateExpenseBatchDTO();
             when(budgetService.getById(BUDGET_ID)).thenReturn(Optional.of(budget));
@@ -697,7 +697,7 @@ public class BudgetControllerTest {
                 .build();
     }
 
-    private static Expenses generateExpense(Budget budget, Long id) {
+    private static Expenses generateExpense(BudgetContent budget, Long id) {
         Expenses expenses =
                 Expenses.builder()
                         .expensesId(id)
@@ -709,7 +709,7 @@ public class BudgetControllerTest {
                         .internalPercent(EXPENSE_PERCENT_INTERNAL)
                         .units(EXPENSE_UNITS)
                         .invoicingTypeOption(EXPENSES_INVOICINGTYPEOPTION)
-                        .budget(budget)
+                        .budget(budget.budget())
                         .build();
 
         ReflectionTestUtils.setField(expenses, "lastUpdatedById", LAST_UPDATED_BY_ID);
@@ -719,7 +719,7 @@ public class BudgetControllerTest {
         return expenses;
     }
 
-    private static Budget generateBudget(Long id) {
+    private static BudgetContent generateBudget(Long id) {
         Budget budget =
                 Budget.builder()
                         .budgetId(id)
@@ -733,7 +733,7 @@ public class BudgetControllerTest {
         ReflectionTestUtils.setField(
                 budget, "lastUpdated", LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS));
 
-        return budget;
+        return new BudgetContent(budget);
     }
 
     private static BudgetVersion generateBudgetVersion() {

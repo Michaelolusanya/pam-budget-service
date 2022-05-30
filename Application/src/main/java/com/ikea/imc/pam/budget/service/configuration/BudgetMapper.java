@@ -11,6 +11,7 @@ import com.ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOptio
 import javax.validation.Valid;
 
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
+import com.ikea.imc.pam.budget.service.service.entity.BudgetContent;
 import com.ikea.imc.pam.common.service.UserService;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
@@ -25,17 +26,17 @@ public class BudgetMapper {
         this.userService = userService;
     }
 
-    public BudgetDTO buildBudgetDTO(Budget budget) {
+    public BudgetDTO buildBudgetDTO(BudgetContent budget) {
         return BudgetDTO.builder()
                 .id(budget.getBudgetId())
-                .parentType(budget.getBudgetVersion().getBudgetArea().getParentType())
-                .parentId(budget.getBudgetVersion().getBudgetArea().getParentId())
-                .projectId(budget.getProjectId())
-                .fiscalYear(budget.getBudgetVersion().getBudgetArea().getFiscalYear())
-                .estimatedCost(budget.getEstimatedBudget())
+                .parentType(budget.getParentType())
+                .parentId(budget.getParentId())
+                .projectId(budget.budget().getProjectId())
+                .fiscalYear(budget.getFiscalYear())
+                .estimatedCost(budget.budget().getEstimatedBudget())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
-                .lastUpdatedAt(budget.getLastUpdated())
-                .expenses(budget.getExpenses().stream().map(this::buildExpenseDTO).toList())
+                .lastUpdatedAt(budget.getLastUpdatedAt())
+                .expenses(budget.budget().getExpenses().stream().map(this::buildExpenseDTO).toList())
                 .build();
     }
 
