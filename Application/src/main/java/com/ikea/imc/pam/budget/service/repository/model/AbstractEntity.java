@@ -14,9 +14,17 @@ import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 @EntityListeners(AuditingEntityListener.class)
 public abstract class AbstractEntity {
 
-    @LastModifiedBy private String lastUpdatedById;
+    @LastModifiedBy
+    String lastUpdatedById;
 
-    @LastModifiedDate private Instant lastUpdated;
+    @LastModifiedDate
+    Instant lastUpdated;
+
+    protected static <T extends AbstractEntity> T mergeLastUpdated(T from, T to) {
+        to.lastUpdatedById = from.lastUpdatedById;
+        to.lastUpdated = from.lastUpdated;
+        return to;
+    }
 
     protected static <T> void setNotNullValue(Supplier<T> getterMethod, Consumer<T> setterMethod) {
         if (getterMethod.get() != null) {

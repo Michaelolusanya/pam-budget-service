@@ -56,20 +56,20 @@ public class Expenses extends AbstractEntity {
         return invoicingTypeOption != null ? invoicingTypeOption.getDescription() : null;
     }
 
-    public static Expenses merge(Expenses masterExpenses, Expenses mergeExpenses) {
+    public static Expenses merge(Expenses fromExpenses, Expenses toExpenses) {
 
-        ExpensesBuilder mergedBuilder = masterExpenses.toBuilder();
+        ExpensesBuilder mergedBuilder = fromExpenses.toBuilder();
 
-        setNotNullValue(mergeExpenses::getPriceItemId, mergedBuilder::priceItemId);
-        setNotNullValue(mergeExpenses::getComment, mergedBuilder::comment);
-        setNotNullValue(mergeExpenses::getCost, mergedBuilder::cost);
-        setNotNullValue(mergeExpenses::getInternalCost, mergedBuilder::internalCost);
-        setNotNullValue(mergeExpenses::getCostPerUnit, mergedBuilder::costPerUnit);
-        setNotNullValue(mergeExpenses::getInternalPercent, mergedBuilder::internalPercent);
-        setNotNullValue(mergeExpenses::getUnits, mergedBuilder::units);
-        setNotNullValue(mergeExpenses::getInvoicingTypeOption, mergedBuilder::invoicingTypeOption);
+        setNotNullValue(toExpenses::getPriceItemId, mergedBuilder::priceItemId);
+        setNotNullValue(toExpenses::getComment, mergedBuilder::comment);
+        setNotNullValue(toExpenses::getCost, mergedBuilder::cost);
+        setNotNullValue(toExpenses::getInternalCost, mergedBuilder::internalCost);
+        setNotNullValue(toExpenses::getCostPerUnit, mergedBuilder::costPerUnit);
+        setNotNullValue(toExpenses::getInternalPercent, mergedBuilder::internalPercent);
+        setNotNullValue(toExpenses::getUnits, mergedBuilder::units);
+        setNotNullValue(toExpenses::getInvoicingTypeOption, mergedBuilder::invoicingTypeOption);
 
-        return mergedBuilder.build();
+        return mergeLastUpdated(fromExpenses, mergedBuilder.build());
     }
 
     public boolean isEqual(Expenses compareTo) {

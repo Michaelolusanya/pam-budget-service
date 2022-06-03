@@ -38,7 +38,7 @@ public class BudgetArea extends AbstractEntity {
 
         setNotNullValue(toBudgetArea::getCostLimit, mergedBudgetArea::costLimit);
 
-        return mergedBudgetArea.build();
+        return mergeLastUpdated(fromBudgetArea, mergedBudgetArea.build());
     }
 
     public static BudgetArea toBudgetArea(BudgetAreaParameters budgetAreaParameters) {

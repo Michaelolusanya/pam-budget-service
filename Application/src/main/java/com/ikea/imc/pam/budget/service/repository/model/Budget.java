@@ -60,7 +60,7 @@ public class Budget extends AbstractEntity {
         setNotNullValue(toBudget::getEstimatedBudget, mergedBudget::estimatedBudget);
         setNotNullValue(toBudget::getStatus, mergedBudget::status);
 
-        return mergedBudget.build();
+        return mergeLastUpdated(fromBudget, mergedBudget.build());
     }
 
     public boolean isEqual(Budget compareTo) {
