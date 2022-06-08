@@ -4,8 +4,7 @@
 # https://aka.ms/yaml
 
 pr: none
-trigger:
-  - main
+trigger: none
 
 pool:
   vmImage: 'ubuntu-latest'
@@ -14,15 +13,11 @@ variables:
 - name: subscriptionId
   value: '73352462-5185-4eab-afca-eed6b857bbe0'
 - name: resourceGroup
-  value: 'BackendRewrite'
-- name: containerRegistryNameDev
-  value: crbackendrewritedev
-- name: containerConnectionDev
-  value: '{"loginServer":"$(containerRegistryNameDev).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameDev)"}'
-- name: containerRegistryNameTest
-  value: crbackendrewritetest
-- name: containerConnectionTest
-  value: '{"loginServer":"$(containerRegistryNameTest).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameTest)"}'
+  value: 'PAM.Common'
+- name: containerRegistryNameStage
+  value: crpamstage
+- name: containerConnectionStage
+  value: '{"loginServer":"$(containerRegistryNameStage).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameStage)"}'
 
 steps:
   - task: MavenAuthenticate@0
@@ -52,8 +47,8 @@ steps:
     inputs:
       PathtoPublish: '$(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
-  
-  # Build container image DEV
+
+  # Build container image STAGE
   - task: Docker@0
     displayName: 'Build an image'
     inputs:
@@ -61,36 +56,15 @@ steps:
       dockerFile: '**/Dockerfile'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       action: 'Build an image'
-      azureContainerRegistry: $(containerConnectionDev)
+      azureContainerRegistry: $(containerConnectionStage)
       includeLatestTag: true
 
-  # Push container image DEV
+  # Push container image STAGE
   - task: Docker@0
     displayName: 'Push an image'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
-      azureContainerRegistry: $(containerConnectionDev)
-      action: 'Push an image'
-      includeLatestTag: true
-
-  # Build container image TEST
-  - task: Docker@0
-    displayName: 'Build an image'
-    inputs:
-      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
-      dockerFile: '**/Dockerfile'
-      imageName: $(Build.Repository.Name):$(Build.BuildId)
-      action: 'Build an image'
-      azureContainerRegistry: $(containerConnectionTest)
-      includeLatestTag: true
-
-  # Push container image TEST
-  - task: Docker@0
-    displayName: 'Push an image'
-    inputs:
-      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
-      imageName: $(Build.Repository.Name):$(Build.BuildId)
-      azureContainerRegistry: $(containerConnectionTest)
+      azureContainerRegistry: $(containerConnectionStage)
       action: 'Push an image'
       includeLatestTag: true
