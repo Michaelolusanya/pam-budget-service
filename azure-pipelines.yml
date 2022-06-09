@@ -55,7 +55,7 @@ steps:
   
   # Build container image DEV
   - task: Docker@0
-    displayName: 'Build an image'
+    displayName: 'Build an image for dev'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       dockerFile: '**/Dockerfile'
@@ -66,7 +66,7 @@ steps:
 
   # Push container image DEV
   - task: Docker@0
-    displayName: 'Push an image'
+    displayName: 'Push an image to dev'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
@@ -76,7 +76,7 @@ steps:
 
   # Build container image TEST
   - task: Docker@0
-    displayName: 'Build an image'
+    displayName: 'Build an image for test'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       dockerFile: '**/Dockerfile'
@@ -87,7 +87,7 @@ steps:
 
   # Push container image TEST
   - task: Docker@0
-    displayName: 'Push an image'
+    displayName: 'Push an image to test'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)

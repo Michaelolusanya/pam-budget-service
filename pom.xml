@@ -45,14 +45,14 @@
         <dependency>
             <groupId>com.ikea.imc.pam</groupId>
             <artifactId>pam-budget-service-client</artifactId>
-            <version>13</version>
+            <version>16</version>
         </dependency>
 
         <!-- Common -->
         <dependency>
             <groupId>com.ikea.imc.pam</groupId>
             <artifactId>pam-common</artifactId>
-            <version>4</version>
+            <version>9</version>
         </dependency>
 
         <!-- Json -->

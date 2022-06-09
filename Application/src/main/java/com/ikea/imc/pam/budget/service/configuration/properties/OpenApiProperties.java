@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ConfigurationProperties("ikea.imc.pam.openapi")
+@ConfigurationProperties("com.ikea.imc.pam.openapi")
 @ConstructorBinding
 public record OpenApiProperties(Documentation documentation) {
 

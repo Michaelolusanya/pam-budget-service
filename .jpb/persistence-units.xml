@@ -4,7 +4,7 @@
     <persistence-units>
       <persistence-unit name="Default" defaultIncludeChangeLogFile="Application/src/main/resources/liquibase/db.changelog-master.xml">
         <packages>
-          <package value="ikea.imc.pam.budget.service" />
+          <package value="com.ikea.imc.pam.budget.service" />
         </packages>
       </persistence-unit>
     </persistence-units>

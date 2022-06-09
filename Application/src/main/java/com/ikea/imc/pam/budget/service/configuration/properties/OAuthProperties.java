@@ -11,7 +11,7 @@ import org.springframework.validation.annotation.Validated;
  * @see org.springdoc.core.SwaggerUiOAuthProperties
  */
 @Validated
-@ConfigurationProperties("ikea.imc.pam.oauth")
+@ConfigurationProperties("com.ikea.imc.pam.oauth")
 @ConstructorBinding
 public class OAuthProperties {
 

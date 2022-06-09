@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizeRequest;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.test.context.ContextConfiguration;
+import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.containers.DockerComposeContainer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
@@ -24,22 +25,22 @@ public abstract class AbstractBaseTest {
 
     protected TestData testData;
 
-    @Value("${ikea.imc.pam.network.port}")
+    @Value("${com.ikea.imc.pam.network.port}")
     private int budgetServicePort;
 
-    @Value("${ikea.imc.pam.budget.service.docker.file.location}")
+    @Value("${com.ikea.imc.pam.budget.service.docker.file.location}")
     private String dockerFileLocation;
 
-    @Value("${ikea.imc.pam.budget.service.docker.container.name}")
+    @Value("${com.ikea.imc.pam.budget.service.docker.container.name}")
     private String budgetServiceContainerName;
 
-    @Value("${ikea.imc.pam.budget.service.docker.standalone:false}")
+    @Value("${com.ikea.imc.pam.budget.service.docker.standalone:false}")
     private boolean dockerStandalone;
 
-    @Value("${ikea.imc.pam.budget.service.wiremock.host}")
+    @Value("${com.ikea.imc.pam.budget.service.wiremock.host}")
     private String wiremockHost;
 
-    @Value("${ikea.imc.pam.budget.service.wiremock.port}")
+    @Value("${com.ikea.imc.pam.budget.service.wiremock.port}")
     private int wiremockPort;
 
     private static DockerComposeContainer container;
@@ -56,6 +57,11 @@ public abstract class AbstractBaseTest {
                     return null;
                 }
             };
+        }
+
+        @Bean
+        WebClient.Builder builder() {
+            return WebClient.builder();
         }
     }
 

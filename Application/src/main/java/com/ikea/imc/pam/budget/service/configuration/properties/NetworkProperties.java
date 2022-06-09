@@ -7,6 +7,6 @@ import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
 
 @Validated
-@ConfigurationProperties("ikea.imc.pam.network")
+@ConfigurationProperties("com.ikea.imc.pam.network")
 @ConstructorBinding
 public record NetworkProperties(String domain, @Max(65535) @Min(0) int port) {}

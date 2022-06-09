@@ -50,7 +50,7 @@ steps:
 
   # Build container image STAGE
   - task: Docker@0
-    displayName: 'Build an image'
+    displayName: 'Build an image for stage'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       dockerFile: '**/Dockerfile'
@@ -61,7 +61,7 @@ steps:
 
   # Push container image STAGE
   - task: Docker@0
-    displayName: 'Push an image'
+    displayName: 'Push an image to stage'
     inputs:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)

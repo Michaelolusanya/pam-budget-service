@@ -61,7 +61,7 @@ azure.activedirectory.authorization-clients.pam-budget-service.scopes[0]= <The s
 spring.security.oauth2.client.registration.pam-budget-service.authorization-grant-type=client_credentials
 spring.security.oauth2.client.registration.pam-budget-service.client-id=<The same value as in the budgets azure.activedirectory.client-id config>
 spring.security.oauth2.client.registration.pam-budget-service.client-secret=<The same value as in the budgets azure.activedirectory.app-secret config>
-spring.security.oauth2.client.provider.pam-budget-service.token-uri=<The same value as in the budgets ikea.imc.pam.oauth.microsoft.token-url config>
+spring.security.oauth2.client.provider.pam-budget-service.token-uri=<The same value as in the budgets com.ikea.imc.pam.oauth.microsoft.token-url config>
 ```
 
 Example:
