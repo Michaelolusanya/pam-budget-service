@@ -13,11 +13,18 @@ services:
         ports:
             - "23154:23154" # Default application port
             - "5006:5006" # Debug port
-        environment:
-            - "SPRING_PROFILES_ACTIVE=local"
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
         healthcheck:
             test: "curl --fail --silent localhost:23154/actuator/health | grep UP || exit 1"
             interval: 30s
             timeout: 5s
             retries: 10
             start_period: 40s
+        networks:
+            - bff
+
+networks:
+    bff:
+        external: true
+        name: pam-shared-network

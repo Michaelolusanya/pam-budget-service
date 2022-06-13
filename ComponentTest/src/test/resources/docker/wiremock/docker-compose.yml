@@ -4,8 +4,9 @@ services:
   wiremock:
     image: 'wiremock/wiremock:2.32.0'
     container_name: 'wiremock'
+    command: "--global-response-templating --verbose"
     ports:
-      - "8443:8080" # Web browser
+      - "8443:8080" # Web browser & CT Mocking
     environment:
       https-port: 8443
       http-port: 8443
@@ -13,3 +14,10 @@ services:
       test: "curl -f http://localhost:8080/__admin || false"
       interval: 1s
       retries: 120
+    networks:
+      - wiremock
+
+networks:
+  wiremock:
+    name: pam-shared-network
+    driver: bridge

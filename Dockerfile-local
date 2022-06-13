@@ -14,4 +14,4 @@ WORKDIR /budget-service
 
 COPY /Application/target /budget-service
 
-ENTRYPOINT java -jar -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=$SUSPENDED_BOOT_ENV,address=*:$DEBUG_PORT_ENV /budget-service/pam-budget-service-exec.jar
+ENTRYPOINT java -Dspring.profiles.active=docker -jar -Xdebug -agentlib:jdwp=transport=dt_socket,server=y,suspend=$SUSPENDED_BOOT_ENV,address=*:$DEBUG_PORT_ENV /budget-service/pam-budget-service-exec.jar

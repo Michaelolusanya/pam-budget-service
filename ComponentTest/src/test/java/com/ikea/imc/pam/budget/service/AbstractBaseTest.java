@@ -16,6 +16,7 @@ import org.springframework.security.oauth2.client.OAuth2AuthorizedClientManager;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.testcontainers.containers.DockerComposeContainer;
+import org.testcontainers.containers.output.Slf4jLogConsumer;
 import org.testcontainers.containers.wait.strategy.Wait;
 
 @Slf4j
@@ -80,7 +81,8 @@ public abstract class AbstractBaseTest {
             container =
                     new DockerComposeContainer(new File(dockerFileLocation))
                             .withRemoveImages(DockerComposeContainer.RemoveImages.ALL)
-                            .withExposedService(budgetServiceContainerName, budgetServicePort, Wait.forHealthcheck());
+                            .withExposedService(budgetServiceContainerName, budgetServicePort, Wait.forHealthcheck())
+                            .withLogConsumer(budgetServiceContainerName, new Slf4jLogConsumer(log));
             container.start();
         }
         testData = new TestData();

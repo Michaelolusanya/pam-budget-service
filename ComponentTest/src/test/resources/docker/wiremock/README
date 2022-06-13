@@ -32,3 +32,4 @@ body with http code 200.
 * Resources
 http://localhost:8443/__admin/ - See mocks that currently exists
 http://localhost:8443/__admin/requests - See requests that Wiremock have received
+http://localhost:8443/__admin/requests/unmatched - See requests that Wiremock have received that no mocks existed for
