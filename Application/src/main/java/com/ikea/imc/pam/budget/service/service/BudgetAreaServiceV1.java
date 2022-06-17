@@ -34,7 +34,7 @@ public class BudgetAreaServiceV1 implements BudgetAreaService {
     }
 
     @Override
-    public BudgetArea putBudgetArea(BudgetArea budgetArea) {
+    public synchronized BudgetArea putBudgetArea(BudgetArea budgetArea) {
 
         log.debug("Put BudgetArea {}", budgetArea);
 
@@ -44,8 +44,9 @@ public class BudgetAreaServiceV1 implements BudgetAreaService {
                 budgetArea.getFiscalYear());
         Optional<BudgetArea> currentBudgetAreaOptional = findBudgetArea(budgetAreaParameters);
 
-        BudgetArea currentBudgetArea = currentBudgetAreaOptional.isPresent()
-                ? BudgetArea.merge(currentBudgetAreaOptional.get(), budgetArea) : budgetArea;
+        BudgetArea currentBudgetArea = currentBudgetAreaOptional
+                .map(area -> BudgetArea.merge(area, budgetArea))
+                .orElse(budgetArea);
 
         log.debug("Save BudgetArea {}", currentBudgetArea);
 
