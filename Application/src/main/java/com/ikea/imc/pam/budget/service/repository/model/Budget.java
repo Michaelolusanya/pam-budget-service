@@ -19,19 +19,33 @@ import lombok.Setter;
 @Builder(toBuilder = true)
 @NamedQuery(
         name = "Budget.getBudgetByProjectId",
-        query = "select b from Budget b where b.projectId in :projectIds AND b.status <> 'ARCHIVED'")
+        query = "select distinct b from Budget b "
+                + "left join fetch b.expenses e "
+                + "join fetch b.budgetVersion bv "
+                + "join fetch bv.budgetArea ba "
+                + "where b.projectId in :projectIds AND b.status <> 'ARCHIVED'")
 @NamedQuery(
         name = "Budget.getBudgetByFiscalYear",
-        query =
-                "select b from Budget b join fetch b.budgetVersion bv join fetch bv.budgetArea ba "
-                        + "where ba.fiscalYear in :fiscalYears AND b.status <> 'ARCHIVED'")
+        query = "select distinct b from Budget b "
+                + "left join fetch b.expenses e "
+                + "join fetch b.budgetVersion bv "
+                + "join fetch bv.budgetArea ba "
+                + "where ba.fiscalYear in :fiscalYears AND b.status <> 'ARCHIVED'")
 @NamedQuery(
         name = "Budget.getBudgetByProjectIdAndFiscalYear",
-        query =
-                "select b from Budget b join fetch b.budgetVersion bv join fetch bv.budgetArea ba "
-                        + "where b.projectId in :projectIds AND ba.fiscalYear in :fiscalYears "
-                        + "AND b.status <> 'ARCHIVED'")
-@NamedQuery(name = "Budget.getAllActive", query = "select b from Budget b where b.status <> 'ARCHIVED'")
+        query = "select distinct b from Budget b "
+                + "left join fetch b.expenses e "
+                + "join fetch b.budgetVersion bv "
+                + "join fetch bv.budgetArea ba "
+                + "where b.projectId in :projectIds AND ba.fiscalYear in :fiscalYears "
+                + "AND b.status <> 'ARCHIVED'")
+@NamedQuery(
+        name = "Budget.getAllActive",
+        query = "select distinct b from Budget b "
+                + "left join fetch b.expenses e "
+                + "join fetch b.budgetVersion bv "
+                + "join fetch bv.budgetArea ba "
+                + "where b.status <> 'ARCHIVED'")
 public class Budget extends AbstractEntity {
 
     @Id

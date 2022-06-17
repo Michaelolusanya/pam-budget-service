@@ -36,14 +36,20 @@ public class BudgetMapper {
                 .estimatedCost(budget.budget().getEstimatedBudget())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
                 .lastUpdatedAt(budget.getLastUpdatedAt())
-                .expenses(budget.budget().getExpenses().stream().map(this::buildExpenseDTO).toList())
+                .expenses(budget.budget().getExpenses().stream().map(
+                        expense ->
+                                buildExpenseDTO(budget.getBudgetId(), expense)).toList())
                 .build();
     }
 
     public ExpenseDTO buildExpenseDTO(Expenses expenses) {
+        return buildExpenseDTO(expenses.getBudget().getBudgetId(), expenses);
+    }
+
+    private ExpenseDTO buildExpenseDTO(Long budgetId, Expenses expenses) {
         return ExpenseDTO.builder()
                 .id(expenses.getExpensesId())
-                .budgetId(expenses.getBudget().getBudgetId())
+                .budgetId(budgetId)
                 .priceItemId(expenses.getPriceItemId())
                 .internalFraction(toFraction(expenses.getInternalPercent()))
                 .internalCost(expenses.getInternalCost())
