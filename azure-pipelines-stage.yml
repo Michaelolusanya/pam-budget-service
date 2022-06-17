@@ -4,7 +4,10 @@
 # https://aka.ms/yaml
 
 pr: none
-trigger: none
+trigger:
+  tags:
+    include:
+      - v1.*
 
 pool:
   vmImage: 'ubuntu-latest'
