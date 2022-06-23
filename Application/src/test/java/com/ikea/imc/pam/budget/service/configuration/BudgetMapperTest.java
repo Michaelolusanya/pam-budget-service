@@ -31,6 +31,7 @@ class BudgetMapperTest {
     private static final Long BUDGET_ID = 1L;
     private static final Long BUDGET_VERSION_ID = 3L;
     private static final Long BUDGET_AREA_ID = 300L;
+    private static final String NOTE = "test note";
     private static final Long PROJECT_ID = 2L;
     private static final Long EXPENSE_ID = 4L, EXPENSE_ID_2 = 112L;
     private static final Long PRICE_ITEM_ID = 5L;
@@ -88,6 +89,7 @@ class BudgetMapperTest {
         assertEquals(PROJECT_ID, dto.getProjectId());
         assertEquals(FISCAL_YEAR, dto.getFiscalYear());
         assertEquals(ESTIMATED_COST, dto.getEstimatedCost());
+        assertEquals(NOTE, dto.getNote());
         assertEquals(LAST_UPDATED_BY_FULL_NAME, dto.getLastUpdatedByName());
         assertEquals(
                 LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS), dto.getLastUpdatedAt());
@@ -161,6 +163,7 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, budget.getBudgetId());
         assertEquals(PROJECT_ID, budget.getProjectId());
         assertEquals(ESTIMATED_BUDGET, budget.getEstimatedBudget());
+        assertEquals(NOTE, budget.getNote());
         assertNotNull(budget.getExpenses());
         assertEquals(1, budget.getExpenses().size());
         assertEquals(EXPENSE_ID, budget.getExpenses().get(0).getExpensesId());
@@ -243,6 +246,7 @@ class BudgetMapperTest {
                         .budgetId(BUDGET_ID)
                         .estimatedBudget(ESTIMATED_BUDGET)
                         .projectId(PROJECT_ID)
+                        .note(NOTE)
                         .budgetVersion(generateBudgetVersion())
                         .expenses(List.of())
                         .build();
@@ -284,6 +288,7 @@ class BudgetMapperTest {
                 .projectId(PROJECT_ID)
                 .fiscalYear(FISCAL_YEAR)
                 .estimatedCost(ESTIMATED_COST)
+                .note(NOTE)
                 .lastUpdatedAt(LAST_UPDATED_AT_INPUT_INSTANT_NANO_PRECISION.truncatedTo(ChronoUnit.MICROS))
                 .lastUpdatedByName(LAST_UPDATED_BY_FULL_NAME)
                 .expenses(List.of())

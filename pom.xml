@@ -45,7 +45,7 @@
         <dependency>
             <groupId>com.ikea.imc.pam</groupId>
             <artifactId>pam-budget-service-client</artifactId>
-            <version>16</version>
+            <version>17</version>
         </dependency>
 
         <!-- Common -->

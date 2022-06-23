@@ -65,6 +65,8 @@ public class Budget extends AbstractEntity {
 
     @OneToMany(mappedBy = "budget", cascade = CascadeType.ALL)
     private List<Expenses> expenses;
+    
+    private String note;
 
     public static Budget merge(Budget fromBudget, Budget toBudget) {
 

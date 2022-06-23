@@ -34,6 +34,7 @@ public class BudgetMapper {
                 .projectId(budget.budget().getProjectId())
                 .fiscalYear(budget.getFiscalYear())
                 .estimatedCost(budget.budget().getEstimatedBudget())
+                .note(budget.budget().getNote())
                 .lastUpdatedByName(toUserFullName(budget.getLastUpdatedById()))
                 .lastUpdatedAt(budget.getLastUpdatedAt())
                 .expenses(budget.budget().getExpenses().stream().map(
@@ -70,6 +71,7 @@ public class BudgetMapper {
                         .budgetId(dto.getId())
                         .projectId(dto.getProjectId())
                         .estimatedBudget(dto.getEstimatedCost())
+                        .note(dto.getNote())
                         .build();
 
         if (dto.getExpenses() != null) {

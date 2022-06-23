@@ -7,8 +7,6 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
 
     <!-- INCLUDES -->
     <include file="liquibase/changelog/model-base.xml"/>
-    <include file="liquibase/changelog/13-01-changelog.xml"/>
-    <include file="liquibase/changelog/db.changelog-1.1.xml"/>
-    <include file="liquibase/changelog/db.changelog-1.2.xml"/>
+    <include file="liquibase/changelog/db.changelog-1.0.xml"/>
 
 </databaseChangeLog>
