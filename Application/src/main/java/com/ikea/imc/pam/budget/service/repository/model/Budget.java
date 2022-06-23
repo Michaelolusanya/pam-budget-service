@@ -54,6 +54,7 @@ public class Budget extends AbstractEntity {
         setNotNullValue(toBudget::getProjectId, mergedBudget::projectId);
         setNotNullValue(toBudget::getEstimatedBudget, mergedBudget::estimatedBudget);
         setNotNullValue(toBudget::getStatus, mergedBudget::status);
+        setNotNullValue(toBudget::getNote, mergedBudget::note);
         
         return mergeLastUpdated(fromBudget, mergedBudget.build());
     }

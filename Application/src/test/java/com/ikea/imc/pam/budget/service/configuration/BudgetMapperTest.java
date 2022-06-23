@@ -80,6 +80,7 @@ class BudgetMapperTest {
         // Given
         Budget budget = generateBudget();
         budget.setExpenses(List.of(generateExpense(budget, EXPENSE_ID), generateExpense(budget, EXPENSE_ID_2)));
+        budget.setNote(NOTE);
         when(userService.getUserInformation(LAST_UPDATED_BY_ID)).thenReturn(generateUserInformation());
         BudgetContent budgetContent = new BudgetContent(budget);
         
@@ -185,6 +186,7 @@ class BudgetMapperTest {
         
         // Then
         assertEquals(ESTIMATED_COST, budget.getEstimatedBudget());
+        assertEquals(NOTE, budget.getNote());
     }
     
     @Test
@@ -317,7 +319,7 @@ class BudgetMapperTest {
     }
     
     private static PatchBudgetDTO generatePatchBudgetDTO() {
-        return PatchBudgetDTO.builder().estimatedCost(ESTIMATED_COST).fiscalYear(FISCAL_YEAR).build();
+        return PatchBudgetDTO.builder().estimatedCost(ESTIMATED_COST).fiscalYear(FISCAL_YEAR).note(NOTE).build();
     }
     
     private static PatchExpenseDTO generatePatchExpenseDTO() {

@@ -157,7 +157,7 @@ class RestEndpointTests extends AbstractBaseTest {
         
         // WHEN (REST call to budget-service to update budget)
         PatchBudgetDTO patchBudgetDTO =
-            PatchBudgetDTO.builder().fiscalYear(MAXIMUM_YEAR).estimatedCost(MAXIMUM_COST).build();
+            PatchBudgetDTO.builder().fiscalYear(MAXIMUM_YEAR).estimatedCost(MAXIMUM_COST).note(testData.NOTE).build();
         
         var res = budgetClient.updateBudget(budgetId, patchBudgetDTO);
         
@@ -165,6 +165,7 @@ class RestEndpointTests extends AbstractBaseTest {
         assertNotNull(res);
         assertEquals(testData.projectId, res.getProjectId());
         assertEquals(MAXIMUM_YEAR, res.getFiscalYear());
+        assertEquals(testData.NOTE, res.getNote());
     }
     
     @Test

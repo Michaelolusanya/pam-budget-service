@@ -82,7 +82,7 @@ public class BudgetMapper {
     }
     
     public Budget buildBudget(PatchBudgetDTO dto) {
-        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).build();
+        return Budget.builder().estimatedBudget(dto.getEstimatedCost()).note(dto.getNote()).build();
     }
     
     private Expenses buildExpense(Budget budget, ExpenseDTO dto) {
