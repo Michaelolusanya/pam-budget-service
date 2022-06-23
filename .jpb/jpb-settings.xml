@@ -3,7 +3,7 @@
   <component name="DatabaseMigrationSettings">
     <database-infos>
       <database-info>
-        <option name="enabled" value="true" />
+        <option name="enabled" value="true"/>
         <dbms-id>postgres</dbms-id>
       </database-info>
     </database-infos>

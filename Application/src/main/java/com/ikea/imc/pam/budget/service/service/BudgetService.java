@@ -9,18 +9,18 @@ import java.util.List;
 import java.util.Optional;
 
 public interface BudgetService {
-
+    
     BudgetContent createBudget(BudgetAreaParameters budgetAreaParameters, Budget budget);
-
+    
     Optional<BudgetContent> getById(Long budgetId);
-
+    
     List<BudgetContent> listBudgets(List<Long> projectIds, List<Integer> fiscalYears);
-
+    
     Optional<BudgetContent> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget);
-
+    
     Expenses createExpenses(Budget budget, Expenses createExpense);
-
+    
     List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses);
-
+    
     Optional<BudgetContent> deleteById(Long budgetId);
 }

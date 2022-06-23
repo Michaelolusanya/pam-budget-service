@@ -10,11 +10,7 @@ import io.swagger.v3.oas.models.info.Contact;
 import io.swagger.v3.oas.models.info.Info;
 import io.swagger.v3.oas.models.media.StringSchema;
 import io.swagger.v3.oas.models.parameters.Parameter;
-import io.swagger.v3.oas.models.security.OAuthFlow;
-import io.swagger.v3.oas.models.security.OAuthFlows;
-import io.swagger.v3.oas.models.security.Scopes;
-import io.swagger.v3.oas.models.security.SecurityRequirement;
-import io.swagger.v3.oas.models.security.SecurityScheme;
+import io.swagger.v3.oas.models.security.*;
 import io.swagger.v3.oas.models.servers.Server;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -22,20 +18,20 @@ import org.springframework.core.env.Environment;
 
 @Configuration
 public class OpenapiConfiguration {
-
+    
     String title = "pam-budget-service-api";
-
+    
     private final NetworkProperties networkProperties;
     private final OAuthProperties oauthProperties;
-
+    
     public OpenapiConfiguration(NetworkProperties networkProperties, OAuthProperties oauthProperties) {
         this.networkProperties = networkProperties;
         this.oauthProperties = oauthProperties;
     }
-
+    
     @Bean
     public OpenAPI openAPI() {
-
+        
         Components openapiComponents = getSecuritySchemesComponents();
         OpenAPI openapi = new OpenAPI();
         openapi.addServersItem(new Server().url(networkProperties.domain()));
@@ -44,31 +40,27 @@ public class OpenapiConfiguration {
         openapi.addSecurityItem(new SecurityRequirement().addList("OAuth"));
         return openapi;
     }
-
+    
     private Info getApplicationInformation() {
         Contact contact = new Contact();
         contact.name("the application owner");
-
+        
         Info info = new Info();
         info.title(title);
         info.description(getDescription());
         info.version("");
         info.contact(contact);
-
+        
         return info;
     }
-
+    
     private String getDescription() {
         Environment environment = ApplicationContextUtil.getBean(Environment.class);
         String activeProfiles = Joiner.on(", ").join(environment.getActiveProfiles());
-        return "<h3><strong>Environment:</strong><br>"
-                + activeProfiles
-                + "<br><br>"
-                + "<strong>Description:</strong><br>"
-                + "Budget Service API that is used by Hushålla BFF API "
-                + "<br>";
+        return "<h3><strong>Environment:</strong><br>" + activeProfiles + "<br><br>" +
+            "<strong>Description:</strong><br>" + "Budget Service API that is used by Hushålla BFF API " + "<br>";
     }
-
+    
     /**
      * *************************************************************************************
      * ****************************** Security Configuration *******************************
@@ -80,14 +72,14 @@ public class OpenapiConfiguration {
         parameter.name("Version");
         parameter.schema(new StringSchema());
         parameter.required(false);
-
+        
         Components components = new Components();
         components.addSecuritySchemes("OAuth", getOpenIdConnectSecurityScheme());
         components.addSecuritySchemes("JWT-Token", getJwtTokenSecurityScheme());
         components.addParameters("Version", parameter);
         return components;
     }
-
+    
     /**
      * *************************************************************************************
      * ******************** Security Configuration: Open ID Connnect ***********************
@@ -104,23 +96,23 @@ public class OpenapiConfiguration {
         secScheme.flows(getAuthorizationCodeOAuthFlows());
         return secScheme;
     }
-
+    
     private OAuthFlows getAuthorizationCodeOAuthFlows() {
         OAuthProperties.ClientScope clientScopeProperties = oauthProperties.getClientScope();
         Scopes scopes = new Scopes();
         scopes.addString(clientScopeProperties.getScope(), clientScopeProperties.scopeName());
-
+        
         OAuthFlow oAuthFlow = new OAuthFlow();
         oAuthFlow.setAuthorizationUrl(oauthProperties.getMicrosoft().authorizationUrl());
         oAuthFlow.setTokenUrl(oauthProperties.getMicrosoft().tokenUrl());
         oAuthFlow.scopes(scopes);
-
+        
         OAuthFlows oauthFlows = new OAuthFlows();
         oauthFlows.authorizationCode(oAuthFlow);
-
+        
         return oauthFlows;
     }
-
+    
     /**
      * *************************************************************************************
      * ************************ Security Configuration: JWT - Token ************************

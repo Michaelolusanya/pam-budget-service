@@ -13,16 +13,16 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- name: subscriptionId
-  value: '73352462-5185-4eab-afca-eed6b857bbe0'
-- name: resourceGroup
-  value: 'BackendRewrite'
+  - name: subscriptionId
+    value: '73352462-5185-4eab-afca-eed6b857bbe0'
+  - name: resourceGroup
+    value: 'BackendRewrite'
 
 steps:
   - task: MavenAuthenticate@0
     inputs:
       artifactsFeeds: 'ikea'
-
+  
   - task: Maven@3
     inputs:
       mavenPomFile: 'pom.xml'

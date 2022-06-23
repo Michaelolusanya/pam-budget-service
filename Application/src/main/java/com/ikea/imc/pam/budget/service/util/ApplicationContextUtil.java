@@ -9,14 +9,14 @@ This seems to be what most search results recommend when looking for
 "How to reach instance of Beans outside spring-managed classes" */
 @Component
 public class ApplicationContextUtil implements ApplicationContextAware {
-
+    
     private static ApplicationContext applicationContext;
-
+    
     @Override
     public void setApplicationContext(ApplicationContext applicationContext) {
         ApplicationContextUtil.applicationContext = applicationContext;
     }
-
+    
     public static <T> T getBean(Class<T> clazz) {
         return applicationContext != null ? applicationContext.getBean(clazz) : null;
     }

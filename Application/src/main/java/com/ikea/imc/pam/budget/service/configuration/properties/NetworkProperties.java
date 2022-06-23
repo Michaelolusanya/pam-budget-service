@@ -1,10 +1,11 @@
 package com.ikea.imc.pam.budget.service.configuration.properties;
 
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.boot.context.properties.ConstructorBinding;
 import org.springframework.validation.annotation.Validated;
+
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
 
 @Validated
 @ConfigurationProperties("com.ikea.imc.pam.network")

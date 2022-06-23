@@ -11,45 +11,42 @@ import java.util.Optional;
 @Service
 @Slf4j
 public class BudgetAreaServiceV1 implements BudgetAreaService {
-
+    
     private final BudgetAreaRepository budgetAreaRepository;
-
+    
     public BudgetAreaServiceV1(BudgetAreaRepository budgetAreaRepository) {
         this.budgetAreaRepository = budgetAreaRepository;
     }
-
+    
     @Override
     public Optional<BudgetArea> getBudgetArea(Long budgetAreaId) {
         log.debug("Get BudgetArea with id {}", budgetAreaId);
         return budgetAreaRepository.findById(budgetAreaId);
     }
-
+    
     @Override
     public Optional<BudgetArea> findBudgetArea(BudgetAreaParameters budgetAreaParameters) {
         log.debug("Find BudgetArea for {}", budgetAreaParameters);
-        return budgetAreaRepository.findBudgetAreaByParentAndFiscalYear(
-                budgetAreaParameters.parentType(),
-                budgetAreaParameters.parentId(),
-                budgetAreaParameters.fiscalYear());
+        return budgetAreaRepository.findBudgetAreaByParentAndFiscalYear(budgetAreaParameters.parentType(),
+            budgetAreaParameters.parentId(),
+            budgetAreaParameters.fiscalYear()
+        );
     }
-
+    
     @Override
     public synchronized BudgetArea putBudgetArea(BudgetArea budgetArea) {
-
+        
         log.debug("Put BudgetArea {}", budgetArea);
-
-        BudgetAreaParameters budgetAreaParameters = new BudgetAreaParameters(
-                budgetArea.getParentType(),
-                budgetArea.getParentId(),
-                budgetArea.getFiscalYear());
+        
+        BudgetAreaParameters budgetAreaParameters =
+            new BudgetAreaParameters(budgetArea.getParentType(), budgetArea.getParentId(), budgetArea.getFiscalYear());
         Optional<BudgetArea> currentBudgetAreaOptional = findBudgetArea(budgetAreaParameters);
-
-        BudgetArea currentBudgetArea = currentBudgetAreaOptional
-                .map(area -> BudgetArea.merge(area, budgetArea))
-                .orElse(budgetArea);
-
+        
+        BudgetArea currentBudgetArea =
+            currentBudgetAreaOptional.map(area -> BudgetArea.merge(area, budgetArea)).orElse(budgetArea);
+        
         log.debug("Save BudgetArea {}", currentBudgetArea);
-
+        
         return budgetAreaRepository.saveAndFlush(currentBudgetArea);
     }
 }

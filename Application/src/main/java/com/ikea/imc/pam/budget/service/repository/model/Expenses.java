@@ -1,21 +1,9 @@
 package com.ikea.imc.pam.budget.service.repository.model;
 
 import com.ikea.imc.pam.budget.service.repository.model.utils.InvoicingTypeOption;
+import lombok.*;
 
-import javax.persistence.Entity;
-import javax.persistence.EnumType;
-import javax.persistence.Enumerated;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import javax.persistence.*;
 
 @Entity
 @Getter
@@ -24,42 +12,42 @@ import lombok.Setter;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 @Builder(toBuilder = true)
 public class Expenses extends AbstractEntity {
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long expensesId;
-
+    
     private Long priceItemId;
-
+    
     private String comment;
-
+    
     private Integer cost;
-
+    
     private Double internalCost;
-
+    
     private Integer costPerUnit;
-
+    
     private Byte internalPercent;
-
+    
     private Short units;
-
+    
     private Byte weeks; //TODO Not in use but retained for future in DB
-
+    
     @Enumerated(EnumType.STRING)
     private InvoicingTypeOption invoicingTypeOption;
-
+    
     @ManyToOne
     @JoinColumn(name = "budgetId")
     private Budget budget;
-
+    
     public String toInvoicingTypeName() {
         return invoicingTypeOption != null ? invoicingTypeOption.getDescription() : null;
     }
-
+    
     public static Expenses merge(Expenses fromExpenses, Expenses toExpenses) {
-
+        
         ExpensesBuilder mergedBuilder = fromExpenses.toBuilder();
-
+        
         setNotNullValue(toExpenses::getPriceItemId, mergedBuilder::priceItemId);
         setNotNullValue(toExpenses::getComment, mergedBuilder::comment);
         setNotNullValue(toExpenses::getCost, mergedBuilder::cost);
@@ -68,21 +56,22 @@ public class Expenses extends AbstractEntity {
         setNotNullValue(toExpenses::getInternalPercent, mergedBuilder::internalPercent);
         setNotNullValue(toExpenses::getUnits, mergedBuilder::units);
         setNotNullValue(toExpenses::getInvoicingTypeOption, mergedBuilder::invoicingTypeOption);
-
+        
         return mergeLastUpdated(fromExpenses, mergedBuilder.build());
     }
-
+    
     public boolean isEqual(Expenses compareTo) {
-
-        if (compareTo == null) return false;
-
+    
+        if (compareTo == null) {return false;}
+        
         return isEqual(
-                Getter.of(this::getPriceItemId, compareTo::getPriceItemId),
-                Getter.of(this::getComment, compareTo::getComment),
-                Getter.of(this::getCost, compareTo::getCost),
-                Getter.of(this::getCostPerUnit, compareTo::getCostPerUnit),
-                Getter.of(this::getInternalPercent, compareTo::getInternalPercent),
-                Getter.of(this::getUnits, compareTo::getUnits),
-                Getter.of(this::getInvoicingTypeOption, compareTo::getInvoicingTypeOption));
+            Getter.of(this::getPriceItemId, compareTo::getPriceItemId),
+            Getter.of(this::getComment, compareTo::getComment),
+            Getter.of(this::getCost, compareTo::getCost),
+            Getter.of(this::getCostPerUnit, compareTo::getCostPerUnit),
+            Getter.of(this::getInternalPercent, compareTo::getInternalPercent),
+            Getter.of(this::getUnits, compareTo::getUnits),
+            Getter.of(this::getInvoicingTypeOption, compareTo::getInvoicingTypeOption)
+        );
     }
 }

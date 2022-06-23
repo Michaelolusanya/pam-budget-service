@@ -10,13 +10,13 @@ import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
 @Configuration
 @EnableJpaAuditing(auditorAwareRef = "auditorAware")
 public class JpaConfig {
-
+    
     private final UserService userService;
-
+    
     public JpaConfig(UserService userService) {
         this.userService = userService;
     }
-
+    
     @Bean
     public AuditorAware<String> auditorAware() {
         return new AuditorAwareImpl(userService);

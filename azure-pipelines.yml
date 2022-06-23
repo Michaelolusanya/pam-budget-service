@@ -11,18 +11,18 @@ pool:
   vmImage: 'ubuntu-latest'
 
 variables:
-- name: subscriptionId
-  value: '73352462-5185-4eab-afca-eed6b857bbe0'
-- name: resourceGroup
-  value: 'BackendRewrite'
-- name: containerRegistryNameDev
-  value: crbackendrewritedev
-- name: containerConnectionDev
-  value: '{"loginServer":"$(containerRegistryNameDev).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameDev)"}'
-- name: containerRegistryNameTest
-  value: crbackendrewritetest
-- name: containerConnectionTest
-  value: '{"loginServer":"$(containerRegistryNameTest).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameTest)"}'
+  - name: subscriptionId
+    value: '73352462-5185-4eab-afca-eed6b857bbe0'
+  - name: resourceGroup
+    value: 'BackendRewrite'
+  - name: containerRegistryNameDev
+    value: crbackendrewritedev
+  - name: containerConnectionDev
+    value: '{"loginServer":"$(containerRegistryNameDev).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameDev)"}'
+  - name: containerRegistryNameTest
+    value: crbackendrewritetest
+  - name: containerConnectionTest
+    value: '{"loginServer":"$(containerRegistryNameTest).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameTest)"}'
 
 steps:
   - task: MavenAuthenticate@0
@@ -38,7 +38,7 @@ steps:
       publishJUnitResults: true
       testResultsFiles: '**/surefire-reports/TEST-*.xml'
       goals: 'package'
-
+  
   - task: CopyFiles@2
     displayName: 'Copy files to staging folder'
     inputs:
@@ -46,7 +46,7 @@ steps:
       Contents: '**/*.jar'
       TargetFolder: '$(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
-
+  
   - task: PublishBuildArtifacts@1
     displayName: 'Publish Artifact: icomdev.pam-budget-service'
     inputs:
@@ -63,7 +63,7 @@ steps:
       action: 'Build an image'
       azureContainerRegistry: $(containerConnectionDev)
       includeLatestTag: true
-
+  
   # Push container image DEV
   - task: Docker@0
     displayName: 'Push an image to dev'
@@ -73,7 +73,7 @@ steps:
       azureContainerRegistry: $(containerConnectionDev)
       action: 'Push an image'
       includeLatestTag: true
-
+  
   # Build container image TEST
   - task: Docker@0
     displayName: 'Build an image for test'
@@ -84,7 +84,7 @@ steps:
       action: 'Build an image'
       azureContainerRegistry: $(containerConnectionTest)
       includeLatestTag: true
-
+  
   # Push container image TEST
   - task: Docker@0
     displayName: 'Push an image to test'

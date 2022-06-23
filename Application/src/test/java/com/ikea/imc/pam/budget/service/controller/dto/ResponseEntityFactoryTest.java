@@ -1,32 +1,28 @@
 package com.ikea.imc.pam.budget.service.controller.dto;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.junit.jupiter.api.Assertions.assertNull;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import com.ikea.imc.pam.budget.service.exception.BadRequestException;
 import com.ikea.imc.pam.budget.service.exception.NotFoundException;
 import com.ikea.imc.pam.budget.service.exception.RequestException;
-import java.util.ArrayList;
-import java.util.List;
-
 import com.ikea.imc.pam.common.dto.ResponseMessageDTO;
 import org.junit.jupiter.api.Test;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
-class ResponseEntityFactoryTest {
+import java.util.ArrayList;
+import java.util.List;
 
+import static org.junit.jupiter.api.Assertions.*;
+
+class ResponseEntityFactoryTest {
+    
     @Test
     void generateSimpleStringResponse() {
         String data = "Any class type data";
         HttpStatus httpStatus = HttpStatus.OK;
-
+        
         ResponseEntity<ResponseMessageDTO<String>> responseEntity =
-                ResponseEntityFactory.generateResponse(httpStatus, data);
-
+            ResponseEntityFactory.generateResponse(httpStatus, data);
+        
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(200, responseEntity.getBody().getStatusCode());
@@ -34,17 +30,17 @@ class ResponseEntityFactoryTest {
         assertEquals(data, responseEntity.getBody().getData());
         assertEquals(HttpStatus.OK.getReasonPhrase(), responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateSimpleListResponse() {
         List<Integer> data = new ArrayList<>();
         data.add(1);
         data.add(2);
         HttpStatus httpStatus = HttpStatus.ACCEPTED;
-
+        
         ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity =
-                ResponseEntityFactory.generateResponse(httpStatus, data);
-
+            ResponseEntityFactory.generateResponse(httpStatus, data);
+        
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(202, responseEntity.getBody().getStatusCode());
@@ -54,16 +50,16 @@ class ResponseEntityFactoryTest {
         assertEquals(2, responseEntity.getBody().getData().get(1));
         assertEquals(HttpStatus.ACCEPTED.getReasonPhrase(), responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateSimpleStringResponseWithMessage() {
         String data = "Any class type data";
         String message = "message1";
         HttpStatus httpStatus = HttpStatus.OK;
-
+        
         ResponseEntity<ResponseMessageDTO<String>> responseEntity =
-                ResponseEntityFactory.generateResponse(httpStatus, message, data);
-
+            ResponseEntityFactory.generateResponse(httpStatus, message, data);
+        
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(200, responseEntity.getBody().getStatusCode());
@@ -71,7 +67,7 @@ class ResponseEntityFactoryTest {
         assertEquals(data, responseEntity.getBody().getData());
         assertEquals(message, responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateSimpleListResponseWithMessage() {
         List<Integer> data = new ArrayList<>();
@@ -79,10 +75,10 @@ class ResponseEntityFactoryTest {
         data.add(2);
         String message = "message1";
         HttpStatus httpStatus = HttpStatus.ACCEPTED;
-
+        
         ResponseEntity<ResponseMessageDTO<List<Integer>>> responseEntity =
-                ResponseEntityFactory.generateResponse(httpStatus, message, data);
-
+            ResponseEntityFactory.generateResponse(httpStatus, message, data);
+        
         assertEquals(httpStatus, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertEquals(202, responseEntity.getBody().getStatusCode());
@@ -92,15 +88,15 @@ class ResponseEntityFactoryTest {
         assertEquals(2, responseEntity.getBody().getData().get(1));
         assertEquals(message, responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateRequestExceptionResponseWithMessage() {
         String message = "not found";
         RequestException exception = new NotFoundException(message);
-
+        
         ResponseEntity<ResponseMessageDTO<Object>> responseEntity =
-                ResponseEntityFactory.generateResponse(exception, message);
-
+            ResponseEntityFactory.generateResponse(exception, message);
+        
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertNull(responseEntity.getBody().getData());
@@ -108,14 +104,14 @@ class ResponseEntityFactoryTest {
         assertFalse(responseEntity.getBody().getSuccess());
         assertEquals(message, responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateNotFoundExceptionResponse() {
         String message = "not found";
         NotFoundException exception = new NotFoundException(message);
-
+        
         ResponseEntity<ResponseMessageDTO<Object>> responseEntity = ResponseEntityFactory.generateResponse(exception);
-
+        
         assertEquals(HttpStatus.NOT_FOUND, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertNull(responseEntity.getBody().getData());
@@ -123,14 +119,14 @@ class ResponseEntityFactoryTest {
         assertFalse(responseEntity.getBody().getSuccess());
         assertEquals(HttpStatus.NOT_FOUND.getReasonPhrase(), responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateBadRequestExceptionResponse() {
         String message = "bad input";
         RequestException exception = new BadRequestException(message);
-
+        
         ResponseEntity<ResponseMessageDTO<Object>> responseEntity = ResponseEntityFactory.generateResponse(exception);
-
+        
         assertEquals(HttpStatus.BAD_REQUEST, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertNull(responseEntity.getBody().getData());
@@ -138,13 +134,13 @@ class ResponseEntityFactoryTest {
         assertFalse(responseEntity.getBody().getSuccess());
         assertEquals(HttpStatus.BAD_REQUEST.getReasonPhrase(), responseEntity.getBody().getMessage());
     }
-
+    
     @Test
     void generateNullPointerExceptionResponse() {
         NullPointerException exception = new NullPointerException();
-
+        
         ResponseEntity<ResponseMessageDTO<Object>> responseEntity = ResponseEntityFactory.generateResponse(exception);
-
+        
         assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, responseEntity.getStatusCode());
         assertNotNull(responseEntity.getBody());
         assertNull(responseEntity.getBody().getData());
