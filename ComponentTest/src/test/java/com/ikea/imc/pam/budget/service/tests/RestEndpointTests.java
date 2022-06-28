@@ -254,7 +254,7 @@ class RestEndpointTests extends AbstractBaseTest {
                 .internalFraction(-1D)
                 .internalCost(-1D)
                 .unitCost(-1)
-                .unitCount((short) -1)
+                .unitCount( -1.0)
                 .build();
             
             // WHEN (REST call to budget-service to update expenses for a budget)
@@ -550,11 +550,11 @@ class RestEndpointTests extends AbstractBaseTest {
     }
     
     private ExpenseDTO minimalExpense() {
-        return minimalExpenseBuilder(MINIMUM_ID, 0.0, 0.0, 0, (short) MINIMUM_COUNT).build();
+        return minimalExpenseBuilder(MINIMUM_ID, 0.0, 0.0, 0, MINIMUM_COUNT).build();
     }
     
     private ExpenseDTO.ExpenseDTOBuilder minimalExpenseBuilder(
-        Long priceItemId, Double internalFraction, Double internalCost, Integer unitCost, Short unitCount) {
+        Long priceItemId, Double internalFraction, Double internalCost, Integer unitCost, Double unitCount) {
         return ExpenseDTO.builder()
             .priceItemId(priceItemId)
             .internalFraction(internalFraction)

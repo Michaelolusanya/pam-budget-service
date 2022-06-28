@@ -9,4 +9,8 @@
     <changeSet id="1656332861624-1" author="maw">
         <modifyDataType tableName="budget" columnName="note" newDataType="VARCHAR(500)"/>
     </changeSet>
+
+    <changeSet id="1656409675510-1" author="maw">
+        <modifyDataType tableName="expenses" columnName="units" newDataType="double"/>
+    </changeSet>
 </databaseChangeLog>

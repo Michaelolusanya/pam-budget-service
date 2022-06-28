@@ -29,7 +29,7 @@ public class Expenses extends AbstractEntity {
     
     private Byte internalPercent;
     
-    private Short units;
+    private Double units;
     
     private Byte weeks; //TODO Not in use but retained for future in DB
     

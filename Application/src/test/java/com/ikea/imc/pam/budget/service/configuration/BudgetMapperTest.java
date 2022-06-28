@@ -50,7 +50,7 @@ class BudgetMapperTest {
     private static final int EXPENSE_COST_PER_UNIT = 40;
     private static final byte EXPENSE_PERCENT_INTERNAL = 80;
     private static final double EXPENSE_FRACTION_INTERNAL = EXPENSE_PERCENT_INTERNAL / 100d;
-    private static final short EXPENSE_UNITS = 41;
+    private static final double EXPENSE_UNITS = 41.0;
     private static final InvoicingTypeOption EXPENSES_INVOICINGTYPEOPTION = InvoicingTypeOption.FIXED_PRICE;
     
     private static final Integer FISCAL_YEAR = 2020;

@@ -64,8 +64,8 @@ public class BudgetServiceV1Test {
     private static final Integer COST_PER_UNIT_2 = 34;
     private static final Byte PERCENT_INTERNAL = 10;
     private static final Byte PERCENT_INTERNAL_2 = 11;
-    private static final Short UNITS = 2;
-    private static final Short UNITS_2 = 4;
+    private static final Double UNITS = 2.0;
+    private static final Double UNITS_2 = 4.0;
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION = InvoicingTypeOption.FIXED_PRICE;
     private static final InvoicingTypeOption INVOICING_TYPE_OPTION_2 = InvoicingTypeOption.HOURLY_PRICE;
     
