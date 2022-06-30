@@ -38,6 +38,7 @@ public class BudgetAreaController {
     @Operation(summary = "Get budget area by id")
     @GetMapping("/{id}")
     public ResponseEntity<ResponseMessageDTO<BudgetAreaDTO>> getBudgetArea(@PathVariable Long id) {
+        log.debug("Get BudgetArea with id {}", id);
         
         return budgetAreaService.getBudgetArea(id)
             .map(budgetArea -> ResponseEntityFactory.generateResponse(
@@ -60,8 +61,8 @@ public class BudgetAreaController {
         @RequestParam(Paths.PARAMETER_PARENT_ID) @Min(Constants.MINIMUM_ID) Long parentId,
         @RequestParam(Paths.PARAMETER_FISCAL_YEAR) @Min(Constants.MINIMUM_YEAR) @Max(
             Constants.MAXIMUM_YEAR) Integer fiscalYear) {
-        
         BudgetAreaParameters budgetAreaParameters = new BudgetAreaParameters(parentType, parentId, fiscalYear);
+        log.debug("Find BudgetArea for {}", budgetAreaParameters);
         
         return budgetAreaService.findBudgetArea(budgetAreaParameters)
             .map(budgetArea -> ResponseEntityFactory.generateResponse(
@@ -89,6 +90,7 @@ public class BudgetAreaController {
     public ResponseEntity<ResponseMessageDTO<BudgetAreaDTO>> putBudgetArea(
         @RequestBody @Valid BudgetAreaDTO budgetAreaDTO) {
         log.debug("Put BudgetArea {}", budgetAreaDTO);
+        
         BudgetArea budgetArea = budgetAreaService.putBudgetArea(budgetAreaMapper.buildBudgetArea(budgetAreaDTO));
         return ResponseEntityFactory.generateResponse(HttpStatus.OK, budgetAreaMapper.buildBudgetAreaDTO(budgetArea));
     }

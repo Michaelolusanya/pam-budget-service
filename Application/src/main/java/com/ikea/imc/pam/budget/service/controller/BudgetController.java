@@ -38,6 +38,7 @@ public class BudgetController {
     @Operation(summary = "Get budget by id")
     @GetMapping("/{id}")
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> getBudget(@PathVariable Long id) {
+        log.debug("Get budget with id {}", id);
         
         return budgetService.getById(id)
             .map(budget -> ResponseEntityFactory.generateResponse(HttpStatus.OK, budgetMapper.buildBudgetDTO(budget)))
@@ -52,6 +53,7 @@ public class BudgetController {
     public ResponseEntity<ResponseMessageDTO<List<BudgetDTO>>> findBudgets(
         @RequestParam(required = false, name = "projectIds") List<Long> projectIds,
         @RequestParam(required = false, name = "fiscalYears") List<Integer> fiscalYears) {
+        log.debug("Find budgets for projectIds {} and fiscalYears {}", projectIds, fiscalYears);
         
         return ResponseEntityFactory.generateResponse(HttpStatus.OK,
             budgetService.listBudgets(projectIds, fiscalYears).stream().map(budgetMapper::buildBudgetDTO).toList()
@@ -61,6 +63,8 @@ public class BudgetController {
     @Operation(summary = "Delete budget by id")
     @DeleteMapping("/{id}")
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> deleteBudget(@PathVariable Long id) {
+        log.debug("Delete budget with id {}", id);
+        
         return budgetService.deleteById(id)
             .map(budget -> ResponseEntityFactory.generateResponse(HttpStatus.OK, budgetMapper.buildBudgetDTO(budget)))
             .orElseGet(() -> ResponseEntityFactory.generateResponse(HttpStatus.NO_CONTENT));
@@ -69,6 +73,7 @@ public class BudgetController {
     @Operation(summary = "Create a new budget")
     @PostMapping
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> createBudget(@Valid @RequestBody BudgetDTO dto) {
+        log.debug("Creating budget {}", dto);
         
         BudgetContent budget =
             budgetService.createBudget(budgetMapper.buildBudgetAreaParameters(dto), budgetMapper.buildBudget(dto));
@@ -80,10 +85,11 @@ public class BudgetController {
     @PatchMapping("/{id}")
     public ResponseEntity<ResponseMessageDTO<BudgetDTO>> updateBudget(
         @PathVariable Long id, @RequestBody @Valid PatchBudgetDTO dto) {
+        log.debug("Patch budget with patch {}", dto);
+        
         Budget budget = budgetMapper.buildBudget(dto);
         return budgetService.patchBudget(id, dto.getFiscalYear(), budget)
-            .map(updatedBudget -> ResponseEntityFactory.generateResponse(
-                HttpStatus.OK,
+            .map(updatedBudget -> ResponseEntityFactory.generateResponse(HttpStatus.OK,
                 budgetMapper.buildBudgetDTO(updatedBudget)
             ))
             .orElseGet(() -> {
@@ -96,6 +102,8 @@ public class BudgetController {
     @PostMapping("/{id}/expenses")
     public ResponseEntity<ResponseMessageDTO<ExpenseDTO>> createExpense(
         @PathVariable Long id, @Valid @RequestBody ExpenseDTO dto) {
+        log.debug("Creating expense for budget {} with data {}", id, dto);
+        
         Optional<BudgetContent> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
             log.warn("Could not create expenses, could not find budget with id {}", id);
@@ -112,6 +120,7 @@ public class BudgetController {
     @PatchMapping("/{id}/expenses")
     public ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> updateExpense(
         @PathVariable Long id, @Valid @RequestBody ExpenseBatchDTO dto) {
+        log.debug("Updating expense for budget {} with data {}", id, dto);
         
         Optional<BudgetContent> optionalBudget = budgetService.getById(id);
         if (optionalBudget.isEmpty()) {
@@ -128,8 +137,7 @@ public class BudgetController {
     }
     
     private <T> ResponseEntity<ResponseMessageDTO<T>> getBudgetNotFoundResponse(Long id) {
-        return ResponseEntityFactory.generateResponseMessage(
-            HttpStatus.NOT_FOUND,
+        return ResponseEntityFactory.generateResponseMessage(HttpStatus.NOT_FOUND,
             String.format("Budget %d not found", id)
         );
     }

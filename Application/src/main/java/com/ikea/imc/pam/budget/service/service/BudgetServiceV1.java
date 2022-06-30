@@ -40,7 +40,6 @@ public class BudgetServiceV1 implements BudgetService {
     
     @Override
     public BudgetContent createBudget(BudgetAreaParameters budgetAreaParameters, Budget budget) {
-        
         BudgetArea budgetArea = budgetAreaService.putBudgetArea(BudgetArea.toBudgetArea(budgetAreaParameters));
         
         BudgetVersion budgetVersion = BudgetVersion.builder()
@@ -58,7 +57,6 @@ public class BudgetServiceV1 implements BudgetService {
     
     @Override
     public Optional<BudgetContent> getById(Long budgetId) {
-        log.debug("Get budget with id {}", budgetId);
         return repository.findById(budgetId).map(BudgetContent::new);
     }
     
@@ -89,10 +87,7 @@ public class BudgetServiceV1 implements BudgetService {
     
     @Override
     public Optional<BudgetContent> patchBudget(Long budgetId, Integer fiscalYear, Budget updatedBudget) {
-        
         // Implemented with the assumption that the expenses are not included in the updatedBudget
-        
-        log.debug("Patch budget with id {}", budgetId);
         Optional<Budget> optionalBudget = repository.findById(budgetId);
         if (optionalBudget.isEmpty() || optionalBudget.get().getStatus() == Status.ARCHIVED) {
             return Optional.empty();
@@ -204,8 +199,6 @@ public class BudgetServiceV1 implements BudgetService {
     
     @Override
     public Optional<BudgetContent> deleteById(Long budgetId) {
-        
-        log.debug("Delete budget with id {}", budgetId);
         Optional<Budget> optionalBudget = repository.findById(budgetId);
         if (optionalBudget.isEmpty()) {
             log.debug("Budget with id {} doesn't exist", budgetId);

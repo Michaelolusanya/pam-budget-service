@@ -20,13 +20,11 @@ public class BudgetAreaServiceV1 implements BudgetAreaService {
     
     @Override
     public Optional<BudgetArea> getBudgetArea(Long budgetAreaId) {
-        log.debug("Get BudgetArea with id {}", budgetAreaId);
         return budgetAreaRepository.findById(budgetAreaId);
     }
     
     @Override
     public Optional<BudgetArea> findBudgetArea(BudgetAreaParameters budgetAreaParameters) {
-        log.debug("Find BudgetArea for {}", budgetAreaParameters);
         return budgetAreaRepository.findBudgetAreaByParentAndFiscalYear(budgetAreaParameters.parentType(),
             budgetAreaParameters.parentId(),
             budgetAreaParameters.fiscalYear()
@@ -35,9 +33,6 @@ public class BudgetAreaServiceV1 implements BudgetAreaService {
     
     @Override
     public synchronized BudgetArea putBudgetArea(BudgetArea budgetArea) {
-        
-        log.debug("Put BudgetArea {}", budgetArea);
-        
         BudgetAreaParameters budgetAreaParameters =
             new BudgetAreaParameters(budgetArea.getParentType(), budgetArea.getParentId(), budgetArea.getFiscalYear());
         Optional<BudgetArea> currentBudgetAreaOptional = findBudgetArea(budgetAreaParameters);
