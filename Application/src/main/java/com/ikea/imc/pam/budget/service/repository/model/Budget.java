@@ -68,7 +68,8 @@ public class Budget extends AbstractEntity {
         return isEqual(
             Getter.of(this::getProjectId, compareTo::getProjectId),
             Getter.of(this::getEstimatedBudget, compareTo::getEstimatedBudget),
-            Getter.of(this::getStatus, compareTo::getStatus)
+            Getter.of(this::getStatus, compareTo::getStatus),
+            Getter.of(this::getNote, compareTo::getNote)
         );
     }
 }
