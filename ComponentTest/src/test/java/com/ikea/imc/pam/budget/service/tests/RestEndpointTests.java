@@ -169,22 +169,6 @@ class RestEndpointTests extends AbstractBaseTest {
     }
     
     @Test
-    void abba() {
-        // GIVEN (Budget already exists in budget-service)
-        Long budgetId =
-            budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build()).getId();
-        
-        // WHEN (REST call to budget-service to update budget)
-        PatchBudgetDTO patchBudgetDTO =
-            PatchBudgetDTO.builder().note("monkies").build();
-        
-        var res = budgetClient.updateBudget(budgetId, patchBudgetDTO);
-        
-        // THEN (Response from budget-service with updated data for the budget)
-        assertEquals("monkies", res.getNote());
-    }
-    
-    @Test
     void updateMissingBudget() {
         // GIVEN (Budget doesn't exist in budget-service)
         PatchBudgetDTO patchBudgetDTO =
