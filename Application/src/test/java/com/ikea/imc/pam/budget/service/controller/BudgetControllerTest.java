@@ -159,7 +159,6 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, expenses1.getBudgetId());
             assertEquals(PRICE_ITEM_ID, expenses1.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, expenses1.getComment());
-            assertEquals(EXPENSE_COST_INTERNAL, expenses1.getInternalCost());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses1.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, expenses1.getInternalFraction());
             assertEquals(EXPENSE_UNITS, expenses1.getUnitCount());
@@ -507,7 +506,6 @@ public class BudgetControllerTest {
             assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
             assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
-            assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
             assertEquals(EXPENSE_COMMENT, expenses.getComment());
             assertEquals(EXPENSE_UNITS, expenses.getUnits());
             assertEquals(EXPENSES_INVOICINGTYPEOPTION, expenses.getInvoicingTypeOption());
@@ -538,7 +536,6 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, dto.getBudgetId());
             assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, dto.getComment());
-            assertEquals(EXPENSE_COST_INTERNAL, dto.getInternalCost());
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
             assertEquals(EXPENSE_UNITS, dto.getUnitCount());
@@ -616,7 +613,6 @@ public class BudgetControllerTest {
             Expenses expenses = expensesList.get(0);
             assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
             assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
-            assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
             assertEquals(EXPENSE_COMMENT, expenses.getComment());
             assertEquals(EXPENSE_UNITS, expenses.getUnits());
         }
@@ -650,7 +646,6 @@ public class BudgetControllerTest {
             assertEquals(BUDGET_ID, dto.getBudgetId());
             assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
             assertEquals(EXPENSE_COMMENT, dto.getComment());
-            assertEquals(EXPENSE_COST_INTERNAL, dto.getInternalCost());
             assertEquals(EXPENSE_COST_PER_UNIT, dto.getUnitCost());
             assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
             assertEquals(EXPENSE_UNITS, dto.getUnitCount());
@@ -702,7 +697,6 @@ public class BudgetControllerTest {
             .priceItemId(PRICE_ITEM_ID)
             .budgetId(budgetId)
             .internalFraction(EXPENSE_FRACTION_INTERNAL)
-            .internalCost(EXPENSE_COST_INTERNAL)
             .unitCost(EXPENSE_COST_PER_UNIT)
             .unitCount(EXPENSE_UNITS)
             .comment(EXPENSE_COMMENT)
@@ -715,7 +709,6 @@ public class BudgetControllerTest {
             .id(EXPENSE_ID)
             .internalFraction(EXPENSE_FRACTION_INTERNAL)
             .unitCost(EXPENSE_COST_PER_UNIT)
-            .internalCost(EXPENSE_COST_INTERNAL)
             .comment(EXPENSE_COMMENT)
             .unitCount(EXPENSE_UNITS)
             .build();
@@ -727,7 +720,6 @@ public class BudgetControllerTest {
             .priceItemId(PRICE_ITEM_ID)
             .comment(EXPENSE_COMMENT)
             .cost(EXPENSE_COST)
-            .internalCost(EXPENSE_COST_INTERNAL)
             .costPerUnit(EXPENSE_COST_PER_UNIT)
             .internalPercent(EXPENSE_PERCENT_INTERNAL)
             .units(EXPENSE_UNITS)
