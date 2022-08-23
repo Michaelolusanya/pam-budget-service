@@ -22,7 +22,9 @@ public class Expenses extends AbstractEntity {
     private String comment;
     
     private Integer cost;
-
+    
+    private Double internalCost;
+    
     private Integer costPerUnit;
     
     private Byte internalPercent;
@@ -49,6 +51,7 @@ public class Expenses extends AbstractEntity {
         setNotNullValue(toExpenses::getPriceItemId, mergedBuilder::priceItemId);
         setNotNullValue(toExpenses::getComment, mergedBuilder::comment);
         setNotNullValue(toExpenses::getCost, mergedBuilder::cost);
+        setNotNullValue(toExpenses::getInternalCost, mergedBuilder::internalCost);
         setNotNullValue(toExpenses::getCostPerUnit, mergedBuilder::costPerUnit);
         setNotNullValue(toExpenses::getInternalPercent, mergedBuilder::internalPercent);
         setNotNullValue(toExpenses::getUnits, mergedBuilder::units);

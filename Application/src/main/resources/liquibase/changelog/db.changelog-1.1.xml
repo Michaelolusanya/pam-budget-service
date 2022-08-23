@@ -13,9 +13,4 @@
     <changeSet id="1656409675510-1" author="maw">
         <modifyDataType tableName="expenses" columnName="units" newDataType="double"/>
     </changeSet>
-
-    <changeSet id="1658924016254-1" author="maw">
-        <dropColumn tableName="expenses" columnName="internal_cost"/>
-    </changeSet>
-
 </databaseChangeLog>

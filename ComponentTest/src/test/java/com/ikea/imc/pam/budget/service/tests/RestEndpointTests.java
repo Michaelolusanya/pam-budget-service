@@ -252,6 +252,7 @@ class RestEndpointTests extends AbstractBaseTest {
             ExpenseDTO expenseToBeCreated = ExpenseDTO.builder()
                 .priceItemId(0L)
                 .internalFraction(-1D)
+                .internalCost(-1D)
                 .unitCost(-1)
                 .unitCount( -1.0)
                 .build();
@@ -267,9 +268,10 @@ class RestEndpointTests extends AbstractBaseTest {
             assertNotNull(body);
             assertEquals(400, body.getStatusCode());
             List<ErrorDTO> errors = body.getErrors();
-            assertEquals(4, errors.size());
+            assertEquals(5, errors.size());
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("priceItemId")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("internalFraction")));
+            assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("internalCost")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCost")));
             assertTrue(errors.stream().anyMatch(error -> error.getPointer().equals("unitCount")));
         }
@@ -290,6 +292,7 @@ class RestEndpointTests extends AbstractBaseTest {
             assertNotNull(expense.getId());
             assertEquals(budgetId, expense.getBudgetId());
             assertEquals(0.0, expense.getInternalFraction());
+            assertEquals(0.0, expense.getInternalCost());
             assertEquals(0, expense.getUnitCost());
             assertEquals((short) MINIMUM_COUNT, expense.getUnitCount());
         }
@@ -547,14 +550,15 @@ class RestEndpointTests extends AbstractBaseTest {
     }
     
     private ExpenseDTO minimalExpense() {
-        return minimalExpenseBuilder(MINIMUM_ID, 0.0,0, MINIMUM_COUNT).build();
+        return minimalExpenseBuilder(MINIMUM_ID, 0.0, 0.0, 0, MINIMUM_COUNT).build();
     }
     
     private ExpenseDTO.ExpenseDTOBuilder minimalExpenseBuilder(
-        Long priceItemId, Double internalFraction, Integer unitCost, Double unitCount) {
+        Long priceItemId, Double internalFraction, Double internalCost, Integer unitCost, Double unitCount) {
         return ExpenseDTO.builder()
             .priceItemId(priceItemId)
             .internalFraction(internalFraction)
+            .internalCost(internalCost)
             .unitCost(unitCost)
             .unitCount(unitCount);
     }

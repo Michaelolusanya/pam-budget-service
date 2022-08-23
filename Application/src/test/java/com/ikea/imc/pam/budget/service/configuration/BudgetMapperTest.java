@@ -46,6 +46,7 @@ class BudgetMapperTest {
     
     private static final String EXPENSE_COMMENT = "EXPENSE_COMMENT123";
     private static final int EXPENSE_COST = 450;
+    private static final double EXPENSE_COST_INTERNAL = 400d;
     private static final int EXPENSE_COST_PER_UNIT = 40;
     private static final byte EXPENSE_PERCENT_INTERNAL = 80;
     private static final double EXPENSE_FRACTION_INTERNAL = EXPENSE_PERCENT_INTERNAL / 100d;
@@ -117,6 +118,7 @@ class BudgetMapperTest {
         assertEquals(BUDGET_ID, dto.getBudgetId());
         assertEquals(PRICE_ITEM_ID, dto.getPriceItemId());
         assertEquals(EXPENSE_FRACTION_INTERNAL, dto.getInternalFraction());
+        assertEquals(EXPENSE_COST_INTERNAL, dto.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_UNITS, dto.getUnitCount());
         assertEquals(EXPENSE_COMMENT, dto.getComment());
@@ -200,6 +202,7 @@ class BudgetMapperTest {
         assertEquals(EXPENSE_ID, expenses.getExpensesId());
         assertEquals(PRICE_ITEM_ID, expenses.getPriceItemId());
         assertEquals(EXPENSE_COMMENT, expenses.getComment());
+        assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
@@ -218,6 +221,7 @@ class BudgetMapperTest {
         // Then
         assertEquals(EXPENSE_ID, expenses.getExpensesId());
         assertEquals(EXPENSE_COMMENT, expenses.getComment());
+        assertEquals(EXPENSE_COST_INTERNAL, expenses.getInternalCost());
         assertEquals(EXPENSE_COST_PER_UNIT, expenses.getCostPerUnit());
         assertEquals(EXPENSE_PERCENT_INTERNAL, expenses.getInternalPercent());
         assertEquals(EXPENSE_UNITS, expenses.getUnits());
@@ -267,6 +271,7 @@ class BudgetMapperTest {
             .priceItemId(PRICE_ITEM_ID)
             .comment(EXPENSE_COMMENT)
             .cost(EXPENSE_COST)
+            .internalCost(EXPENSE_COST_INTERNAL)
             .costPerUnit(EXPENSE_COST_PER_UNIT)
             .internalPercent(EXPENSE_PERCENT_INTERNAL)
             .units(EXPENSE_UNITS)
@@ -305,6 +310,7 @@ class BudgetMapperTest {
             .priceItemId(PRICE_ITEM_ID)
             .budgetId(BUDGET_ID)
             .internalFraction(EXPENSE_FRACTION_INTERNAL)
+            .internalCost(EXPENSE_COST_INTERNAL)
             .unitCost(EXPENSE_COST_PER_UNIT)
             .unitCount(EXPENSE_UNITS)
             .comment(EXPENSE_COMMENT)
@@ -321,6 +327,7 @@ class BudgetMapperTest {
             .id(EXPENSE_ID)
             .internalFraction(EXPENSE_FRACTION_INTERNAL)
             .unitCost(EXPENSE_COST_PER_UNIT)
+            .internalCost(EXPENSE_COST_INTERNAL)
             .comment(EXPENSE_COMMENT)
             .unitCount(EXPENSE_UNITS)
             .build();
