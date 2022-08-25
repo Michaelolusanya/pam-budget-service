@@ -29,6 +29,7 @@
           <execution>
             <phase>test-compile</phase>
             <goals>
+              <goal>down</goal> <!-- Remove old as it might be from another repository -->
               <goal>up</goal>
             </goals>
           </execution>
