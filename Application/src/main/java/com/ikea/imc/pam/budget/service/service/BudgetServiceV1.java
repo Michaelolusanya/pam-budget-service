@@ -1,5 +1,6 @@
 package com.ikea.imc.pam.budget.service.service;
 
+import com.ikea.imc.pam.budget.service.client.dto.DeleteExpensesDTO;
 import com.ikea.imc.pam.budget.service.exception.NotFoundException;
 import com.ikea.imc.pam.budget.service.repository.BudgetRepository;
 import com.ikea.imc.pam.budget.service.repository.BudgetVersionRepository;
@@ -130,8 +131,7 @@ public class BudgetServiceV1 implements BudgetService {
     public Expenses createExpenses(Budget budget, Expenses createExpense) {
         
         if (budget == null || budget.getStatus() == Status.ARCHIVED) {
-            throw new NotFoundException(String.format(
-                "Budget %d not found",
+            throw new NotFoundException(String.format("Budget %d not found",
                 budget != null ? budget.getBudgetId() : 0
             ));
         }
@@ -147,8 +147,7 @@ public class BudgetServiceV1 implements BudgetService {
     public List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses) {
         
         if (budget == null || budget.getStatus() == Status.ARCHIVED) {
-            throw new NotFoundException(String.format(
-                "Budget %d not found",
+            throw new NotFoundException(String.format("Budget %d not found",
                 budget != null ? budget.getBudgetId() : 0
             ));
         }
@@ -164,6 +163,28 @@ public class BudgetServiceV1 implements BudgetService {
             .map(id -> toUpdatedExpenses(id, expensesMap, savedExpenses))
             .sorted(Comparator.comparing(Expenses::getExpensesId))
             .toList();
+    }
+    
+    @Override
+    public List<Expenses> deleteExpenses(Budget budget, DeleteExpensesDTO deleteExpensesDTO) {
+        if (budget == null || budget.getStatus() == Status.ARCHIVED) {
+            throw new NotFoundException(String.format("Budget %d not found",
+                budget != null ? budget.getBudgetId() : 0
+            ));
+        }
+        log.debug("Deleting expenses for budget {}", budget.getBudgetId());
+        
+        List<Long> existingExpenseIdsList = budget.getExpenses().stream().map(Expenses::getExpensesId).toList();
+        for (Long expenseId : deleteExpensesDTO.ids()) {
+            if (!existingExpenseIdsList.contains(expenseId)) {
+                log.warn("expenseId {} doesn't exist for budgetId {}, ignoring", expenseId, budget.getBudgetId());
+            } else {
+                budget.getExpenses().remove(expensesRepository.getById(expenseId));
+            }
+        }
+        
+        repository.saveAndFlush(budget);
+        return repository.getById(budget.getBudgetId()).getExpenses();
     }
     
     private List<Expenses> updateExpenses(List<Expenses> updatedExpenses, Map<Long, Expenses> expensesMap) {

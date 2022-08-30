@@ -1,5 +1,6 @@
 package com.ikea.imc.pam.budget.service.service;
 
+import com.ikea.imc.pam.budget.service.client.dto.DeleteExpensesDTO;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
 import com.ikea.imc.pam.budget.service.repository.model.Expenses;
 import com.ikea.imc.pam.budget.service.service.entity.BudgetAreaParameters;
@@ -21,6 +22,8 @@ public interface BudgetService {
     Expenses createExpenses(Budget budget, Expenses createExpense);
     
     List<Expenses> patchExpenses(Budget budget, List<Expenses> updatedExpenses);
+    
+    List<Expenses> deleteExpenses(Budget budget, DeleteExpensesDTO deleteExpensesDTO);
     
     Optional<BudgetContent> deleteById(Long budgetId);
 }

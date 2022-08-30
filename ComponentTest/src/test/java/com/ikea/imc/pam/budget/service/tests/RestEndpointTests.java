@@ -540,6 +540,55 @@ class RestEndpointTests extends AbstractBaseTest {
         }
     }
     
+    @Nested
+    class DeleteExpensesTest {
+        @Test
+        void deleteAllExpenses() {
+            // GIVEN (Budget already exists in budget-service with expenses)
+            Long budgetId =
+                budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build()).getId();
+            Long expenseId = budgetClient.createExpense(budgetId, minimalExpense()).getId();
+            
+            // WHEN (REST call to budget-service to delete all expenses)
+            DeleteExpensesDTO deleteExpensesDTO = DeleteExpensesDTO.builder().ids(List.of(expenseId)).build();
+            List<ExpenseDTO> result = budgetClient.deleteExpenses(budgetId, deleteExpensesDTO);
+            
+            // THEN (Response from budget-service with remaining expenses (zero))
+            assertEquals(0, result.size());
+        }
+        
+        @Test
+        void deleteAnExpenses() {
+            // GIVEN (Budget already exists in budget-service with expenses)
+            Long budgetId =
+                budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build()).getId();
+            budgetClient.createExpense(budgetId, minimalExpense()).getId();
+            Long expenseId = budgetClient.createExpense(budgetId, minimalExpense()).getId();
+            
+            // WHEN (REST call to budget-service to delete an expenses)
+            DeleteExpensesDTO deleteExpensesDTO = DeleteExpensesDTO.builder().ids(List.of(expenseId)).build();
+            List<ExpenseDTO> result = budgetClient.deleteExpenses(budgetId, deleteExpensesDTO);
+            
+            // THEN (Response from budget-service with remaining expenses (one))
+            assertEquals(1, result.size());
+        }
+        
+        @Test
+        void deleteNonExistentExpenses() {
+            // GIVEN (Budget already exists in budget-service with expenses)
+            Long budgetId =
+                budgetClient.createBudget(minimalBudgetBuilder(testData.projectId, MINIMUM_YEAR).build()).getId();
+            budgetClient.createExpense(budgetId, minimalExpense()).getId();
+            
+            // WHEN (REST call to budget-service to delete expenses that doesn't exist)
+            DeleteExpensesDTO deleteExpensesDTO = DeleteExpensesDTO.builder().ids(List.of(-1L)).build();
+            List<ExpenseDTO> result = budgetClient.deleteExpenses(budgetId, deleteExpensesDTO);
+            
+            // THEN (Response from budget-service with no expenses changed)
+            assertEquals(1, result.size());
+        }
+    }
+    
     private BudgetDTO.BudgetDTOBuilder minimalBudgetBuilder(Long projectId, Integer fiscalYear) {
         return BudgetDTO.builder()
             .parentType(BudgetParentType.BUSINESS_AREA)

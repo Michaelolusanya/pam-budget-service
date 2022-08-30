@@ -1,10 +1,7 @@
 package com.ikea.imc.pam.budget.service.controller;
 
 import com.ikea.imc.pam.budget.service.client.Paths;
-import com.ikea.imc.pam.budget.service.client.dto.BudgetDTO;
-import com.ikea.imc.pam.budget.service.client.dto.ExpenseBatchDTO;
-import com.ikea.imc.pam.budget.service.client.dto.ExpenseDTO;
-import com.ikea.imc.pam.budget.service.client.dto.PatchBudgetDTO;
+import com.ikea.imc.pam.budget.service.client.dto.*;
 import com.ikea.imc.pam.budget.service.configuration.BudgetMapper;
 import com.ikea.imc.pam.budget.service.controller.dto.ResponseEntityFactory;
 import com.ikea.imc.pam.budget.service.repository.model.Budget;
@@ -133,6 +130,24 @@ public class BudgetController {
         BudgetContent budget = optionalBudget.get();
         return ResponseEntityFactory.generateResponse(HttpStatus.OK,
             budgetService.patchExpenses(budget.budget(), expenses).stream().map(budgetMapper::buildExpenseDTO).toList()
+        );
+    }
+    
+    @Operation(summary = "Delete a set of budget expenses by expenseId")
+    @DeleteMapping("/{id}/expenses")
+    public ResponseEntity<ResponseMessageDTO<List<ExpenseDTO>>> deleteExpenses(
+        @PathVariable Long id, @Valid @RequestBody DeleteExpensesDTO dto) {
+        log.debug("Deleting expenses for budget {} with ids {}", id, dto.ids());
+        
+        Optional<BudgetContent> optionalBudget = budgetService.getById(id);
+        if (optionalBudget.isEmpty()) {
+            log.warn("Could not delete expenses, could not find budget with id {}", id);
+            return getBudgetNotFoundResponse(id);
+        }
+        
+        BudgetContent budget = optionalBudget.get();
+        return ResponseEntityFactory.generateResponse(HttpStatus.OK,
+            budgetService.deleteExpenses(budget.budget(), dto).stream().map(budgetMapper::buildExpenseDTO).toList()
         );
     }
     
