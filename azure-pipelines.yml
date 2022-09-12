@@ -19,10 +19,6 @@ variables:
     value: crbackendrewritedev
   - name: containerConnectionDev
     value: '{"loginServer":"$(containerRegistryNameDev).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameDev)"}'
-  - name: containerRegistryNameTest
-    value: crbackendrewritetest
-  - name: containerConnectionTest
-    value: '{"loginServer":"$(containerRegistryNameTest).azurecr.io", "id" : "/subscriptions/$(subscriptionId)/resourceGroups/$(resourceGroup)/providers/Microsoft.ContainerRegistry/registries/$(containerRegistryNameTest)"}'
 
 steps:
   - task: MavenAuthenticate@0
@@ -44,6 +40,14 @@ steps:
     inputs:
       SourceFolder: '$(system.defaultworkingdirectory)'
       Contents: '**/*.jar'
+      TargetFolder: '$(build.artifactstagingdirectory)'
+    condition: succeededOrFailed()
+
+  - task: CopyFiles@2
+    displayName: 'Copy docker file to staging folder'
+    inputs:
+      SourceFolder: '$(Build.SourcesDirectory)'
+      Contents: '**/Dockerfile'
       TargetFolder: '$(build.artifactstagingdirectory)'
     condition: succeededOrFailed()
   
@@ -71,26 +75,5 @@ steps:
       azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
       imageName: $(Build.Repository.Name):$(Build.BuildId)
       azureContainerRegistry: $(containerConnectionDev)
-      action: 'Push an image'
-      includeLatestTag: true
-  
-  # Build container image TEST
-  - task: Docker@0
-    displayName: 'Build an image for test'
-    inputs:
-      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
-      dockerFile: '**/Dockerfile'
-      imageName: $(Build.Repository.Name):$(Build.BuildId)
-      action: 'Build an image'
-      azureContainerRegistry: $(containerConnectionTest)
-      includeLatestTag: true
-  
-  # Push container image TEST
-  - task: Docker@0
-    displayName: 'Push an image to test'
-    inputs:
-      azureSubscription: 'sc-oneui-ikeaorderandcreate-nonprd'
-      imageName: $(Build.Repository.Name):$(Build.BuildId)
-      azureContainerRegistry: $(containerConnectionTest)
       action: 'Push an image'
       includeLatestTag: true
