@@ -9,4 +9,5 @@ http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.7.xsd">
   <include file="liquibase/changelog/model-base.xml"/>
   <include file="liquibase/changelog/db.changelog-1.0.xml"/>
   <include file="liquibase/changelog/db.changelog-1.1.xml"/>
+  <include file="liquibase/changelog/db.changelog-1.2.xml"/>
 </databaseChangeLog>
