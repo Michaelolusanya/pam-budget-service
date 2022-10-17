@@ -9,18 +9,27 @@ To be able to run the application properly you need to have all this installed
 Download the project to your computer and follow the steps below on
 how to set everything up.
 
-## How to run&debug application in local environment
+## How to run & debug application in local environment
+### Add project to Intellij (Recommended)
+
+1. git clone git@github.com:icomdev/pam-budget-service.git
+2. IntelliJ -> New -> Project from Existing Sources...
+3. Select the root pom
+4. After the project is loaded, edit 'StartSpringbootApi' configuration, add environment variables.
+5. Run the application
+
 
 Navigate to the root of pam-budget-service **mvn clean install**, this will create everything that pam-budget-service
 need itself.
 
 To debug connect a *Remote JVM Debug* configuration on port **5006**
 
-### Add project to Intellij (Recommended)
+## Ports
+| Service            | Port |
+|--------------------|----|
+| pam-budget-service | 23154 |
+| Remote JVM Debug   | 5006 |
 
-1. git clone git@github.com:icomdev/pam-budget-service.git
-2. IntelliJ -> New -> Project from Existing Sources...
-3. Select the root pom
 
 ## Database
 
@@ -30,13 +39,17 @@ pam-budget-service uses the H2 engine to run an embedded Postgres db in local an
 
 To view the database:
 
-1. Start application
-2. localhost:23154/h2-console
+1. Start pam-budget-service application
+2. Go to localhost:23154/h2-console
+3. User name: sa
+4. JDBC URL: jdbc:h2:mem:budget-service
 
-* User name: sa
-* JDBC URL: jdbc:h2:mem:budget-service
+#### H2 Database Credentials
+Note: Database credentials in application-local.properties must be correct
+* spring.datasource.username=sa
+* spring.datasource.password=
 
-### Azure
+#### Azure Database
 
 pam-budget-service uses Postgres as it's RDBMS
 
@@ -49,19 +62,58 @@ To view the database it's recommended to use pgAdmin:
 
 Important environment variables and how to set them up to get everything running.
 
+Budget-service uses the following environment variables:
+* spring.profiles.active=local
+
 ## Swagger
 
 Swagger includes automated documentation of the restful APIs expressed using json. It displays all the endpoints in a project and generates test-cases
 for those. To be able to test the endpoints, firstly an authorization is needed through OAuth2. After that all endpoints can be tested out.
 <br>
 The site displays which environment that the project are currently running on under the title "Environment:".
-When the application is running swagger can be find with this url `http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config`
+<br>
+When the budget-Service application is running:
+* To access the site for the Local environment, swagger can be found with this url `http://localhost:23154/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
+* To access the site for the Dev environment, swagger can be found with this url `https://app-pam-budget-service-dev.azurewebsites.net/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
+* To access the site for the Test environment, swagger can be found with this url `https://app-pam-budget-service-test.azurewebsites.net/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
+* To access the site for the stage environment, swagger can be found with this url `https://app-pam-budget-service-stage.azurewebsites.net/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
+* To access the site for the Prod environment, swagger can be found with this url `https://app-pam-budget-service-prod.azurewebsites.net/swagger-ui/index.html?configUrl=/v3/api-docs/swagger-config#/`
+
 The configuration file for swagger is in **apiconfiguration/OpenapiConfiguration.java**
 
-## Local Tips
+Note: All environment except local are protected using client ID. To get access to the environments, fetch client ID from Azure Key Vault.
 
-* For component-test set property *ikea.imc.pam.budget.service.docker.standalone* to true for faster tests. Keep in mind
-  though that you, the user, is responsible for the application lifecycle.
+## Client URL for Environment
+
+* Local: http://localhost:3000
+* Dev: 
+* Test: 
+* Stage: https://stage.forena.inter.ikea.net/
+* Prod: 
+
+## Testing (Local Tips)
+
+* For component-test, set property *ikea.imc.pam.budget.service.docker.standalone* to true for faster tests
+* Run the application before running the component test. Make sure that your docker is running
+* Keep in mind though that you, the user, is responsible for the application lifecycle.
+
+## How to deploy
+
+1. Create a branch from master
+2. Make changes in code and commit
+3. Create a pull request to master and wait for approval
+4. Merge to master (Deploys automatically to dev)
+5. Test in dev environment
+6. If test is successful, click on deploy in dev environment. This will deploy to test
+7. Test in test environment
+8. If test is successful, click on deploy in test environment. This will deploy to stage
+9. Test in stage environment
+10. If test is successful, click on deploy in stage environment. This will deploy to prod
+11. Test in prod environment if needed
+
+## Docker
+
+Docker is used to run the application in a container. The dockerfile is located in the root of the project.
 
 ## How to use BudgetClient
 
@@ -94,3 +146,6 @@ spring.security.oauth2.client.registration.change-value.client-id=0000aaaa-0000-
 spring.security.oauth2.client.registration.change-value.client-secret=00aa00aa00aa@@00!!00--00aa00aa00aa00a
 spring.security.oauth2.client.provider.change-value.token-uri=https://login.microsoftonline.com/tenantid-0000-0000-0000-aa00/oauth2/v2.0/token
 ```
+Changes in Budget-Service-Client means the version of the client has to be changed in the pom.xml of the project that uses the client (Version can be found in Azure Artifacts).
+<br>
+
