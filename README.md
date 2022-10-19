@@ -24,7 +24,16 @@ need itself.
 
 To debug connect a *Remote JVM Debug* configuration on port **5006**
 
+### Environmental variables
+
+Important environment variables and how to set them up to get everything running.
+<br> *Note: The variables are set in the StartSpringbootApi configuration in Intellij as it holds configuration settings for the environment you will be using*
+
+Budget-service uses the following environment variables:
+* spring.profiles.active=local
+
 ## Ports
+
 | Service            | Port |
 |--------------------|----|
 | pam-budget-service | 23154 |
@@ -45,6 +54,7 @@ To view the database:
 4. JDBC URL: jdbc:h2:mem:budget-service
 
 #### H2 Database Credentials
+
 Note: Database credentials in application-local.properties must be correct
 * spring.datasource.username=sa
 * spring.datasource.password=
@@ -57,13 +67,6 @@ To view the database it's recommended to use pgAdmin:
 
 1. Install and start up the program
 2. Username and password exists as secrets in Azure
-
-## Environmental variables
-
-Important environment variables and how to set them up to get everything running.
-
-Budget-service uses the following environment variables:
-* spring.profiles.active=local
 
 ## Swagger
 
@@ -86,10 +89,8 @@ Note: All environment except local are protected using client ID. To get access 
 ## Client URL for Environment
 
 * Local: http://localhost:3000
-* Dev: 
-* Test: 
 * Stage: https://stage.forena.inter.ikea.net/
-* Prod: 
+* Prod: https://forena.inter.ikea.net/
 
 ## Testing (Local Tips)
 
@@ -99,10 +100,10 @@ Note: All environment except local are protected using client ID. To get access 
 
 ## How to deploy
 
-1. Create a branch from master
+1. Create a branch from main
 2. Make changes in code and commit
 3. Create a pull request to master and wait for approval
-4. Merge to master (Deploys automatically to dev)
+4. Merge to main (Deploys automatically to dev)
 5. Test in dev environment
 6. If test is successful, click on deploy in dev environment. This will deploy to test
 7. Test in test environment
